@@ -1,4 +1,4 @@
-package main
+package migration
 
 import (
 	"log"
@@ -7,12 +7,7 @@ import (
 	"github.com/xbklyn/getgoal-app/modules/label"
 )
 
-func init() {
-	common.LoadEnvVariables()
-	common.InitDB()
-}
-
-func main() {
+func Migrate() {
 	log.Default().Println("Migrating...")
 
 	common.DB.AutoMigrate(&label.Label{})
