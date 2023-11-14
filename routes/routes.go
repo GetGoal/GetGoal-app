@@ -10,6 +10,7 @@ func GetRoutes() *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	label.LabelAnonymousRegister(v1.Group("/labels"))
+	label.LabelRegister(v1.Group("/labels"))
 
 	landing := r.Group("/api/pong")
 	landing.GET("/", func(c *gin.Context) {
