@@ -18,15 +18,19 @@ func LabelAnonymousRegister(router *gin.RouterGroup) {
 }
 
 func LabelCreate(c *gin.Context) {
-	var label Label
-	c.BindJSON(&label)
-
-	if err := SaveOne(&label); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+	labelValidator := NewLabelValidator()
+	if err := labelValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, label)
+	if err := SaveOne(&labelValidator.labelModel); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
+		return
+	}
+
+	serializer := LabelSerializer{c, labelValidator.labelModel}
+	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
 }
 
 func LabelList(c *gin.Context) {
