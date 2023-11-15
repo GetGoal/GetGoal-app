@@ -33,8 +33,8 @@ type LabelsSerializer struct {
 
 func (s *LabelsSerializer) Response() []LabelResponse {
 	response := []LabelResponse{}
-	for _, article := range s.Labels {
-		serializer := LabelSerializer{s.C, article}
+	for _, label := range s.Labels {
+		serializer := LabelSerializer{s.C, label}
 		response = append(response, serializer.Response())
 	}
 	return response
