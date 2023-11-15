@@ -13,7 +13,7 @@ func LabelRegister(router *gin.RouterGroup) {
 }
 func LabelAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("/", LabelList)
-	router.GET("/filter", LabelFilterList)
+	router.GET("/search", LabelFilterList)
 	router.GET("/:id", LabelDetail)
 }
 
@@ -41,12 +41,19 @@ func LabelList(c *gin.Context) {
 		return
 	}
 
-	serializer := LabelsSerializer{c, label}
+	serializer := LabelsSerializer{C: c, Labels: label, Count: len(label)}
 	c.JSON(http.StatusOK, gin.H{"Lable": serializer.Response()})
 }
 
 func LabelFilterList(c *gin.Context) {
+	label, err := FindSearchLabel()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, common.NewError("Label", err))
+		return
+	}
 
+	serializer := LabelsSerializer{C: c, Labels: label, Count: len(label)}
+	c.JSON(http.StatusOK, gin.H{"Lable": serializer.Response()})
 }
 
 func LabelDetail(c *gin.Context) {

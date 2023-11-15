@@ -29,13 +29,20 @@ func (s *LabelSerializer) Response() LabelResponse {
 type LabelsSerializer struct {
 	C      *gin.Context
 	Labels []Label
+	Count  int `json:"count"`
 }
 
-func (s *LabelsSerializer) Response() []LabelResponse {
-	response := []LabelResponse{}
+func (s *LabelsSerializer) Response() map[string]interface{} {
+	response := make(map[string]interface{})
+	labelResponses := []LabelResponse{}
+
 	for _, label := range s.Labels {
 		serializer := LabelSerializer{s.C, label}
-		response = append(response, serializer.Response())
+		labelResponses = append(labelResponses, serializer.Response())
 	}
+
+	response["count"] = s.Count
+	response["labels"] = labelResponses
+
 	return response
 }

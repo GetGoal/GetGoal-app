@@ -1,6 +1,8 @@
 package label
 
 import (
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -25,12 +27,39 @@ func (label *Label) BeforeUpdate(tx *gorm.DB) (err error) {
 	return nil
 }
 
+func getSearchLimitFromEnv() int {
+	// Get the limit from the environment variable
+	limitStr := os.Getenv("SEARCH_LIMIT")
+
+	// Default limit in case the environment variable is not set
+	defaultLimit := 13
+
+	// Convert the limit string to an integer
+	limit, err := strconv.Atoi(limitStr)
+
+	if err != nil {
+		return defaultLimit
+	}
+	return limit
+}
+
 func FindAllLabel() ([]Label, error) {
 	db := common.GetDB()
 
 	var labels []Label
 
 	err := db.Find(&labels).Error
+	return labels, err
+}
+
+func FindSearchLabel() ([]Label, error) {
+	db := common.GetDB()
+
+	var labels []Label
+	var limit int = getSearchLimitFromEnv()
+
+	err := db.Order("RANDOM()").Limit(limit).Find(&labels).Error
+
 	return labels, err
 }
 
