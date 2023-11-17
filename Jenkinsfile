@@ -7,6 +7,15 @@ pipeline {
     }
 
     stages {
+      stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/*']], userRemoteConfigs: [[url: 'https://github.com/GetGoal/GetGoal-app.git']]])
+                }
+            }
+        }
+      }
 
         stage('Build App Images | Check ENV') {
             steps {
