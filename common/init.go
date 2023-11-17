@@ -11,8 +11,12 @@ func LoadEnvVariables() {
 	// Check if .env.local file exists
 	envFile := ".env.local"
 	if _, err := os.Stat(envFile); os.IsNotExist(err) {
-		log.Default().Println("No .env.local file found, using .env.prod")
-		// If .env.local doesn't exist, use .env.prod
+		log.Default().Println("No .env.local file found, finding .env.prod")
+		envFile = ".env.qa"
+	}
+
+	if _, err := os.Stat(envFile); os.IsNotExist(err) {
+		log.Default().Println("No .env.qa file found, using .env.prod")
 		envFile = ".env.prod"
 	}
 
@@ -21,4 +25,5 @@ func LoadEnvVariables() {
 	if err != nil {
 		log.Fatalf("Error loading %s file", envFile)
 	}
+	log.Default().Println("Currenly using " + envFile + " environment")
 }
