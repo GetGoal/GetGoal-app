@@ -18,7 +18,7 @@ type Label struct {
 }
 
 func (Label) TableName() string {
-	return "labels"
+	return "label"
 }
 
 func (label *Label) BeforeUpdate(tx *gorm.DB) (err error) {
