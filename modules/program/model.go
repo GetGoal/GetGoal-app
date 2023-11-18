@@ -37,3 +37,11 @@ func FindAllProgram() ([]Program, error) {
 	err := db.Find(&programs).Error
 	return programs, err
 }
+func FindOneProgram(condition interface{}) (Program, error) {
+	db := common.GetDB()
+
+	var program Program
+
+	err := db.Where(condition).First(&program).Error
+	return program, err
+}
