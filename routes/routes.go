@@ -8,7 +8,7 @@ import (
 func GetRoutes() *gin.Engine {
 	r := gin.Default()
 
-	v1 := r.Group("/v1")
+	v1 := r.Group("/api/v1")
 	label.LabelAnonymousRegister(v1.Group("/labels"))
 	label.LabelRegister(v1.Group("/labels"))
 
