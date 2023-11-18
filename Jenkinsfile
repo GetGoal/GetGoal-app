@@ -34,7 +34,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                  sh "docker run -d --name ${CONTAINER_NAME}-${ENV} --hostname ${CONTAINER_NAME}-${ENV} ${IMAGE_NAME}:${GIT_TAG}"
+                  sh "docker run -d --name ${CONTAINER_NAME}-${ENV} --hostname ${CONTAINER_NAME}-${ENV} --restart unless-stopped ${IMAGE_NAME}:${GIT_TAG}"
                 }
             }
         }
