@@ -34,7 +34,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                  sh "docker run -d --name ${CONTAINER_NAME}-${GIT_TAG} ${IMAGE_NAME}:${GIT_TAG}"
+                  sh "docker run -d --name ${CONTAINER_NAME}-${ENV} ${IMAGE_NAME}:${GIT_TAG}"
                 }
             }
         }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
 
-                  sh "docker network connect ${ENV}-network ${CONTAINER_NAME}-${GIT_TAG}"
+                  sh "docker network connect ${ENV}-network ${CONTAINER_NAME}-${ENV}"
                 }
             }
         
@@ -60,7 +60,7 @@ pipeline {
         stage('Health Cheack') {
             steps {
                 script {
-                    def containerId = sh(script: "docker ps -q --filter name=${CONTAINER_NAME}-${GIT_TAG}", returnStdout: true)
+                    def containerId = sh(script: "docker ps -q --filter name=${CONTAINER_NAME}-${ENV}", returnStdout: true)
 
                     if (containerId) {
                         def healthStatus = sh(script: "docker inspect --format '{{.State.Running}}'  ${containerId}", returnStdout: true)
