@@ -9,7 +9,6 @@ func GetRoutes() *gin.Engine {
 	r := gin.Default()
 
 	r.RedirectTrailingSlash = false
-	r.RemoveExtraSlash = true
 
 	v1 := r.Group("/api/v1")
 	label.LabelAnonymousRegister(v1.Group("/labels"))
