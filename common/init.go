@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -21,7 +20,5 @@ func LoadEnvVariables() {
 	if err != nil {
 		log.Fatalf("Error loading %s file", envFile)
 	}
-
-	fmt.Println(os.Getenv("SEARCH_LIMIT"))
 	log.Default().Println("Currenly using " + envFile + " environment")
 }
