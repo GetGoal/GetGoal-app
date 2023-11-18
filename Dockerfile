@@ -15,14 +15,12 @@ ARG DB_PASSWORD
 ARG DB_NAME
 
 # Set environment
+ENV ENV=${ENV}
 ENV DB_HOST = ${DB_HOST}
 ENV DB_USER = ${DB_USER}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV DB_NAME=${DB_NAME}
 ENV DB_PORT=${DB_PORT}
-
-# Copy the environment-specific .env file
-COPY .env.${ENV} .env
 
 # Download and install any required third-party dependencies
 RUN go mod download
