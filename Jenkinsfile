@@ -11,7 +11,7 @@ pipeline {
                 script {
                     sh "docker build \
                     --build-arg ENV=${ENV} \
-                    --build-arg DB_HOST=${env.DB_HOST}_${ENV} \
+                    --build-arg DB_HOST=${env.DB_HOST}-${ENV} \
                     --build-arg DB_USER=${env.DB_USER}  \
                     --build-arg DB_PORT=${env.DB_PORT}  \
                     --build-arg DB_NAME=${env.DB_NAME}  \
