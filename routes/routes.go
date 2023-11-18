@@ -13,7 +13,7 @@ func GetRoutes() *gin.Engine {
 	label.LabelRegister(v1.Group("/labels"))
 
 	landing := r.Group("/pong")
-	landing.GET("/", func(c *gin.Context) {
+	landing.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
