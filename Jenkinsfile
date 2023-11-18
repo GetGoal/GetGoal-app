@@ -9,10 +9,18 @@ pipeline {
         stage('Build GO-App Images') {
             steps {
                 script {
-                    sh "docker build --build-arg ENV=${ENV} -t ${IMAGE_NAME}:${GIT_TAG} ."
+                    sh "docker build \
+                    --build-arg ENV=${ENV} \
+                    --build-arg DB_HOST=${env.DB_HOST}_${ENV} \
+                    --build-arg DB_USER=${env.DB_USER}  \
+                    --build-arg DB_PORT=${env.DB_PORT}  \
+                    --build-arg DB_NAME=${env.DB_NAME}  \
+                    --build-arg DB_PASSWORD=${DB_PASSWORD} \
+                    -t ${IMAGE_NAME}:${GIT_TAG} ."
                 }
             }
         }
+    
         stage ('Remove container'){
             steps {
               script {

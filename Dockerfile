@@ -8,6 +8,18 @@ COPY . .
 
 # ARG directive allows passing build-time variables, in this case, the ENV_FILE
 ARG ENV
+ARG DB_HOST
+ARG DB_USER
+ARG DB_PORT
+ARG DB_PASSWORD
+ARG DB_NAME
+
+# Set environment
+ENV DB_HOST = ${DB_HOST}
+ENV DB_USER = ${DB_USER}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV DB_NAME=${DB_NAME}
+ENV DB_PORT=${DB_PORT}
 
 # Copy the environment-specific .env file
 COPY .env.${ENV} .env
