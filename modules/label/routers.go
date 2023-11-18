@@ -9,10 +9,10 @@ import (
 )
 
 func LabelRegister(router *gin.RouterGroup) {
-	router.POST("/", LabelCreate)
+	router.POST("", LabelCreate)
 }
 func LabelAnonymousRegister(router *gin.RouterGroup) {
-	router.GET("/", LabelList)
+	router.GET("", LabelList)
 	router.GET("/search", LabelFilterList)
 	router.GET("/:id", LabelDetail)
 }
