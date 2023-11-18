@@ -1,4 +1,3 @@
-# Use the official Golang image as the base image
 FROM golang:latest
 
 # Set the working directory inside the container
@@ -6,6 +5,12 @@ WORKDIR /app
 
 # Copy the Go application files into the container at /app
 COPY . .
+
+# ARG directive allows passing build-time variables, in this case, the ENV_FILE
+ARG ENV
+
+# Copy the environment-specific .env file
+COPY .env.${ENV} .env
 
 # Download and install any required third-party dependencies
 RUN go mod download
