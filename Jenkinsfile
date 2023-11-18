@@ -46,15 +46,16 @@ pipeline {
                   --name ${CONTAINER_NAME}-${ENV} \
                   --hostname ${CONTAINER_NAME}-${ENV} \
                   --network  ${ENV}-network \
-                  --restart unless-stopped ${IMAGE_NAME}:${GIT_TAG}"
+                  ${IMAGE_NAME}:${GIT_TAG}"
                 }
             }
         }
-
+        
         stage('Clear Storage') {
             steps {
                 script {
-                    sh "docker image prune -a -f"
+                    sh "docker image prune -af"
+                    sh "docker builder prune -af"
                 }
             }
         }
