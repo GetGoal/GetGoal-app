@@ -74,6 +74,6 @@ func FindOneLable(condition interface{}) (Label, error) {
 
 func SaveOne(data interface{}) error {
 	db := common.GetDB()
-	err := db.Save(data).Error
+	err := db.Create(data).Error
 	return err
 }
