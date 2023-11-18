@@ -50,12 +50,25 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Clear Storage') {
             steps {
                 script {
-                    sh "docker image prune -af"
-                    sh "docker builder prune -af"
+                    def dockerSystem = sh("docker system df", returnStdout: true)
+                    echo "${dockerSystem}"
+
+                    echo "Removing unused images"
+                    sh "docker image prune -a -f"
+
+                    echo "Removing unused volumes"
+                    sh "docker volume prune -f"
+
+                    echo "Removing build cached "
+                    sh "docker buildx prune -f"
+              
+                    echo "Removing unused networks "
+                    sh "docker network prune -f"
+
                 }
             }
         }
