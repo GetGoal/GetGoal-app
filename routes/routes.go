@@ -12,12 +12,11 @@ func GetRoutes() *gin.Engine {
 
 	api := r.Group("/api/" + func() string {
 		env := os.Getenv("ENV")
-		if env == "qa" {
-			return "qa"
-		} else if env == "dev" {
-			return "dev"
+		if env == "prod" {
+			return ""
+		} else {
+			return env
 		}
-		return ""
 	}())
 
 	v1 := api.Group("/v1")
