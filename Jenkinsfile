@@ -39,22 +39,16 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy and link network') {
             steps {
                 script {
-                  sh "docker run -d --name ${CONTAINER_NAME}-${ENV} --hostname ${CONTAINER_NAME}-${ENV} --restart unless-stopped ${IMAGE_NAME}:${GIT_TAG}"
+                  sh "docker run -d \
+                  --name ${CONTAINER_NAME}-${ENV} \
+                  --hostname ${CONTAINER_NAME}-${ENV} \
+                  --network  ${ENV}-network \
+                  --restart unless-stopped ${IMAGE_NAME}:${GIT_TAG}"
                 }
             }
-        }
-
-        stage('Link Networks') {
-            steps {
-                script {
-
-                  sh "docker network connect ${ENV}-network ${CONTAINER_NAME}-${ENV}"
-                }
-            }
-        
         }
 
         stage('Clear Storage') {
