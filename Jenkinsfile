@@ -54,8 +54,6 @@ pipeline {
         stage('Clear Storage') {
             steps {
                 script {
-                    def dockerSystem = sh("docker system df", returnStdout: true)
-                    echo "${dockerSystem}"
 
                     echo "Removing unused images"
                     sh "docker image prune -a -f"
