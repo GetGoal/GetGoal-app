@@ -1,4 +1,4 @@
-package initializers
+package common
 
 import (
 	"os"
@@ -19,4 +19,8 @@ func InitDB() {
 	if err != nil {
 		panic("Failed to connect to database")
 	}
+}
+
+func GetDB() *gorm.DB {
+	return DB
 }

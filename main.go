@@ -1,22 +1,19 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/xbklyn/getgoal-app/initializers"
+	"github.com/xbklyn/getgoal-app/SQL/migration"
+	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/routes"
 )
 
 func init() {
-	initializers.LoadEnvVariables()
-	initializers.InitDB()
+	common.LoadEnvVariables()
+	common.InitDB()
 }
 func main() {
 
-	r := gin.Default()
+	r := routes.GetRoutes()
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	migration.Migrate()
+	r.Run()
 }
