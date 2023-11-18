@@ -10,8 +10,6 @@ import (
 func GetRoutes() *gin.Engine {
 	r := gin.Default()
 
-	// r.RedirectTrailingSlash = false
-
 	api := r.Group("/api/" + func() string {
 		if os.Getenv("ENV") == "qa" {
 			return "qa"
