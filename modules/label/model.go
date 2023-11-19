@@ -95,7 +95,7 @@ func FindOneLable(condition interface{}) (Label, error) {
 
 	var label Label
 
-	err := db.Where(condition).First(&label).Error
+	err := db.Debug().Model(&Label{}).Preload("Programs").Where(condition).First(&label).Error
 	return label, err
 }
 
