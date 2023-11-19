@@ -28,6 +28,7 @@ func GetRoutes() *gin.Engine {
 
 	//Program groups
 	program.ProgramAnonymousRegister(v1.Group("/programs"))
+	program.ProgramRegister(v1.Group("/programs"))
 
 	landing := api.Group("/ping")
 	landing.GET("", func(c *gin.Context) {
