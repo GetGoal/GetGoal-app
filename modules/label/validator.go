@@ -27,6 +27,6 @@ func (s *LabelValidator) Bind(c *gin.Context) error {
 
 	fmt.Printf("Received JSON payload: %+v\n", s.Label)
 	s.labelModel.LabelName = s.Label.LabelName
-
+	fmt.Printf("Binded JSON payload: %+v\n", s.Label)
 	return nil
 }

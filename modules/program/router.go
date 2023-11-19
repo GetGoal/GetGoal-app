@@ -8,11 +8,30 @@ import (
 	"github.com/xbklyn/getgoal-app/common"
 )
 
+func ProgramRegister(router *gin.RouterGroup) {
+	router.POST("", ProgramCreate)
+}
 func ProgramAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", ProgramList)
 	router.GET("/:id", ProgramDetail)
 }
 
+func ProgramCreate(c *gin.Context) {
+	programValidator := NewProgramValidator()
+	if err := programValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	if err := SaveOne(&programValidator.programModel); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
+		return
+	}
+
+	serializer := ProgramSerializer{c, programValidator.programModel}
+	c.JSON(http.StatusOK, gin.H{"Program": serializer.Response()})
+
+}
 func ProgramList(c *gin.Context) {
 	programs, err := FindAllProgram()
 	if err != nil {

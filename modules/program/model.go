@@ -45,3 +45,9 @@ func FindOneProgram(condition interface{}) (Program, error) {
 	err := db.Where(condition).First(&program).Error
 	return program, err
 }
+func SaveOne(program *Program) error {
+	db := common.GetDB()
+
+	err := db.Create(program).Error
+	return err
+}
