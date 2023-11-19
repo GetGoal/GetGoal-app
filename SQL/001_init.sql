@@ -44,6 +44,13 @@ CREATE TABLE "public"."label_program" (
   "program_id" INT NOT NULL
 );
 
+CREATE TABLE "public"."label_program" (
+  "label_id" INT NOT NULL,
+  "program_id" INT NOT NULL,
+  PRIMARY KEY ("label_id", "program_id")
+);
+
+
 CREATE TABLE "public"."action_type" (
   "action_id" SERIAL PRIMARY KEY,
   "action_name" VARCHAR(50)
