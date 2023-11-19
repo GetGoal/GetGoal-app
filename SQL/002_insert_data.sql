@@ -6,6 +6,7 @@
 -- Dumped by pg_dump version 16.1
 
 -- Started on 2023-11-16 22:42:09
+\c getgoal;
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,7 +19,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
--- \c getgoal;
 --
 -- TOC entry 4844 (class 0 OID 16688)
 -- Dependencies: 225
