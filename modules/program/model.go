@@ -65,11 +65,6 @@ func FindAllProgram() ([]Program, error) {
 	var programs []Program
 
 	err := db.Debug().Model(&Program{}).Preload("Labels").Find(&programs).Error
-
-	for _, program := range programs {
-		fmt.Printf("Program ID: %d\n", program.ProgramID)
-		fmt.Printf("Number of Labels: %d\n", len(program.Labels))
-	}
 	return programs, err
 }
 func FindOneProgram(condition interface{}) (Program, error) {
@@ -77,7 +72,7 @@ func FindOneProgram(condition interface{}) (Program, error) {
 
 	var program Program
 
-	err := db.Where(condition).First(&program).Error
+	err := db.Debug().Model(&Program{}).Preload("Labels").Where(condition).First(&program).Error
 	return program, err
 }
 func SaveOne(program *Program) error {
