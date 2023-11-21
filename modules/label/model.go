@@ -1,9 +1,11 @@
 package label
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -90,17 +92,33 @@ func FindSearchLabel() ([]Label, error) {
 	return labels, err
 }
 
-func FindOneLable(condition interface{}) (Label, error) {
+func FindOneLableById(id uint64) (Label, error) {
 	db := common.GetDB()
 
 	var label Label
 
-	err := db.Debug().Model(&Label{}).Preload("Programs").Where(condition).First(&label).Error
+	err := db.Debug().Model(&Label{}).Preload("Programs").Where("label_id = ?", id).First(&label).Error
 	return label, err
 }
 
-func SaveOne(data interface{}) error {
+func FindOneLableByName(name string) (Label, error) {
 	db := common.GetDB()
-	err := db.Create(data).Error
-	return err
+
+	var label Label
+
+	err := db.Debug().Model(&Label{}).Preload("Programs").Where("LOWER(REPLACE(label_name, ' ', '')) = LOWER(?)", strings.ToLower(strings.ReplaceAll(name, " ", ""))).First(&label).Error
+
+	fmt.Println("FindOneLableByName: " + label.LabelName)
+	return label, err
+}
+
+func SaveOne(label *Label) error {
+	db := common.GetDB()
+	if _, err := FindOneLableByName(label.LabelName); err != nil {
+
+		err := db.Debug().Create(label).Error
+		return err
+	}
+
+	return errors.New("label with this name already existed")
 }
