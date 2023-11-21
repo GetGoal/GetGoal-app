@@ -15,6 +15,8 @@ type ProgramValidator struct {
 		MediaURL           string  `json:"media_url" form:"media_url"`
 		ExpectedTime       string  `json:"expected_time" form:"expected_time"`
 	} `json:"program"`
+	LabelName []string `json:"label_name" form:"label_name" binding:"max=30"`
+
 	programModel Program
 }
 

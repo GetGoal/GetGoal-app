@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/modules/label"
 	"gorm.io/gorm"
 )
 
@@ -67,6 +68,7 @@ func FindAllProgram() ([]Program, error) {
 	err := db.Debug().Model(&Program{}).Preload("Labels").Find(&programs).Error
 	return programs, err
 }
+
 func FindOneProgram(condition interface{}) (Program, error) {
 	db := common.GetDB()
 
@@ -75,9 +77,49 @@ func FindOneProgram(condition interface{}) (Program, error) {
 	err := db.Debug().Model(&Program{}).Preload("Labels").Where(condition).First(&program).Error
 	return program, err
 }
-func SaveOne(program *Program) error {
+
+func SaveOne(program *Program, labelNames []string) error {
 	db := common.GetDB()
 
-	err := db.Create(program).Error
-	return err
+	// Create the new program
+	if err := db.Create(program).Error; err != nil {
+		return err
+	}
+
+	var labels []Label
+	if len(labelNames) > 0 {
+		for _, labelName := range labelNames {
+
+			labelModel, err := getOrCreateLabel(db, labelName)
+			if err != nil {
+				return err
+			}
+
+			labels = append(labels, *labelModel)
+		}
+	}
+
+	if err := db.Debug().Model(&program).Association("Labels").Append(labels); err != nil {
+		return fmt.Errorf("failed to associate labels with program: %v", err)
+	}
+
+	return nil
+}
+
+func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
+
+	existingLabel, err := label.FindOneLableByName(labelName)
+	if err != nil {
+		fmt.Println("No label found with name: " + labelName)
+		newLabel := label.Label{LabelName: labelName}
+		if err := label.SaveOne(&newLabel); err != nil {
+			return nil, err
+		}
+		fmt.Printf("Returning new label: %v", newLabel)
+		return &Label{LabelID: newLabel.LabelID, LabelName: labelName}, nil
+	} else {
+
+		return &Label{LabelID: existingLabel.LabelID, LabelName: existingLabel.LabelName}, nil
+	}
+
 }

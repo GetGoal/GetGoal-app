@@ -23,7 +23,7 @@ func ProgramCreate(c *gin.Context) {
 		return
 	}
 
-	if err := SaveOne(&programValidator.programModel); err != nil {
+	if err := SaveOne(&programValidator.programModel, programValidator.LabelName); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
