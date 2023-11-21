@@ -68,6 +68,7 @@ func FindAllProgram() ([]Program, error) {
 	err := db.Debug().Model(&Program{}).Preload("Labels").Find(&programs).Error
 	return programs, err
 }
+
 func FindOneProgram(condition interface{}) (Program, error) {
 	db := common.GetDB()
 
@@ -76,6 +77,7 @@ func FindOneProgram(condition interface{}) (Program, error) {
 	err := db.Debug().Model(&Program{}).Preload("Labels").Where(condition).First(&program).Error
 	return program, err
 }
+
 func SaveOne(program *Program, labelNames []string) error {
 	db := common.GetDB()
 
@@ -106,11 +108,11 @@ func SaveOne(program *Program, labelNames []string) error {
 
 func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
 
-	existingLabel, err := label.FindOneLable(&Label{LabelName: labelName})
+	existingLabel, err := label.FindOneLableByName(labelName)
 	if err != nil {
 
 		newLabel := Label{LabelName: labelName}
-		if err := label.SaveOne(&newLabel); err != nil {
+		if err := label.SaveOne(&label.Label{LabelName: labelName}); err != nil {
 			return nil, err
 		}
 
