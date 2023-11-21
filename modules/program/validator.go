@@ -1,6 +1,8 @@
 package program
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 )
@@ -23,14 +25,17 @@ func NewProgramValidator() ProgramValidator {
 func (s *ProgramValidator) Bind(c *gin.Context) error {
 	err := common.Bind(c, s)
 	if err != nil {
+		fmt.Printf("Error in ProgramValidator.Bind : %s\n", err.Error())
 		return err
 	}
 
+	fmt.Printf("Received JSON payload: %+v\n", s.Program)
 	s.programModel.ProgramName = s.Program.ProgramName
 	s.programModel.ProgramDescription = s.Program.ProgramDescription
 	s.programModel.Rating = s.Program.Rating
 	s.programModel.MediaURL = s.Program.MediaURL
 	s.programModel.ExpectedTime = s.Program.ExpectedTime
+	fmt.Printf("Binded JSON payload: %+v\n", s.Program)
 
 	return nil
 }

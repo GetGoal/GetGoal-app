@@ -1,6 +1,7 @@
 package label
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -15,10 +16,31 @@ type Label struct {
 	CreatedAt time.Time  `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
+
+	Programs []Program `gorm:"many2many:label_program;foreignKey:LabelID;joinForeignKey:LabelID;References:ProgramID;JoinReferences:ProgramID" json:"programs"`
 }
 
-func (Label) TableName() string {
+type Program struct {
+	ProgramID          uint64    `gorm:"column:program_id;primary_key;auto_increment" json:"program_id"`
+	ProgramName        string    `gorm:"column:program_name;type:varchar(150);not null" json:"program_name"`
+	Rating             float64   `gorm:"column:rating;not null;default:0" json:"rating"`
+	MediaURL           string    `gorm:"column:media_url;type:varchar(255)" json:"media_url"`
+	ProgramDescription string    `gorm:"column:program_description;type:varchar(250)" json:"program_description"`
+	ExpectedTime       string    `gorm:"column:expected_time;type:varchar(30)" json:"expected_time"`
+	UpdatedAt          time.Time `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
+}
+
+func Migrate() {
+	db := common.GetDB()
+	db.AutoMigrate(&Label{}, &Program{})
+}
+
+func (lable *Label) TableName() string {
 	return "label"
+}
+
+func (program *Program) TableName() string {
+	return "program"
 }
 
 func (label *Label) BeforeUpdate(tx *gorm.DB) (err error) {
@@ -48,7 +70,12 @@ func FindAllLabel() ([]Label, error) {
 
 	var labels []Label
 
-	err := db.Find(&labels).Error
+	err := db.Debug().Model(&Label{}).Preload("Programs").Find(&labels).Error
+
+	for _, label := range labels {
+		fmt.Printf("Label ID: %d\n", label.LabelID)
+		fmt.Printf("Number of Programs: %d\n", len(label.Programs))
+	}
 	return labels, err
 }
 
@@ -68,12 +95,12 @@ func FindOneLable(condition interface{}) (Label, error) {
 
 	var label Label
 
-	err := db.Where(condition).First(&label).Error
+	err := db.Debug().Model(&Label{}).Preload("Programs").Where(condition).First(&label).Error
 	return label, err
 }
 
 func SaveOne(data interface{}) error {
 	db := common.GetDB()
-	err := db.Save(data).Error
+	err := db.Create(data).Error
 	return err
 }

@@ -18,6 +18,7 @@ type ProgramResponse struct {
 	ProgramDescription string    `json:"program_description"`
 	ExpectedTime       string    `json:"expected_time"`
 	UpdatedAt          time.Time `json:"updated_at"`
+	Labels             []Label   `json:"labels"`
 }
 
 func (s *ProgramSerializer) Response() ProgramResponse {
@@ -29,6 +30,7 @@ func (s *ProgramSerializer) Response() ProgramResponse {
 		Rating:             s.Rating,
 		ExpectedTime:       s.ExpectedTime,
 		UpdatedAt:          s.UpdatedAt,
+		Labels:             s.Labels,
 	}
 }
 
@@ -42,13 +44,13 @@ func (s *ProgramsSerializer) Response() map[string]interface{} {
 	response := make(map[string]interface{})
 	programResponses := []ProgramResponse{}
 
-	for _, label := range s.Program {
-		serializer := ProgramSerializer{s.C, label}
+	for _, program := range s.Program {
+		serializer := ProgramSerializer{s.C, program}
 		programResponses = append(programResponses, serializer.Response())
 	}
 
 	response["count"] = s.Count
-	response["labels"] = programResponses
+	response["program"] = programResponses
 
 	return response
 }

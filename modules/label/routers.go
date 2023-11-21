@@ -60,7 +60,7 @@ func LabelDetail(c *gin.Context) {
 	labelId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadGateway, common.NewError("Label", err))
+		c.JSON(http.StatusBadRequest, common.NewError("Label", err))
 		return
 	}
 

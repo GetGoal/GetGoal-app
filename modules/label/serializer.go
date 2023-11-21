@@ -15,6 +15,7 @@ type LabelResponse struct {
 	LabelID   uint64    `json:"label_id"`
 	LabelName string    `json:"label_name"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Programs  []Program `json:"programs"`
 }
 
 func (s *LabelSerializer) Response() LabelResponse {
@@ -23,6 +24,7 @@ func (s *LabelSerializer) Response() LabelResponse {
 		LabelID:   s.LabelID,
 		LabelName: s.LabelName,
 		UpdatedAt: s.UpdatedAt,
+		Programs:  s.Programs,
 	}
 }
 
