@@ -1,7 +1,6 @@
 package program
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +27,7 @@ func ProgramCreate(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	fmt.Println("Going to serialize")
+
 	serializer := ProgramSerializer{c, programValidator.programModel}
 	c.JSON(http.StatusOK, gin.H{"Program": serializer.Response()})
 
