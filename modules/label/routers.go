@@ -42,7 +42,7 @@ func LabelList(c *gin.Context) {
 	}
 
 	serializer := LabelsSerializer{C: c, Labels: label, Count: len(label)}
-	c.JSON(http.StatusOK, gin.H{"Lable": serializer.Response()})
+	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
 }
 
 func LabelFilterList(c *gin.Context) {
@@ -53,7 +53,7 @@ func LabelFilterList(c *gin.Context) {
 	}
 
 	serializer := LabelsSerializer{C: c, Labels: label, Count: len(label)}
-	c.JSON(http.StatusOK, gin.H{"Lable": serializer.Response()})
+	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
 }
 
 func LabelDetail(c *gin.Context) {
@@ -64,7 +64,7 @@ func LabelDetail(c *gin.Context) {
 		return
 	}
 
-	label, err := FindOneLable(&Label{LabelID: labelId})
+	label, err := FindOneLableById(labelId)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, common.NewError("Label", err))
@@ -72,5 +72,5 @@ func LabelDetail(c *gin.Context) {
 	}
 
 	serializer := LabelSerializer{c, label}
-	c.JSON(http.StatusOK, gin.H{"Lable": serializer.Response()})
+	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
 }
