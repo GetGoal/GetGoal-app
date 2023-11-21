@@ -110,15 +110,16 @@ func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
 
 	existingLabel, err := label.FindOneLableByName(labelName)
 	if err != nil {
-
-		newLabel := Label{LabelName: labelName}
-		if err := label.SaveOne(&label.Label{LabelName: labelName}); err != nil {
+		fmt.Println("No label found with name: " + labelName)
+		newLabel := label.Label{LabelName: labelName}
+		if err := label.SaveOne(&newLabel); err != nil {
 			return nil, err
 		}
-
-		return &newLabel, nil
+		fmt.Printf("Returning new label: %v", newLabel)
+		return &Label{LabelID: newLabel.LabelID, LabelName: labelName}, nil
 	} else {
 
 		return &Label{LabelID: existingLabel.LabelID, LabelName: existingLabel.LabelName}, nil
 	}
+
 }
