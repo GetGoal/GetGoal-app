@@ -15,6 +15,7 @@ func ProgramAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", ProgramList)
 	router.GET("/:id", ProgramDetail)
 	router.GET("/search", ProgramSearch)
+	router.GET("/search/filter", ProgramFilter)
 }
 
 func ProgramCreate(c *gin.Context) {
@@ -66,6 +67,19 @@ func ProgramSearch(c *gin.Context) {
 	text := c.Query("text")
 
 	program, err := FindSearchProgram(text)
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("Program", err))
+		return
+	}
+
+	serializer := ProgramsSerializer{C: c, Program: program, Count: len(program)}
+	c.JSON(http.StatusOK, gin.H{"Program": serializer.Response()})
+}
+
+func ProgramFilter(c *gin.Context) {
+	filter := c.Query("filter")
+
+	program, err := FilterProgram(filter)
 	if err != nil {
 		c.JSON(http.StatusNotFound, common.NewError("Program", err))
 		return

@@ -133,3 +133,15 @@ func FindSearchProgram(text string) ([]Program, error) {
 
 	return programs, err
 }
+
+func FilterProgram(filter string) ([]Program, error) {
+	db := common.GetDB()
+
+	var programs []Program
+	err := db.Debug().Model(&Program{}).Joins("JOIN label_program ON program.program_id = label_program.program_id").
+		Joins("JOIN label ON label_program.label_id = label.label_id AND label.label_name = ?", filter).
+		Preload("Labels", "label_name = ?", filter).
+		Find(&programs).Error
+
+	return programs, err
+}
