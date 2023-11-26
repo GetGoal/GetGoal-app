@@ -123,3 +123,13 @@ func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
 	}
 
 }
+
+func FindSearchProgram(text string) ([]Program, error) {
+	db := common.GetDB()
+
+	var programs []Program
+
+	err := db.Debug().Where("program_name ILIKE ?", "%"+text+"%").Find(&programs).Error
+
+	return programs, err
+}
