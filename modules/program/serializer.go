@@ -16,6 +16,7 @@ type ProgramResponse struct {
 	ProgramName        string    `json:"program_name"`
 	Rating             float64   `json:"rating"`
 	ProgramDescription string    `json:"program_description"`
+	MediaURL           string    `json:"media_url"`
 	ExpectedTime       string    `json:"expected_time"`
 	UpdatedAt          time.Time `json:"updated_at"`
 	Labels             []Label   `json:"labels"`
@@ -27,6 +28,7 @@ func (s *ProgramSerializer) Response() ProgramResponse {
 		ProgramID:          s.ProgramID,
 		ProgramName:        s.ProgramName,
 		ProgramDescription: s.ProgramDescription,
+		MediaURL:           s.MediaURL,
 		Rating:             s.Rating,
 		ExpectedTime:       s.ExpectedTime,
 		UpdatedAt:          s.UpdatedAt,
