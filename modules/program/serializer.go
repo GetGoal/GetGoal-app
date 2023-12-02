@@ -52,7 +52,7 @@ func (s *ProgramsSerializer) Response() map[string]interface{} {
 	}
 
 	response["count"] = s.Count
-	response["program"] = programResponses
+	response["programs"] = programResponses
 
 	return response
 }
