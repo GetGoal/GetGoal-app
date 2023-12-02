@@ -42,7 +42,7 @@ func ProgramList(c *gin.Context) {
 	}
 
 	serializer := ProgramsSerializer{C: c, Program: programs, Count: len(programs)}
-	c.JSON(http.StatusOK, gin.H{"Programs": serializer.Response()})
+	c.JSON(http.StatusOK, gin.H{"Program": serializer.Response()})
 }
 
 func ProgramDetail(c *gin.Context) {
