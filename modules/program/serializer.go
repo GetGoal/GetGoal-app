@@ -20,6 +20,7 @@ type ProgramResponse struct {
 	ExpectedTime       string    `json:"expected_time"`
 	UpdatedAt          time.Time `json:"updated_at"`
 	Labels             []Label   `json:"labels"`
+	Tasks              []Task    `json:"tasks"`
 }
 
 func (s *ProgramSerializer) Response() ProgramResponse {
@@ -33,6 +34,7 @@ func (s *ProgramSerializer) Response() ProgramResponse {
 		ExpectedTime:       s.ExpectedTime,
 		UpdatedAt:          s.UpdatedAt,
 		Labels:             s.Labels,
+		Tasks:              s.Tasks,
 	}
 }
 
