@@ -3,6 +3,7 @@ package migration
 import (
 	"log"
 
+	"github.com/xbklyn/getgoal-app/modules/action"
 	"github.com/xbklyn/getgoal-app/modules/label"
 	"github.com/xbklyn/getgoal-app/modules/program"
 	"github.com/xbklyn/getgoal-app/modules/task"
@@ -16,6 +17,7 @@ func Migrate() {
 	label.Migrate()
 	task.Migrate()
 	user_account.Migrate()
+	action.Migrate()
 
 	log.Default().Println("Migration complete")
 }
