@@ -24,6 +24,19 @@ type Task struct {
 	CreatedAt         time.Time  `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt         time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 	DeletedAt         *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
+
+	// Relationship
+	Program *Program `gorm:"foreignKey:ProgramID" json:"program"`
+}
+
+type Program struct {
+	ProgramID          uint64    `gorm:"column:program_id;primary_key;auto_increment" json:"program_id"`
+	ProgramName        string    `gorm:"column:program_name;type:varchar(150);not null" json:"program_name"`
+	Rating             float64   `gorm:"column:rating;not null;default:0" json:"rating"`
+	MediaURL           string    `gorm:"column:media_url;type:varchar(255)" json:"media_url"`
+	ProgramDescription string    `gorm:"column:program_description;type:varchar(250)" json:"program_description"`
+	ExpectedTime       string    `gorm:"column:expected_time;type:varchar(30)" json:"expected_time"`
+	UpdatedAt          time.Time `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 }
 
 func Migrate() {
@@ -33,6 +46,10 @@ func Migrate() {
 
 func (task *Task) TableName() string {
 	return "task"
+}
+
+func (program *Program) TableName() string {
+	return "program"
 }
 
 func (task *Task) BeforeUpdate(tx *gorm.DB) (err error) {
@@ -46,7 +63,7 @@ func FindAllTask() ([]Task, error) {
 
 	var tasks []Task
 
-	err := db.Debug().Model(&Task{}).Find(&tasks).Error
+	err := db.Debug().Model(&Task{}).Preload("Program").Find(&tasks).Error
 	return tasks, err
 }
 
@@ -55,7 +72,7 @@ func FindOneTask(condition interface{}) (Task, error) {
 
 	var task Task
 
-	err := db.Debug().Model(&Task{}).Where(condition).First(&task).Error
+	err := db.Debug().Model(&Task{}).Preload("Program").Where(condition).First(&task).Error
 	return task, err
 }
 

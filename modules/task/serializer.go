@@ -26,6 +26,8 @@ type TaskResponse struct {
 	Link              string     `json:"link"`
 	MediaURL          string     `json:"media_url"`
 	UpdatedAt         time.Time  `json:"updated_at"`
+
+	Program Program `json:"program"`
 }
 
 func (s *TaskSerializer) Response() TaskResponse {
@@ -45,6 +47,7 @@ func (s *TaskSerializer) Response() TaskResponse {
 		Link:              s.Link,
 		MediaURL:          s.MediaURL,
 		UpdatedAt:         s.UpdatedAt,
+		Program:           *s.Program,
 	}
 }
 
