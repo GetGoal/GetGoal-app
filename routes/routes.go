@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xbklyn/getgoal-app/modules/action"
 	"github.com/xbklyn/getgoal-app/modules/label"
 	"github.com/xbklyn/getgoal-app/modules/program"
 	"github.com/xbklyn/getgoal-app/modules/task"
@@ -39,6 +40,10 @@ func GetRoutes() *gin.Engine {
 	//User groups
 	user_account.UserAnonymousRegister(v1.Group("/users"))
 	user_account.UserRegister(v1.Group("/users"))
+
+	//Action groups
+	action.ActionTypeAnonymousRegister(v1.Group("/actions"))
+	action.ActionTypeRegister(v1.Group("/actions"))
 
 	//Ping group
 	landing := api.Group("/ping")
