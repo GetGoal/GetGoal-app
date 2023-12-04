@@ -55,7 +55,7 @@ func FindOneTask(condition interface{}) (Task, error) {
 
 	var task Task
 
-	err := db.Debug().Model(&Task{}).Preload("Labels").Where(condition).First(&task).Error
+	err := db.Debug().Model(&Task{}).Where(condition).First(&task).Error
 	return task, err
 }
 
