@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/modules/label"
 	"github.com/xbklyn/getgoal-app/modules/program"
+	"github.com/xbklyn/getgoal-app/modules/task"
 )
 
 func GetRoutes() *gin.Engine {
@@ -29,6 +30,8 @@ func GetRoutes() *gin.Engine {
 	//Program groups
 	program.ProgramAnonymousRegister(v1.Group("/programs"))
 	program.ProgramRegister(v1.Group("/programs"))
+
+	task.TaskAnonymousRegister(v1.Group("/tasks"))
 
 	landing := api.Group("/ping")
 	landing.GET("", func(c *gin.Context) {
