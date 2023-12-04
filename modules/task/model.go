@@ -15,7 +15,6 @@ type Task struct {
 	IsSetNotification int        `gorm:"column:is_set_noti;not null" json:"is_set_noti"`
 	StartTime         time.Time  `gorm:"column:start_time;not null" json:"start_time"`
 	EndTime           *time.Time `gorm:"column:end_time" json:"end_time"`
-	ProgramID         int        `gorm:"column:program_id" json:"program_id"`
 	Category          string     `gorm:"column:category;type:varchar(50)" json:"category"`
 	TimeBeforeNotify  int        `gorm:"column:time_before_notify" json:"time_before_notify"`
 	TaskDescription   string     `gorm:"column:task_description;type:varchar(250)" json:"task_description"`
@@ -26,7 +25,8 @@ type Task struct {
 	DeletedAt         *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 
 	// Relationship
-	Program *Program `gorm:"foreignKey:ProgramID" json:"program"`
+	ProgramID int      `gorm:"column:program_id" json:"program_id"`
+	Program   *Program `gorm:"foreignKey:ProgramID;references:program_id" json:"program"`
 }
 
 type Program struct {
@@ -41,7 +41,7 @@ type Program struct {
 
 func Migrate() {
 	db := common.GetDB()
-	db.AutoMigrate(&Task{})
+	db.AutoMigrate(&Task{}, &Program{})
 }
 
 func (task *Task) TableName() string {
