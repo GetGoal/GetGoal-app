@@ -64,7 +64,7 @@ func (s *TasksSerializer) Response() map[string]interface{} {
 	}
 
 	response["count"] = s.Count
-	response["programs"] = programResponses
+	response["tasks"] = programResponses
 
 	return response
 }
