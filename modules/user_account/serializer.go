@@ -17,17 +17,23 @@ type UserAccountResponse struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Tasks     *[]Task   `json:"tasks"`
 }
 
 func (s *UserAccountSerializer) Response() UserAccountResponse {
-
-	return UserAccountResponse{
+	response := UserAccountResponse{
 		UserID:    s.UserID,
 		FirstName: s.FirstName,
 		LastName:  s.LastName,
 		Email:     s.Email,
 		UpdatedAt: s.UpdatedAt,
 	}
+
+	if s.Tasks != nil {
+		response.Tasks = s.Tasks
+	}
+
+	return response
 }
 
 type UserAccountsSerializer struct {
@@ -38,15 +44,15 @@ type UserAccountsSerializer struct {
 
 func (s *UserAccountsSerializer) Response() map[string]interface{} {
 	response := make(map[string]interface{})
-	programResponses := []UserAccountResponse{}
+	userAccountResponses := []UserAccountResponse{}
 
 	for _, user := range s.UserAccounts {
 		serializer := UserAccountSerializer{s.C, user}
-		programResponses = append(programResponses, serializer.Response())
+		userAccountResponses = append(userAccountResponses, serializer.Response())
 	}
 
 	response["count"] = s.Count
-	response["users"] = programResponses
+	response["users"] = userAccountResponses
 
 	return response
 }
