@@ -27,7 +27,8 @@ type TaskResponse struct {
 	MediaURL          string     `json:"media_url"`
 	UpdatedAt         time.Time  `json:"updated_at"`
 
-	Program *Program `json:"program"`
+	Program     *Program    `json:"program"`
+	UserAccount UserAccount `json:"user_account"`
 }
 
 func (s *TaskSerializer) Response() TaskResponse {
@@ -46,6 +47,7 @@ func (s *TaskSerializer) Response() TaskResponse {
 		Link:              s.Link,
 		MediaURL:          s.MediaURL,
 		UpdatedAt:         s.UpdatedAt,
+		UserAccount:       s.UserAccount,
 	}
 
 	// Check if the Program is not nil before dereferencing

@@ -11,7 +11,6 @@ type Task struct {
 	TaskID            uint64     `gorm:"column:task_id;primary_key;auto_increment" json:"task_id"`
 	TaskName          string     `gorm:"column:task_name;type:varchar(150);not null" json:"task_name"`
 	TaskStatus        int        `gorm:"column:task_status;not null" json:"task_status"`
-	UserAccountID     int        `gorm:"column:user_account_id;not null" json:"user_account_id"`
 	IsSetNotification int        `gorm:"column:is_set_noti;not null" json:"is_set_noti"`
 	StartTime         time.Time  `gorm:"column:start_time;not null" json:"start_time"`
 	EndTime           *time.Time `gorm:"column:end_time" json:"end_time"`
@@ -27,6 +26,9 @@ type Task struct {
 	// Relationship
 	ProgramID int      `gorm:"column:program_id" json:"program_id"`
 	Program   *Program `gorm:"foreignKey:ProgramID;references:program_id" json:"program"`
+
+	UserAccountID int         `gorm:"column:user_account_id;not null" json:"user_account_id"`
+	UserAccount   UserAccount `gorm:"foreignKey:UserID;references:user_account_id" json:"user_account"`
 }
 
 type Program struct {
@@ -39,9 +41,17 @@ type Program struct {
 	UpdatedAt          time.Time `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 }
 
+type UserAccount struct {
+	UserID    uint64    `gorm:"column:user_id;primary_key;auto_increment" json:"user_id"`
+	FirstName string    `gorm:"column:first_name;type:varchar(70);not null" json:"first_name"`
+	LastName  string    `gorm:"column:last_name;type:varchar(70);not null" json:"last_name"`
+	Email     string    `gorm:"column:email;type:varchar(100);not null" json:"email"`
+	UpdatedAt time.Time `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
+}
+
 func Migrate() {
 	db := common.GetDB()
-	db.AutoMigrate(&Task{}, &Program{})
+	db.AutoMigrate(&Task{}, &Program{}, &UserAccount{})
 }
 
 func (task *Task) TableName() string {
@@ -50,6 +60,10 @@ func (task *Task) TableName() string {
 
 func (program *Program) TableName() string {
 	return "program"
+}
+
+func (userAccount *UserAccount) TableName() string {
+	return "user_account"
 }
 
 func (task *Task) BeforeUpdate(tx *gorm.DB) (err error) {
@@ -63,7 +77,7 @@ func FindAllTask() ([]Task, error) {
 
 	var tasks []Task
 
-	err := db.Debug().Model(&Task{}).Preload("Program").Find(&tasks).Error
+	err := db.Debug().Model(&Task{}).Preload("Program").Preload("UserAccount").Find(&tasks).Error
 	return tasks, err
 }
 
@@ -72,7 +86,7 @@ func FindOneTask(condition interface{}) (Task, error) {
 
 	var task Task
 
-	err := db.Debug().Model(&Task{}).Preload("Program").Where(condition).First(&task).Error
+	err := db.Debug().Model(&Task{}).Preload("Program").Preload("UserAccount").Where(condition).First(&task).Error
 	return task, err
 }
 
