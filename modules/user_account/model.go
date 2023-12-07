@@ -15,15 +15,38 @@ type UserAccount struct {
 	CreatedAt time.Time  `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
+
+	//Relationship
+	Tasks *[]Task `gorm:"foreignKey:UserAccountID" json:"tasks"`
+}
+
+type Task struct {
+	TaskID            uint64     `gorm:"column:task_id;primary_key;auto_increment" json:"task_id"`
+	TaskName          string     `gorm:"column:task_name;type:varchar(150);not null" json:"task_name"`
+	TaskStatus        int        `gorm:"column:task_status;not null" json:"task_status"`
+	IsSetNotification int        `gorm:"column:is_set_noti;not null" json:"is_set_noti"`
+	StartTime         time.Time  `gorm:"column:start_time;not null" json:"start_time"`
+	EndTime           *time.Time `gorm:"column:end_time" json:"end_time"`
+	UserAccountID     int        `gorm:"column:user_account_id;not null" json:"user_account_id"`
+	Category          string     `gorm:"column:category;type:varchar(50)" json:"category"`
+	TimeBeforeNotify  int        `gorm:"column:time_before_notify" json:"time_before_notify"`
+	TaskDescription   string     `gorm:"column:task_description;type:varchar(250)" json:"task_description"`
+	Link              string     `gorm:"column:link;type:varchar(255)" json:"link"`
+	MediaURL          string     `gorm:"column:media_url;type:varchar(255)" json:"media_url"`
+	UpdatedAt         time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 }
 
 func Migrate() {
 	db := common.GetDB()
-	db.AutoMigrate(&UserAccount{})
+	db.AutoMigrate(&UserAccount{}, &Task{})
 }
 
 func (user *UserAccount) TableName() string {
 	return "user_account"
+}
+
+func (task *Task) TableName() string {
+	return "task"
 }
 
 func (user *UserAccount) BeforeUpdate(tx *gorm.DB) (err error) {
@@ -37,7 +60,7 @@ func FindAllUsers() ([]UserAccount, error) {
 
 	var users []UserAccount
 
-	err := db.Debug().Model(&UserAccount{}).Find(&users).Error
+	err := db.Debug().Model(&UserAccount{}).Preload("Tasks").Find(&users).Error
 	return users, err
 }
 
@@ -46,7 +69,7 @@ func FindOneUser(condition interface{}) (UserAccount, error) {
 
 	var user UserAccount
 
-	err := db.Debug().Model(&UserAccount{}).Where(condition).First(&user).Error
+	err := db.Debug().Model(&UserAccount{}).Preload("Tasks").Where(condition).First(&user).Error
 	return user, err
 }
 
