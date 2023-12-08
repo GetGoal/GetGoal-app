@@ -15,11 +15,9 @@ type TaskResponse struct {
 	TaskID            uint64     `json:"task_id"`
 	TaskName          string     `json:"task_name"`
 	TaskStatus        int        `json:"task_status"`
-	UserAccountID     int        `json:"user_account_id"`
 	IsSetNotification int        `json:"is_set_noti"`
 	StartTime         time.Time  `json:"start_time"`
 	EndTime           *time.Time `json:"end_time"`
-	ProgramID         int        `json:"program_id"`
 	Category          string     `json:"category"`
 	TimeBeforeNotify  int        `json:"time_before_notify"`
 	TaskDescription   string     `json:"task_description"`
@@ -28,7 +26,7 @@ type TaskResponse struct {
 	UpdatedAt         time.Time  `json:"updated_at"`
 
 	Program     *Program    `json:"program"`
-	UserAccount UserAccount `json:"user_account"`
+	UserAccount UserAccount `json:"owner"`
 }
 
 func (s *TaskSerializer) Response() TaskResponse {
@@ -36,11 +34,9 @@ func (s *TaskSerializer) Response() TaskResponse {
 		TaskID:            s.TaskID,
 		TaskName:          s.TaskName,
 		TaskStatus:        s.TaskStatus,
-		UserAccountID:     s.UserAccountID,
 		IsSetNotification: s.IsSetNotification,
 		StartTime:         s.StartTime,
 		EndTime:           s.EndTime,
-		ProgramID:         s.ProgramID,
 		Category:          s.Category,
 		TimeBeforeNotify:  s.TimeBeforeNotify,
 		TaskDescription:   s.TaskDescription,

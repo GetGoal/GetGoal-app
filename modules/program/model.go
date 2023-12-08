@@ -21,46 +21,19 @@ type Program struct {
 	DeletedAt          *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
 
 	// Relationships
-	Labels []Label `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
-	Tasks  []Task  `gorm:"foreignKey:ProgramID" json:"tasks"`
-}
-
-type Label struct {
-	LabelID   uint64 `gorm:"column:label_id;primary_key;auto_increment" json:"label_id"`
-	LabelName string `gorm:"column:label_name;type:varchar(50);not null" json:"label_name"`
-}
-type Task struct {
-	TaskID            uint64     `gorm:"column:task_id;primary_key;auto_increment" json:"task_id"`
-	TaskName          string     `gorm:"column:task_name;type:varchar(150);not null" json:"task_name"`
-	TaskStatus        int        `gorm:"column:task_status;not null" json:"task_status"`
-	UserAccountID     int        `gorm:"column:user_account_id;not null" json:"user_account_id"`
-	IsSetNotification int        `gorm:"column:is_set_noti;not null" json:"is_set_noti"`
-	StartTime         time.Time  `gorm:"column:start_time;not null" json:"start_time"`
-	EndTime           *time.Time `gorm:"column:end_time" json:"end_time"`
-	ProgramID         int        `gorm:"column:program_id" json:"program_id"`
-	Category          string     `gorm:"column:category;type:varchar(50)" json:"category"`
-	TimeBeforeNotify  int        `gorm:"column:time_before_notify" json:"time_before_notify"`
-	TaskDescription   string     `gorm:"column:task_description;type:varchar(250)" json:"task_description"`
-	Link              string     `gorm:"column:link;type:varchar(255)" json:"link"`
-	MediaURL          string     `gorm:"column:media_url;type:varchar(255)" json:"media_url"`
-	UpdatedAt         time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
+	Labels      []Label       `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
+	Tasks       []Task        `gorm:"foreignKey:ProgramID" json:"tasks"`
+	UserAccount []UserAccount `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:user_id;JoinReferences:user_account_id" json:"user_account"`
+	// ActionType  []ActionType  `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:ActionID;JoinReferences:ActionID" json:"action_type"`
 }
 
 func Migrate() {
 	db := common.GetDB()
-	db.AutoMigrate(&Program{}, &Label{})
+	db.AutoMigrate(&Program{}, &Label{}, &UserAccount{}, &ActionType{})
 }
 
 func (program *Program) TableName() string {
 	return "program"
-}
-
-func (label *Label) TableName() string {
-	return "label"
-}
-
-func (task *Task) TableName() string {
-	return "task"
 }
 
 func (program *Program) BeforeUpdate(tx *gorm.DB) (err error) {
@@ -74,7 +47,12 @@ func FindAllProgram() ([]Program, error) {
 
 	var programs []Program
 
-	err := db.Debug().Model(&Program{}).Preload("Labels").Preload("Tasks").Find(&programs).Error
+	err := db.Debug().
+		Preload("Labels").
+		Preload("Tasks").
+		Preload("UserAccount").
+		Preload("UserAccount.ActionType").
+		Find(&programs).Error
 	return programs, err
 }
 
@@ -83,7 +61,12 @@ func FindOneProgram(condition interface{}) (Program, error) {
 
 	var program Program
 
-	err := db.Debug().Model(&Program{}).Preload("Labels").Preload("Tasks").Where(condition).First(&program).Error
+	err := db.Debug().Model(&Program{}).
+		Preload("Labels").
+		Preload("Tasks").
+		Preload("UserAccount").
+		Preload("UserAccount.ActionType").
+		Where(condition).First(&program).Error
 	return program, err
 }
 
