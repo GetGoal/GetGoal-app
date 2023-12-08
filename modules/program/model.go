@@ -21,13 +21,15 @@ type Program struct {
 	DeletedAt          *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
 
 	// Relationships
-	Labels []Label `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
-	Tasks  []Task  `gorm:"foreignKey:ProgramID" json:"tasks"`
+	Labels      []Label       `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
+	Tasks       []Task        `gorm:"foreignKey:ProgramID" json:"tasks"`
+	UserAccount []UserAccount `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:user_id;JoinReferences:user_account_id" json:"user_account"`
+	// ActionType  []ActionType  `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:ActionID;JoinReferences:ActionID" json:"action_type"`
 }
 
 func Migrate() {
 	db := common.GetDB()
-	db.AutoMigrate(&Program{}, &Label{})
+	db.AutoMigrate(&Program{}, &Label{}, &UserAccount{}, &ActionType{})
 }
 
 func (program *Program) TableName() string {
@@ -45,7 +47,12 @@ func FindAllProgram() ([]Program, error) {
 
 	var programs []Program
 
-	err := db.Debug().Model(&Program{}).Preload("Labels").Preload("Tasks").Find(&programs).Error
+	err := db.Debug().
+		Preload("Labels").
+		Preload("Tasks").
+		Preload("UserAccount").
+		Preload("UserAccount.ActionType").
+		Find(&programs).Error
 	return programs, err
 }
 
@@ -54,7 +61,12 @@ func FindOneProgram(condition interface{}) (Program, error) {
 
 	var program Program
 
-	err := db.Debug().Model(&Program{}).Preload("Labels").Preload("Tasks").Where(condition).First(&program).Error
+	err := db.Debug().Model(&Program{}).
+		Preload("Labels").
+		Preload("Tasks").
+		Preload("UserAccount").
+		Preload("UserAccount.ActionType").
+		Where(condition).First(&program).Error
 	return program, err
 }
 

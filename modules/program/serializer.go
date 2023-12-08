@@ -12,15 +12,17 @@ type ProgramSerializer struct {
 }
 
 type ProgramResponse struct {
-	ProgramID          uint64    `json:"program_id"`
-	ProgramName        string    `json:"program_name"`
-	Rating             float64   `json:"rating"`
-	ProgramDescription string    `json:"program_description"`
-	MediaURL           string    `json:"media_url"`
-	ExpectedTime       string    `json:"expected_time"`
-	UpdatedAt          time.Time `json:"updated_at"`
-	Labels             []Label   `json:"labels"`
-	Tasks              []Task    `json:"tasks"`
+	ProgramID          uint64        `json:"program_id"`
+	ProgramName        string        `json:"program_name"`
+	Rating             float64       `json:"rating"`
+	ProgramDescription string        `json:"program_description"`
+	MediaURL           string        `json:"media_url"`
+	ExpectedTime       string        `json:"expected_time"`
+	UpdatedAt          time.Time     `json:"updated_at"`
+	Labels             []Label       `json:"labels"`
+	Tasks              []Task        `json:"tasks"`
+	UserAccount        []UserAccount `json:"user_account"`
+	// ActionType         []ActionType  `json:"action_type"`
 }
 
 func (s *ProgramSerializer) Response() ProgramResponse {
@@ -35,6 +37,8 @@ func (s *ProgramSerializer) Response() ProgramResponse {
 		UpdatedAt:          s.UpdatedAt,
 		Labels:             s.Labels,
 		Tasks:              s.Tasks,
+		UserAccount:        s.UserAccount,
+		// ActionType:         s.ActionType,
 	}
 }
 
