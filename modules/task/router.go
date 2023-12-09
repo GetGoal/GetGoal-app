@@ -112,6 +112,6 @@ func TaskPlanning(c *gin.Context) {
 		}
 	}
 
-	serializer := TasksSerializer{C: c, Tasks: tasks, Count: len(tasks)}
+	serializer := TasksPlanningSerializer{C: c, Tasks: tasks, Count: len(tasks)}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }
