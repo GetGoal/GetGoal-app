@@ -57,20 +57,56 @@ func (s *TaskSerializer) Response() TaskResponse {
 type TasksSerializer struct {
 	C     *gin.Context
 	Tasks []Task
-	Count int `json:"count"`
+	Count int
 }
 
 func (s *TasksSerializer) Response() map[string]interface{} {
 	response := make(map[string]interface{})
-	programResponses := []TaskResponse{}
+	tasksResponses := []TaskResponse{}
 
 	for _, task := range s.Tasks {
 		serializer := TaskSerializer{s.C, task}
-		programResponses = append(programResponses, serializer.Response())
+		tasksResponses = append(tasksResponses, serializer.Response())
 	}
 
 	response["count"] = s.Count
-	response["tasks"] = programResponses
+	response["tasks"] = tasksResponses
+
+	return response
+}
+
+type TasksPlanningSerializer struct {
+	C     *gin.Context
+	Tasks []Task
+	Count int `json:"count"`
+}
+
+type TasksPlanningResponse struct {
+	TaskID            uint64    `json:"task_id"`
+	TaskName          string    `json:"task_name"`
+	IsSetNotification int       `json:"is_set_noti"`
+	StartTime         time.Time `json:"start_time"`
+	TimeBeforeNotify  int       `json:"time_before_notify"`
+	TaskDescription   string    `json:"task_description"`
+}
+
+func (s *TasksPlanningSerializer) Response() map[string]interface{} {
+	response := make(map[string]interface{})
+	taskResponses := []TasksPlanningResponse{}
+
+	for _, task := range s.Tasks {
+		taskResponses = append(taskResponses, TasksPlanningResponse{
+			TaskID:            task.TaskID,
+			TaskName:          task.TaskName,
+			IsSetNotification: task.IsSetNotification,
+			StartTime:         task.StartTime,
+			TimeBeforeNotify:  task.TimeBeforeNotify,
+			TaskDescription:   task.TaskDescription,
+		})
+	}
+
+	response["tasks"] = taskResponses
+	response["count"] = s.Count
 
 	return response
 }
