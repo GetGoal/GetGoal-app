@@ -64,6 +64,18 @@ func FindOneTask(condition interface{}) (Task, error) {
 	return task, err
 }
 
+func FindTaskByDateAndEmail(condition *Task) ([]Task, error) {
+	db := common.GetDB()
+
+	var tasks []Task
+
+	err := db.Debug().Model(&Task{}).Preload("Program").Preload("UserAccount").
+		Where("DATE(start_time) = DATE(?)", condition.StartTime).
+		Where("user_account_id = ?", condition.UserAccountID).
+		Find(&tasks).Error
+	return tasks, err
+}
+
 // func SaveOne(program *Program, labelNames []string) error {
 // 	db := common.GetDB()
 

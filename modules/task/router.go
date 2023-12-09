@@ -6,10 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/modules/user_account"
 )
 
 func TaskRegister(router *gin.RouterGroup) {
 	// router.POST("", ProgramCreate)
+	router.GET("/to-do", TaskFromEmailAndDate)
 }
 func TaskAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", TaskList)
@@ -43,4 +45,29 @@ func TaskDetail(c *gin.Context) {
 	serializer := TaskSerializer{C: c, Task: task}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 
+}
+
+func TaskFromEmailAndDate(c *gin.Context) {
+
+	taskByEmailAndDateValidator := NewGetTaskByEmailandDateValidator()
+	if err := taskByEmailAndDateValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: taskByEmailAndDateValidator.getTaskByEmailAndDateModel.Email})
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("User", err))
+		return
+	}
+
+	tasks, err := FindTaskByDateAndEmail(&Task{UserAccountID: int(user.UserID), StartTime: taskByEmailAndDateValidator.getTaskByEmailAndDateModel.Date})
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("Task", err))
+		return
+	}
+
+	serializer := TasksSerializer{C: c, Tasks: tasks, Count: len(tasks)}
+	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }
