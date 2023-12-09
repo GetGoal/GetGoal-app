@@ -1,7 +1,6 @@
 package task
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -50,13 +49,11 @@ func TaskDetail(c *gin.Context) {
 
 func TaskFromEmailAndDate(c *gin.Context) {
 
-	log.Default().Println("TaskFromEmailAndDate")
 	taskByEmailAndDateValidator := NewGetTaskByEmailandDateValidator()
 	if err := taskByEmailAndDateValidator.Bind(c); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
-	log.Default().Println("email => ", taskByEmailAndDateValidator.getTaskByEmailAndDateModel.Email)
 
 	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: taskByEmailAndDateValidator.getTaskByEmailAndDateModel.Email})
 
