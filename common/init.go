@@ -22,3 +22,7 @@ func LoadEnvVariables() {
 	}
 	log.Default().Println("Currenly using " + envFile + " environment")
 }
+
+func SetTimeZone() {
+	os.Setenv("TZ", "Asia/Bangkok")
+}

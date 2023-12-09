@@ -8,6 +8,7 @@ import (
 
 func init() {
 	common.LoadEnvVariables()
+	common.SetTimeZone()
 	common.InitDB()
 }
 func main() {
