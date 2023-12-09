@@ -28,7 +28,7 @@ func (s *GetTaskByEmailAndDateValidator) Bind(c *gin.Context) error {
 		return err
 	}
 
-	parsedDate, err := time.Parse(time.RFC3339, s.GetTaskByEmailAndDateTask.Date)
+	parsedDate, err := time.Parse("2006-01-02", s.GetTaskByEmailAndDateTask.Date)
 	if err != nil {
 		fmt.Printf("Error parsing date: %s\n", err.Error())
 		return err
