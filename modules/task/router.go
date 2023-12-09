@@ -1,7 +1,7 @@
 package task
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -88,7 +88,7 @@ func TaskPlanning(c *gin.Context) {
 	}
 
 	now := time.Now()
-	log.Println(now)
+	fmt.Println(now)
 	var originalStartTime time.Time
 
 	for i := range tasks {
