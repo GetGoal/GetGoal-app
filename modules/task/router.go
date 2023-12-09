@@ -104,7 +104,7 @@ func TaskPlanning(c *gin.Context) {
 			continue
 		} else {
 
-			newStartTime, _ := time.Parse(time.RFC3339, now.Format("2006-01-02")+"T"+originalTime+"Z")
+			newStartTime, _ := time.Parse(time.RFC3339, now.Add(time.Hour*24).Format("2006-01-02")+"T"+originalTime+"Z")
 
 			originalStartTime = tasks[i].StartTime
 			tasks[i].StartTime = newStartTime
