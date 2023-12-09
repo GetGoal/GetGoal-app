@@ -88,10 +88,10 @@ func TaskPlanning(c *gin.Context) {
 	}
 
 	now := time.Now()
+	log.Println(now)
 	var originalStartTime time.Time
 
 	for i := range tasks {
-		log.Println("=====", i, "=====")
 		originalTime := tasks[i].StartTime.Format("15:04:05")
 
 		if i > 0 {
