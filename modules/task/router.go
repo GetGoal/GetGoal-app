@@ -9,10 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/modules/user_account"
+	"github.com/xbklyn/getgoal-app/modules/user_program"
 )
 
 func TaskRegister(router *gin.RouterGroup) {
 	router.GET("/to-do", TaskFromEmailAndDate)
+	router.POST("/join-program/:program_id", JoinProgramTaskCreate)
 }
 func TaskAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", TaskList)
@@ -113,5 +115,51 @@ func TaskPlanning(c *gin.Context) {
 	}
 
 	serializer := TasksPlanningSerializer{C: c, Tasks: tasks, Count: len(tasks)}
+	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
+}
+
+func JoinProgramTaskCreate(c *gin.Context) {
+	bulkTaskValidator := NewBulkTaskValidator()
+	if err := bulkTaskValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	programId, err := strconv.ParseUint(c.Param("program_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, common.NewError("Program", err))
+		return
+	}
+
+	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: bulkTaskValidator.UserEmail})
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("User", err))
+		return
+	}
+
+	updatedTasks, err := GetTaskByProgramId(programId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("Task", err))
+		return
+	}
+
+	for i := 0; i < len(updatedTasks); i++ {
+		updatedTasks[i].TaskID = 0
+
+		updatedTasks[i].UserAccountID = int(user.UserID)
+
+		updatedTasks[i].StartTime = bulkTaskValidator.bulkTaskModel[i].StartTime
+		updatedTasks[i].IsSetNotification = bulkTaskValidator.bulkTaskModel[i].IsSetNotification
+		updatedTasks[i].TimeBeforeNotify = bulkTaskValidator.bulkTaskModel[i].TimeBeforeNotify
+
+		if err := SaveOne(&updatedTasks[i]); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("Task", err))
+			return
+		}
+	}
+
+	user_program.SaveOne(1, programId, user.UserID)
+
+	serializer := TasksSerializer{C: c, Tasks: updatedTasks, Count: len(bulkTaskValidator.bulkTaskModel)}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }
