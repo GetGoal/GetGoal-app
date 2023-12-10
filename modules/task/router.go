@@ -14,7 +14,7 @@ import (
 
 func TaskRegister(router *gin.RouterGroup) {
 	router.GET("/to-do", TaskFromEmailAndDate)
-	router.POST("/from-program/:program_id", BulkTaskCreate)
+	router.POST("/join-program/:program_id", JoinProgramTaskCreate)
 }
 func TaskAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", TaskList)
@@ -118,7 +118,7 @@ func TaskPlanning(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }
 
-func BulkTaskCreate(c *gin.Context) {
+func JoinProgramTaskCreate(c *gin.Context) {
 	bulkTaskValidator := NewBulkTaskValidator()
 	if err := bulkTaskValidator.Bind(c); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
@@ -138,8 +138,6 @@ func BulkTaskCreate(c *gin.Context) {
 	}
 	programModel := BindProgram(program)
 
-	// program, err := program.FindOneProgram(&program.Program{ProgramID: programId})
-
 	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: bulkTaskValidator.UserEmail})
 	if err != nil {
 		c.JSON(http.StatusNotFound, common.NewError("User", err))
@@ -147,19 +145,28 @@ func BulkTaskCreate(c *gin.Context) {
 	}
 	userModel := BindUser(user)
 
-	for i := 0; i < len(bulkTaskValidator.bulkTaskModel); i++ {
-		bulkTaskValidator.bulkTaskModel[i].ProgramID = int(programId)
-		bulkTaskValidator.bulkTaskModel[i].Program = &programModel
+	updatedTasks, err := GetTaskByProgramId(programId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("Task", err))
+		return
+	}
 
-		bulkTaskValidator.bulkTaskModel[i].UserAccountID = int(user.UserID)
-		bulkTaskValidator.bulkTaskModel[i].UserAccount = userModel
+	for i := 0; i < len(updatedTasks); i++ {
+		updatedTasks[i].TaskID = 0
 
-		if err := SaveOne(&bulkTaskValidator.bulkTaskModel[i], &userModel, &programModel); err != nil {
+		updatedTasks[i].ProgramID = int(programId)
+		updatedTasks[i].UserAccountID = int(user.UserID)
+
+		updatedTasks[i].StartTime = bulkTaskValidator.bulkTaskModel[i].StartTime
+		updatedTasks[i].IsSetNotification = bulkTaskValidator.bulkTaskModel[i].IsSetNotification
+		updatedTasks[i].TimeBeforeNotify = bulkTaskValidator.bulkTaskModel[i].TimeBeforeNotify
+
+		if err := SaveOne(&updatedTasks[i], &userModel, &programModel); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, common.NewError("Task", err))
 			return
 		}
 	}
 
-	serializer := TasksSerializer{C: c, Tasks: bulkTaskValidator.bulkTaskModel, Count: len(bulkTaskValidator.bulkTaskModel)}
+	serializer := TasksSerializer{C: c, Tasks: updatedTasks, Count: len(bulkTaskValidator.bulkTaskModel)}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }
