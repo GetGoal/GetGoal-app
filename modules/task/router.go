@@ -8,12 +8,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/modules/program"
 	"github.com/xbklyn/getgoal-app/modules/user_account"
 )
 
 func TaskRegister(router *gin.RouterGroup) {
 	router.GET("/to-do", TaskFromEmailAndDate)
-	router.POST("/from-program", BulkTaskCreate)
+	router.POST("/from-program/:program_id", BulkTaskCreate)
 }
 func TaskAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", TaskList)
@@ -124,5 +125,41 @@ func BulkTaskCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	programId, err := strconv.ParseUint(c.Param("program_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, common.NewError("Program", err))
+		return
+	}
+
+	program, err := program.FindOneProgram(&program.Program{ProgramID: programId})
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("Program", err))
+		return
+	}
+	programModel := BindProgram(program)
+
+	// program, err := program.FindOneProgram(&program.Program{ProgramID: programId})
+
+	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: bulkTaskValidator.UserEmail})
+	if err != nil {
+		c.JSON(http.StatusNotFound, common.NewError("User", err))
+		return
+	}
+	userModel := BindUser(user)
+
+	for i := 0; i < len(bulkTaskValidator.bulkTaskModel); i++ {
+		bulkTaskValidator.bulkTaskModel[i].ProgramID = int(programId)
+		bulkTaskValidator.bulkTaskModel[i].Program = &programModel
+
+		bulkTaskValidator.bulkTaskModel[i].UserAccountID = int(user.UserID)
+		bulkTaskValidator.bulkTaskModel[i].UserAccount = userModel
+
+		if err := SaveOne(&bulkTaskValidator.bulkTaskModel[i], &userModel, &programModel); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("Task", err))
+			return
+		}
+	}
+
+	serializer := TasksSerializer{C: c, Tasks: bulkTaskValidator.bulkTaskModel, Count: len(bulkTaskValidator.bulkTaskModel)}
+	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
 }

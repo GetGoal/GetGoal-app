@@ -1,9 +1,12 @@
 package task
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/modules/program"
+	"github.com/xbklyn/getgoal-app/modules/user_account"
 	"gorm.io/gorm"
 )
 
@@ -85,70 +88,46 @@ func GetTaskByProgramId(program_id uint64) ([]Task, error) {
 	return tasks, err
 }
 
-// func SaveOne(program *Program, labelNames []string) error {
-// 	db := common.GetDB()
+func SaveOne(task *Task, user *UserAccount, program *Program) error {
+	db := common.GetDB()
 
-// 	// Create the new program
-// 	if err := db.Create(program).Error; err != nil {
-// 		return err
-// 	}
+	if err := db.Create(task).Error; err != nil {
+		return err
+	}
+	fmt.Println("Generated Task ID:", task.TaskID)
 
-// 	var labels []Label
-// 	if len(labelNames) > 0 {
-// 		for _, labelName := range labelNames {
+	if err := db.Debug().Model(&task).Association("UserAccount").Append(user); err != nil {
+		fmt.Printf("failed to associate labels with program: %v", err)
+		return err
+	}
 
-// 			labelModel, err := getOrCreateLabel(db, labelName)
-// 			if err != nil {
-// 				return err
-// 			}
+	if program != nil {
 
-// 			labels = append(labels, *labelModel)
-// 		}
-// 	}
+		if err := db.Debug().Model(&task).Association("Program").Append(program); err != nil {
+			fmt.Printf("failed to associate labels with program: %v", err)
+			return err
+		}
+	}
 
-// 	if err := db.Debug().Model(&program).Association("Labels").Append(labels); err != nil {
-// 		return fmt.Errorf("failed to associate labels with program: %v", err)
-// 	}
+	return nil
+}
 
-// 	return nil
-// }
+func BindUser(user user_account.UserAccount) UserAccount {
+	return UserAccount{
+		UserID:    user.UserID,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+	}
+}
 
-// func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
-
-// 	existingLabel, err := label.FindOneLableByName(labelName)
-// 	if err != nil {
-// 		fmt.Println("No label found with name: " + labelName)
-// 		newLabel := label.Label{LabelName: labelName}
-// 		if err := label.SaveOne(&newLabel); err != nil {
-// 			return nil, err
-// 		}
-// 		fmt.Printf("Returning new label: %v", newLabel)
-// 		return &Label{LabelID: newLabel.LabelID, LabelName: labelName}, nil
-// 	} else {
-
-// 		return &Label{LabelID: existingLabel.LabelID, LabelName: existingLabel.LabelName}, nil
-// 	}
-
-// }
-
-// func FindSearchProgram(text string) ([]Program, error) {
-// 	db := common.GetDB()
-
-// 	var programs []Program
-
-// 	err := db.Debug().Where("program_name ILIKE ?", "%"+text+"%").Find(&programs).Error
-
-// 	return programs, err
-// }
-
-// func FilterProgram(filter string) ([]Program, error) {
-// 	db := common.GetDB()
-
-// 	var programs []Program
-// 	err := db.Debug().Model(&Program{}).Joins("JOIN label_program ON program.program_id = label_program.program_id").
-// 		Joins("JOIN label ON label_program.label_id = label.label_id AND label.label_name = ?", filter).
-// 		Preload("Labels", "label_name = ?", filter).
-// 		Find(&programs).Error
-
-// 	return programs, err
-// }
+func BindProgram(program program.Program) Program {
+	return Program{
+		ProgramID:          program.ProgramID,
+		ProgramName:        program.ProgramName,
+		Rating:             program.Rating,
+		MediaURL:           program.MediaURL,
+		ProgramDescription: program.ProgramDescription,
+		ExpectedTime:       program.ExpectedTime,
+	}
+}

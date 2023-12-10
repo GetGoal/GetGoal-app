@@ -45,7 +45,7 @@ func (s *GetTaskByEmailAndDateValidator) Bind(c *gin.Context) error {
 
 type BulkTaskValidator struct {
 	BulkTask []struct {
-		TaskID            uint64 `json:"task_id" binding:"required"`
+		TaskName          string `json:"task_name" binding:"required"`
 		IsSetNotification int    `json:"is_set_noti"`
 		StartTime         string `json:"start_time" binding:"required"`
 		TaskDescription   string `json:"task_description" binding:"max=250"`
@@ -62,12 +62,9 @@ func NewBulkTaskValidator() BulkTaskValidator {
 func (s *BulkTaskValidator) Bind(c *gin.Context) error {
 	err := common.Bind(c, s)
 	if err != nil {
-		log.Default().Printf("Error binding JSON: %s\n", err.Error())
 		return err
 	}
-
 	for _, task := range s.BulkTask {
-
 		parseTime, err := time.Parse("2006-01-02 15:04:05", task.StartTime)
 		if err != nil {
 
@@ -75,10 +72,10 @@ func (s *BulkTaskValidator) Bind(c *gin.Context) error {
 			return err
 		}
 		s.bulkTaskModel = append(s.bulkTaskModel, Task{
-			TaskID:            task.TaskID,
-			TaskDescription:   task.TaskDescription,
-			StartTime:         parseTime,
+			TaskName:          task.TaskName,
 			IsSetNotification: task.IsSetNotification,
+			StartTime:         parseTime,
+			TaskDescription:   task.TaskDescription,
 		})
 	}
 
