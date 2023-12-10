@@ -8,6 +8,7 @@ import (
 	"github.com/xbklyn/getgoal-app/modules/program"
 	"github.com/xbklyn/getgoal-app/modules/task"
 	"github.com/xbklyn/getgoal-app/modules/user_account"
+	"github.com/xbklyn/getgoal-app/modules/user_program"
 )
 
 func Migrate() {
@@ -18,6 +19,7 @@ func Migrate() {
 	task.Migrate()
 	user_account.Migrate()
 	action.Migrate()
+	user_program.Migrate()
 
 	log.Default().Println("Migration complete")
 }
