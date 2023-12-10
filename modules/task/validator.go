@@ -47,7 +47,7 @@ type JoinProgramkValidator struct {
 	BulkTask []struct {
 		IsSetNotification int    `json:"is_set_noti"`
 		StartTime         string `json:"start_time" binding:"required"`
-		TaskDescription   string `json:"task_description" binding:"max=250"`
+		TimeBeforeNotify  int    `json:"time_before_notify" binding:"max=250"`
 	} `json:"modifications" binding:"required"`
 	UserEmail string `json:"email" binding:"required"`
 
@@ -61,6 +61,7 @@ func NewBulkTaskValidator() JoinProgramkValidator {
 func (s *JoinProgramkValidator) Bind(c *gin.Context) error {
 	err := common.Bind(c, s)
 	if err != nil {
+		log.Default().Printf("Error binding JSON: %s\n", err.Error())
 		return err
 	}
 	for _, task := range s.BulkTask {
@@ -73,7 +74,7 @@ func (s *JoinProgramkValidator) Bind(c *gin.Context) error {
 		s.bulkTaskModel = append(s.bulkTaskModel, Task{
 			IsSetNotification: task.IsSetNotification,
 			StartTime:         parseTime,
-			TaskDescription:   task.TaskDescription,
+			TimeBeforeNotify:  task.TimeBeforeNotify,
 		})
 	}
 

@@ -88,27 +88,13 @@ func GetTaskByProgramId(program_id uint64) ([]Task, error) {
 	return tasks, err
 }
 
-func SaveOne(task *Task, user *UserAccount, program *Program) error {
+func SaveOne(task *Task) error {
 	db := common.GetDB()
 
 	if err := db.Create(task).Error; err != nil {
 		return err
 	}
 	fmt.Println("Generated Task ID:", task.TaskID)
-
-	if err := db.Debug().Model(&task).Association("UserAccount").Append(user); err != nil {
-		fmt.Printf("failed to associate labels with program: %v", err)
-		return err
-	}
-
-	if program != nil {
-
-		if err := db.Debug().Model(&task).Association("Program").Append(program); err != nil {
-			fmt.Printf("failed to associate labels with program: %v", err)
-			return err
-		}
-	}
-
 	return nil
 }
 

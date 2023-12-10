@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
-	"github.com/xbklyn/getgoal-app/modules/program"
 	"github.com/xbklyn/getgoal-app/modules/user_account"
+	"github.com/xbklyn/getgoal-app/modules/user_program"
 )
 
 func TaskRegister(router *gin.RouterGroup) {
@@ -131,19 +131,11 @@ func JoinProgramTaskCreate(c *gin.Context) {
 		return
 	}
 
-	program, err := program.FindOneProgram(&program.Program{ProgramID: programId})
-	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("Program", err))
-		return
-	}
-	programModel := BindProgram(program)
-
 	user, err := user_account.FindOneUser(&user_account.UserAccount{Email: bulkTaskValidator.UserEmail})
 	if err != nil {
 		c.JSON(http.StatusNotFound, common.NewError("User", err))
 		return
 	}
-	userModel := BindUser(user)
 
 	updatedTasks, err := GetTaskByProgramId(programId)
 	if err != nil {
@@ -154,18 +146,19 @@ func JoinProgramTaskCreate(c *gin.Context) {
 	for i := 0; i < len(updatedTasks); i++ {
 		updatedTasks[i].TaskID = 0
 
-		updatedTasks[i].ProgramID = int(programId)
 		updatedTasks[i].UserAccountID = int(user.UserID)
 
 		updatedTasks[i].StartTime = bulkTaskValidator.bulkTaskModel[i].StartTime
 		updatedTasks[i].IsSetNotification = bulkTaskValidator.bulkTaskModel[i].IsSetNotification
 		updatedTasks[i].TimeBeforeNotify = bulkTaskValidator.bulkTaskModel[i].TimeBeforeNotify
 
-		if err := SaveOne(&updatedTasks[i], &userModel, &programModel); err != nil {
+		if err := SaveOne(&updatedTasks[i]); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, common.NewError("Task", err))
 			return
 		}
 	}
+
+	user_program.SaveOne(1, programId, user.UserID)
 
 	serializer := TasksSerializer{C: c, Tasks: updatedTasks, Count: len(bulkTaskValidator.bulkTaskModel)}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
