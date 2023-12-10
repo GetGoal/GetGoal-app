@@ -27,3 +27,15 @@ func (program *Program) TableName() string {
 func (userAccount *UserAccount) TableName() string {
 	return "user_account"
 }
+
+type GetTaskByEmailAndDateTask struct {
+	Email string
+	Date  time.Time
+}
+type BulkTask []struct {
+	TaskID            uint64
+	IsSetNotification int
+	StartTime         time.Time
+	TaskDescription   string
+	UserEmail         string
+}

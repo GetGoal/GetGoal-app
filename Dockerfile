@@ -21,6 +21,7 @@ ENV DB_USER=${DB_USER}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV DB_NAME=${DB_NAME}
 ENV DB_PORT=${DB_PORT}
+ENV TZ=Asia/Bangkok
 
 # Download and install any required third-party dependencies
 RUN go mod download
