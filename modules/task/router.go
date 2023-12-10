@@ -13,6 +13,7 @@ import (
 
 func TaskRegister(router *gin.RouterGroup) {
 	router.GET("/to-do", TaskFromEmailAndDate)
+	router.POST("/from-program", BulkTaskCreate)
 }
 func TaskAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("", TaskList)
@@ -114,4 +115,14 @@ func TaskPlanning(c *gin.Context) {
 
 	serializer := TasksPlanningSerializer{C: c, Tasks: tasks, Count: len(tasks)}
 	c.JSON(http.StatusOK, gin.H{"Task": serializer.Response()})
+}
+
+func BulkTaskCreate(c *gin.Context) {
+	bulkTaskValidator := NewBulkTaskValidator()
+	if err := bulkTaskValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }

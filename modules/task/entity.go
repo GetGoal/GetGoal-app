@@ -32,3 +32,10 @@ type GetTaskByEmailAndDateTask struct {
 	Email string
 	Date  time.Time
 }
+type BulkTask []struct {
+	TaskID            uint64
+	IsSetNotification int
+	StartTime         time.Time
+	TaskDescription   string
+	UserEmail         string
+}
