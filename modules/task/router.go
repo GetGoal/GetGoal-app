@@ -147,6 +147,7 @@ func JoinProgramTaskCreate(c *gin.Context) {
 		updatedTasks[i].TaskID = 0
 		updatedTasks[i].ProgramID = nil
 
+		updatedTasks[i].TaskStatus = 0
 		updatedTasks[i].UserAccountID = int(user.UserID)
 		updatedTasks[i].StartTime = bulkTaskValidator.bulkTaskModel[i].StartTime
 		updatedTasks[i].IsSetNotification = bulkTaskValidator.bulkTaskModel[i].IsSetNotification
