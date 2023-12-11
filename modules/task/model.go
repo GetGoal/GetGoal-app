@@ -27,7 +27,7 @@ type Task struct {
 	DeletedAt         *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 
 	// Relationship
-	ProgramID int      `gorm:"column:program_id" json:"program_id"`
+	ProgramID *int     `gorm:"column:program_id" json:"program_id"`
 	Program   *Program `gorm:"foreignKey:ProgramID;references:program_id" json:"program"`
 
 	UserAccountID int         `gorm:"column:user_account_id;not null" json:"user_account_id"`
