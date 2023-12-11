@@ -121,7 +121,11 @@ func FindSearchProgram(text string) ([]Program, error) {
 
 	var programs []Program
 
-	err := db.Debug().Where("program_name ILIKE ?", "%"+text+"%").Find(&programs).Error
+	err := db.Debug().Model(&Program{}).
+		Preload("Tasks").
+		Preload("Labels").
+		Preload("UserAccount").
+		Where("program_name ILIKE ?", "%"+text+"%").Find(&programs).Error
 
 	return programs, err
 }

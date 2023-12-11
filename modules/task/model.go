@@ -1,9 +1,12 @@
 package task
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/modules/program"
+	"github.com/xbklyn/getgoal-app/modules/user_account"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +27,7 @@ type Task struct {
 	DeletedAt         *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 
 	// Relationship
-	ProgramID int      `gorm:"column:program_id" json:"program_id"`
+	ProgramID *int     `gorm:"column:program_id" json:"program_id"`
 	Program   *Program `gorm:"foreignKey:ProgramID;references:program_id" json:"program"`
 
 	UserAccountID int         `gorm:"column:user_account_id;not null" json:"user_account_id"`
@@ -64,70 +67,53 @@ func FindOneTask(condition interface{}) (Task, error) {
 	return task, err
 }
 
-// func SaveOne(program *Program, labelNames []string) error {
-// 	db := common.GetDB()
+func FindTaskByDateAndEmail(condition *Task) ([]Task, error) {
+	db := common.GetDB()
 
-// 	// Create the new program
-// 	if err := db.Create(program).Error; err != nil {
-// 		return err
-// 	}
+	var tasks []Task
 
-// 	var labels []Label
-// 	if len(labelNames) > 0 {
-// 		for _, labelName := range labelNames {
+	err := db.Debug().Model(&Task{}).Preload("Program").Preload("UserAccount").
+		Where("DATE(start_time) = DATE(?)", condition.StartTime).
+		Where("user_account_id = ?", condition.UserAccountID).
+		Find(&tasks).Error
+	return tasks, err
+}
 
-// 			labelModel, err := getOrCreateLabel(db, labelName)
-// 			if err != nil {
-// 				return err
-// 			}
+func GetTaskByProgramId(program_id uint64) ([]Task, error) {
+	db := common.GetDB()
 
-// 			labels = append(labels, *labelModel)
-// 		}
-// 	}
+	var tasks []Task
 
-// 	if err := db.Debug().Model(&program).Association("Labels").Append(labels); err != nil {
-// 		return fmt.Errorf("failed to associate labels with program: %v", err)
-// 	}
+	err := db.Debug().Model(&Task{}).Preload("UserAccount").Where("program_id = ?", program_id).Order("start_time ASC").Find(&tasks).Error
+	return tasks, err
+}
 
-// 	return nil
-// }
+func SaveOne(task *Task) error {
+	db := common.GetDB()
 
-// func getOrCreateLabel(db *gorm.DB, labelName string) (*Label, error) {
+	if err := db.Create(task).Error; err != nil {
+		return err
+	}
+	fmt.Println("Generated Task ID:", task.TaskID)
+	return nil
+}
 
-// 	existingLabel, err := label.FindOneLableByName(labelName)
-// 	if err != nil {
-// 		fmt.Println("No label found with name: " + labelName)
-// 		newLabel := label.Label{LabelName: labelName}
-// 		if err := label.SaveOne(&newLabel); err != nil {
-// 			return nil, err
-// 		}
-// 		fmt.Printf("Returning new label: %v", newLabel)
-// 		return &Label{LabelID: newLabel.LabelID, LabelName: labelName}, nil
-// 	} else {
+func BindUser(user user_account.UserAccount) UserAccount {
+	return UserAccount{
+		UserID:    user.UserID,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+	}
+}
 
-// 		return &Label{LabelID: existingLabel.LabelID, LabelName: existingLabel.LabelName}, nil
-// 	}
-
-// }
-
-// func FindSearchProgram(text string) ([]Program, error) {
-// 	db := common.GetDB()
-
-// 	var programs []Program
-
-// 	err := db.Debug().Where("program_name ILIKE ?", "%"+text+"%").Find(&programs).Error
-
-// 	return programs, err
-// }
-
-// func FilterProgram(filter string) ([]Program, error) {
-// 	db := common.GetDB()
-
-// 	var programs []Program
-// 	err := db.Debug().Model(&Program{}).Joins("JOIN label_program ON program.program_id = label_program.program_id").
-// 		Joins("JOIN label ON label_program.label_id = label.label_id AND label.label_name = ?", filter).
-// 		Preload("Labels", "label_name = ?", filter).
-// 		Find(&programs).Error
-
-// 	return programs, err
-// }
+func BindProgram(program program.Program) Program {
+	return Program{
+		ProgramID:          program.ProgramID,
+		ProgramName:        program.ProgramName,
+		Rating:             program.Rating,
+		MediaURL:           program.MediaURL,
+		ProgramDescription: program.ProgramDescription,
+		ExpectedTime:       program.ExpectedTime,
+	}
+}
