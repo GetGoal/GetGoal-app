@@ -49,6 +49,7 @@ func GetConfig() Config {
 	viper.AutomaticEnv() // Automatically read from environment variables
 	viper.SetConfigType("env")
 
+	log.Default().Println("Binding environment variables...")
 	viper.BindEnv("ENV")
 	viper.BindEnv("DB_HOST")
 	viper.BindEnv("DB_USER")
@@ -56,14 +57,7 @@ func GetConfig() Config {
 	viper.BindEnv("DB_NAME")
 	viper.BindEnv("DB_PORT")
 	viper.BindEnv("TZ")
-	log.Default().Printf(" ENV variables in dockerfiles :")
-	log.Default().Printf(" ENV : %s", viper.GetString("ENV"))
-	log.Default().Printf(" DB_HOST : %s", viper.GetString("DB_HOST"))
-	log.Default().Printf(" DB_USER : %s", viper.GetString("DB_USER"))
-	log.Default().Printf(" DB_PASSWORD : %s", viper.GetString("DB_PASSWORD"))
-	log.Default().Printf(" DB_NAME : %s", viper.GetString("DB_NAME"))
-	log.Default().Printf(" DB_PORT : %s", viper.GetString("DB_PORT"))
-	log.Default().Printf(" TZ : %s", viper.GetString("TZ"))
+	log.Default().Println("Done binding environment variables")
 
 	log.Default().Println("Reading config file...")
 	viper.SetConfigName("config.local")
@@ -72,8 +66,8 @@ func GetConfig() Config {
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Default().Printf("Fatal error when loading config.local file: %s \n", err)
-		log.Default().Printf("Using config.yaml")
 
+		log.Default().Printf("Reading config.yaml")
 		viper.SetConfigName("config")
 
 		if err := viper.ReadInConfig(); err != nil {
@@ -88,13 +82,13 @@ func GetConfig() Config {
 			Port: viper.GetInt("app.server.port"),
 		},
 		Db: Db{
-			Host:     viper.GetString("database.host"),
-			Port:     viper.GetInt("database.port"),
-			User:     viper.GetString("database.user"),
-			Password: viper.GetString("database.password"),
-			DBName:   viper.GetString("database.dbname"),
-			SSLMode:  viper.GetString("database.sslmode"),
-			TimeZone: viper.GetString("database.timezone"),
+			Host:     viper.GetString("DB_HOST"),
+			Port:     viper.GetInt("DB_PORT"),
+			User:     viper.GetString("DB_USER"),
+			Password: viper.GetString("DB_PASSWORD"),
+			DBName:   viper.GetString("DB_NAME"),
+			SSLMode:  "disable",
+			TimeZone: viper.GetString("TZ"),
 		},
 		Env: viper.GetString("env"),
 		Search: Search{
