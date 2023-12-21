@@ -50,13 +50,15 @@ func GetConfig() Config {
 	viper.SetConfigType("env")
 
 	log.Default().Println("Binding environment variables...")
-	viper.BindEnv("ENV")
-	viper.BindEnv("DB_HOST")
-	viper.BindEnv("DB_USER")
-	viper.BindEnv("DB_PASSWORD")
-	viper.BindEnv("DB_NAME")
-	viper.BindEnv("DB_PORT")
-	viper.BindEnv("TZ")
+	viper.BindEnv("env")
+	viper.BindEnv("database.host")
+	viper.BindEnv("database.port")
+	viper.BindEnv("database.user")
+	viper.BindEnv("database.password")
+	viper.BindEnv("database.dbname")
+	viper.BindEnv("database.sslmode")
+	viper.BindEnv("database.timezone")
+
 	log.Default().Println("Done binding environment variables")
 
 	log.Default().Println("Reading config file...")
@@ -82,13 +84,13 @@ func GetConfig() Config {
 			Port: viper.GetInt("app.server.port"),
 		},
 		Db: Db{
-			Host:     viper.GetString("DB_HOST"),
-			Port:     viper.GetInt("DB_PORT"),
-			User:     viper.GetString("DB_USER"),
-			Password: viper.GetString("DB_PASSWORD"),
-			DBName:   viper.GetString("DB_NAME"),
-			SSLMode:  "disable",
-			TimeZone: viper.GetString("TZ"),
+			Host:     viper.GetString("database.host"),
+			Port:     viper.GetInt("database.port"),
+			User:     viper.GetString("database.user"),
+			Password: viper.GetString("database.password"),
+			DBName:   viper.GetString("database.dbname"),
+			SSLMode:  viper.GetString("database.sslmode"),
+			TimeZone: viper.GetString("database.timezone"),
 		},
 		Env: viper.GetString("env"),
 		Search: Search{
