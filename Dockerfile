@@ -26,6 +26,8 @@ ENV TZ=Asia/Bangkok
 # Download and install any required third-party dependencies
 RUN go mod download
 
+RUN go mod tidy
+
 # Build the Go application
 RUN go build -o main .
 
