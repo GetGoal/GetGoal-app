@@ -1,5 +1,3 @@
-env: prod
-
 app:
   server:
     port: 8080

@@ -59,6 +59,16 @@ func GetConfig() Config {
 	viper.BindEnv("database.sslmode")
 	viper.BindEnv("database.timezone")
 
+	log.Default().Printf("ENV in docker container : ")
+	log.Default().Printf("Env %s", viper.GetString("env"))
+	log.Default().Printf("DbHost %s", viper.GetString("database.host"))
+	log.Default().Printf("DbPort %d", viper.GetInt("database.port"))
+	log.Default().Printf("DbUser %s", viper.GetString("database.user"))
+	log.Default().Printf("DbPass %s", viper.GetString("database.password"))
+	log.Default().Printf("DbName %s", viper.GetString("database.dbname"))
+	log.Default().Printf("SSLMode %s", viper.GetString("database.sslmode"))
+	log.Default().Printf("TimeZone %s", viper.GetString("database.timezone"))
+
 	log.Default().Println("Done binding environment variables")
 
 	log.Default().Println("Reading config file...")
