@@ -61,7 +61,7 @@ func GetConfig() Config {
 	log.Default().Println(viper.AllSettings())
 
 	viper.BindEnv("env")
-	viper.BindEnv("database_host")
+	viper.BindEnv("DATABASE_HOST")
 	viper.BindEnv("database_port")
 	viper.BindEnv("database_user")
 	viper.BindEnv("database_password")
@@ -69,7 +69,7 @@ func GetConfig() Config {
 	viper.BindEnv("database_sslmode")
 	viper.BindEnv("database_timezone")
 	log.Default().Printf("env %s", viper.GetString("env"))
-	log.Default().Printf("database_host %s", viper.GetString("database_host"))
+	log.Default().Printf("database_host %s", viper.GetString("DATABASE_HOST"))
 	log.Default().Printf("database_port %d", viper.GetInt("database_port"))
 	log.Default().Printf("database_user %s", viper.GetString("database_user"))
 	log.Default().Printf("database_password %s", viper.GetString("database_password"))

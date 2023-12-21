@@ -17,7 +17,7 @@ ARG DB_PASSWORD
 # Set environment
 
 ENV env=${ENV}
-ENV database_host=${DB_HOST}
+ENV DATABASE_HOST=${DB_HOST}
 ENV database_port=${DB_PORT}
 ENV database_user=${DB_USER}
 ENV database_password=${DB_PASSWORD}
