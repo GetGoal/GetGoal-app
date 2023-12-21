@@ -47,7 +47,6 @@ type (
 func GetConfig() Config {
 	// Set up Viper
 	viper.AutomaticEnv() // Automatically read from environment variables
-	viper.SetConfigType("env")
 
 	log.Default().Println("Binding environment variables...")
 	viper.BindEnv("env")
