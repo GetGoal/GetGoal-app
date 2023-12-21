@@ -15,6 +15,13 @@ ARG DB_NAME
 ARG DB_PASSWORD
 
 # Set environment
+ENV ENV=${ENV}
+ENV DB_HOST=${DB_HOST}
+ENV DB_USER=${DB_USER}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV DB_NAME=${DB_NAME}
+ENV DB_PORT=${DB_PORT}
+ENV TZ=Asia/Bangkok
 ENV env=${ENV}
 ENV database.host=${DB_HOST}
 ENV database.port=${DB_PORT}

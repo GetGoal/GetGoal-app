@@ -47,7 +47,6 @@ type (
 func GetConfig() Config {
 	// Set up Viper
 	viper.AutomaticEnv() // Automatically read from environment variables
-	viper.SetConfigType("env")
 
 	log.Default().Println("Binding environment variables...")
 	viper.BindEnv("env")
@@ -59,6 +58,14 @@ func GetConfig() Config {
 	viper.BindEnv("database.sslmode")
 	viper.BindEnv("database.timezone")
 
+	viper.BindEnv("ENV")
+	viper.BindEnv("DB_HOST")
+	viper.BindEnv("DB_USER")
+	viper.BindEnv("DB_PASSWORD")
+	viper.BindEnv("DB_NAME")
+	viper.BindEnv("DB_PORT")
+	viper.BindEnv("TZ")
+
 	log.Default().Printf("ENV in docker container : ")
 	log.Default().Printf("Env %s", viper.GetString("env"))
 	log.Default().Printf("DbHost %s", viper.GetString("database.host"))
@@ -68,6 +75,15 @@ func GetConfig() Config {
 	log.Default().Printf("DbName %s", viper.GetString("database.dbname"))
 	log.Default().Printf("SSLMode %s", viper.GetString("database.sslmode"))
 	log.Default().Printf("TimeZone %s", viper.GetString("database.timezone"))
+
+	log.Default().Printf("ENV in docker container : ")
+	log.Default().Printf("Env %s", viper.GetString("ENV"))
+	log.Default().Printf("DbHost %s", viper.GetString("DB_HOST"))
+	log.Default().Printf("DbPort %d", viper.GetInt("DB_PORT"))
+	log.Default().Printf("DbUser %s", viper.GetString("DB_USER"))
+	log.Default().Printf("DbPass %s", viper.GetString("DB_PASSWORD"))
+	log.Default().Printf("DbName %s", viper.GetString("DB_NAME"))
+	log.Default().Printf("TimeZone %s", viper.GetString("TZ"))
 
 	log.Default().Println("Done binding environment variables")
 
