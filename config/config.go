@@ -47,40 +47,12 @@ type (
 func GetConfig() Config {
 	// Set up Viper
 	viper.AutomaticEnv() // Automatically read from environment variables
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	log.Default().Println("Binding environment variables...")
-	// Bind environment variables
-	viper.BindEnv("ENV")
-	viper.BindEnv("DATABASE_HOST")
-	viper.BindEnv("DATABASE_PORT")
-	viper.BindEnv("DATABASE_USER")
-	viper.BindEnv("DATABASE_PASSWORD")
-	viper.BindEnv("DATABASE_DBNAME")
-	viper.BindEnv("DATABASE_SSLMODE")
-	viper.BindEnv("DATABASE_TIMEZONE")
-	log.Default().Println(viper.AllSettings())
-	//Set default values
-	viper.Set("env", viper.BindEnv("ENV"))
-	viper.Set("database.host", viper.BindEnv("database_host"))
-	viper.Set("database.port", viper.BindEnv("database_port"))
-	viper.Set("database.user", viper.BindEnv("database_user"))
-	viper.Set("database.password", viper.BindEnv("database_password"))
-	viper.Set("database.dbname", viper.BindEnv("database_dbname"))
-	viper.Set("database.sslmode", viper.BindEnv("database_sslmode"))
-	viper.Set("database.timezone", viper.BindEnv("database_timezone"))
 	log.Default().Println(viper.AllSettings())
 	//Log values
 	log.Default().Println("ENV in docker container : ")
-	log.Default().Printf("Env %s", viper.GetString("env"))
-	log.Default().Printf("DbHost %s", viper.GetString("database.host"))
-	log.Default().Printf("DbPort %d", viper.GetInt("database.port"))
-	log.Default().Printf("DbUser %s", viper.GetString("database.user"))
-	log.Default().Printf("DbPass %s", viper.GetString("database.password"))
-	log.Default().Printf("DbName %s", viper.GetString("database.dbname"))
-	log.Default().Printf("SSLMode %s", viper.GetString("database.sslmode"))
-	log.Default().Printf("TimeZone %s", viper.GetString("database.timezone"))
-	//Log values
-	log.Default().Printf("ENV after set : ")
 	log.Default().Printf("Env %s", viper.GetString("env"))
 	log.Default().Printf("DbHost %s", viper.GetString("database.host"))
 	log.Default().Printf("DbPort %d", viper.GetInt("database.port"))
