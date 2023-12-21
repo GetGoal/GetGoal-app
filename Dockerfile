@@ -23,13 +23,13 @@ ENV DB_NAME=${DB_NAME}
 ENV DB_PORT=${DB_PORT}
 ENV TZ=Asia/Bangkok
 ENV env=${ENV}
-ENV database.host=${DB_HOST}
-ENV database.port=${DB_PORT}
-ENV database.user=${DB_USER}
-ENV database.password=${DB_PASSWORD}
-ENV database.dbname=${DB_NAME}
-ENV database.sslmode=disable
-ENV database.timezone=Asia/Bangkok
+ENV database_host=${DB_HOST}
+ENV database_port=${DB_PORT}
+ENV database_user=${DB_USER}
+ENV database_password=${DB_PASSWORD}
+ENV database_dbname=${DB_NAME}
+ENV database_sslmode=disable
+ENV database_timezone=Asia/Bangkok
 
 # Download and install any required third-party dependencies
 RUN go mod download
