@@ -49,6 +49,7 @@ func GetConfig() Config {
 	viper.AutomaticEnv() // Automatically read from environment variables
 
 	log.Default().Println("Binding environment variables...")
+	log.Default().Println(viper.AllSettings())
 	viper.BindEnv("env")
 	viper.BindEnv("database.host")
 	viper.BindEnv("database.port")
