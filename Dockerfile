@@ -16,14 +16,14 @@ ARG DB_PASSWORD
 
 # Set environment
 
-ENV env=${ENV}
+ENV ENV=${ENV}
 ENV DATABASE_HOST=${DB_HOST}
-ENV database_port=${DB_PORT}
-ENV database_user=${DB_USER}
-ENV database_password=${DB_PASSWORD}
-ENV database_dbname=${DB_NAME}
-ENV database_sslmode=disable
-ENV database_timezone=Asia/Bangkok
+ENV DATABASE_PORT=${DB_PORT}
+ENV DATABASE_USER=${DB_USER}
+ENV DATABASE_PASSWORD=${DB_PASSWORD}
+ENV DATABASE_DBNAME=${DB_NAME}
+ENV DATABASE_SSLMODE=disable
+ENV DATABASE_TIMEZONE=Asia/Bangkok
 
 # Download and install any required third-party dependencies
 RUN go mod download
