@@ -68,6 +68,7 @@ func GetConfig() Config {
 	viper.Set("database.dbname", viper.BindEnv("DATABASE_DBNAME"))
 	viper.Set("database.sslmode", viper.BindEnv("DATABASE_SSLMODE"))
 	viper.Set("database.timezone", viper.BindEnv("DATABASE_TIMEZONE"))
+	log.Default().Println(viper.AllSettings())
 	//Log values
 	log.Default().Println("ENV in docker container : ")
 	log.Default().Printf("Env %s", viper.GetString("env"))
