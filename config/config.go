@@ -49,7 +49,6 @@ func GetConfig() Config {
 	viper.AutomaticEnv() // Automatically read from environment variables
 
 	log.Default().Println("Binding environment variables...")
-	log.Default().Println(viper.AllSettings())
 
 	viper.Set("env", viper.BindEnv("env"))
 	viper.Set("database.host", viper.BindEnv("database_host"))
@@ -59,6 +58,17 @@ func GetConfig() Config {
 	viper.Set("database.dbname", viper.BindEnv("database_dbname"))
 	viper.Set("database.sslmode", viper.BindEnv("database_sslmode"))
 	viper.Set("database.timezone", viper.BindEnv("database_timezone"))
+	log.Default().Println(viper.AllSettings())
+
+	viper.BindEnv("env")
+	viper.BindEnv("database_host")
+	viper.BindEnv("database_port")
+	viper.BindEnv("database_user")
+	viper.BindEnv("database_password")
+	viper.BindEnv("database_dbname")
+	viper.BindEnv("database_sslmode")
+	viper.BindEnv("database_timezone")
+
 	// viper.BindEnv("database.host")
 	// viper.BindEnv("database.port")
 	// viper.BindEnv("database.user")
