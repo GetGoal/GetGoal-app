@@ -58,6 +58,7 @@ func GetConfig() Config {
 	viper.BindEnv("DATABASE_DBNAME")
 	viper.BindEnv("DATABASE_SSLMODE")
 	viper.BindEnv("DATABASE_TIMEZONE")
+	log.Default().Println(viper.AllSettings())
 	//Set default values
 	viper.Set("env", viper.BindEnv("ENV"))
 	viper.Set("database.host", viper.BindEnv("DATABASE_HOST"))
@@ -89,7 +90,6 @@ func GetConfig() Config {
 	log.Default().Printf("TimeZone %s", viper.GetString("database.timezone"))
 
 	log.Default().Println("Done binding environment variables")
-	log.Default().Println(viper.AllSettings())
 
 	log.Default().Println("Reading config file...")
 	viper.SetConfigName("config.local")
