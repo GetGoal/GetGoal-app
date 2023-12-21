@@ -7,7 +7,7 @@
 *.dll
 *.so
 *.dylib
-.env.local
+config.local.yaml
 getgoal-app
 # Test binary, built with `go test -c`
 *.test
