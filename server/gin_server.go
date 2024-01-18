@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/config"
-	"github.com/xbklyn/getgoal-app/modules/label/handlers"
-	"github.com/xbklyn/getgoal-app/modules/label/repositories"
-	"github.com/xbklyn/getgoal-app/modules/label/usecases"
+	"github.com/xbklyn/getgoal-app/handlers"
+	"github.com/xbklyn/getgoal-app/repositories"
+	"github.com/xbklyn/getgoal-app/usecases"
 	"gorm.io/gorm"
 )
 

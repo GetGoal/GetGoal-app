@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/xbklyn/getgoal-app/config"
-	"github.com/xbklyn/getgoal-app/modules/label/migrations"
+	"github.com/xbklyn/getgoal-app/migrations"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
