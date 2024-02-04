@@ -6,4 +6,5 @@ import (
 
 type LabelHandler interface {
 	FindAllLabels(c *gin.Context)
+	FindLabelByID(c *gin.Context)
 }

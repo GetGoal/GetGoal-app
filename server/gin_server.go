@@ -60,4 +60,5 @@ func (s *ginServer) initializeLabelHandler(v1 *gin.RouterGroup) {
 
 	labelRouter := v1.Group("/labels")
 	labelRouter.GET("", handler.FindAllLabels)
+	labelRouter.GET("/:id", handler.FindLabelByID)
 }

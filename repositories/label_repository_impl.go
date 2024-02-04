@@ -11,6 +11,16 @@ type labelRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// FindLabelByID implements LabelRepository.
+func (l *labelRepositoryImpl) FindLabelByID(id int) (entities.Label, error) {
+	log.Default().Printf("Query label by id: %d \n", id)
+
+	var label entities.Label
+
+	err := l.db.Debug().Model(&entities.Label{}).Preload("Programs").First(&label, id).Error
+	return label, err
+}
+
 // FindAllLabels implements LabelRepository.
 func (l *labelRepositoryImpl) FindAllLabels() ([]entities.Label, error) {
 	log.Default().Println("Query all labels")
@@ -18,12 +28,7 @@ func (l *labelRepositoryImpl) FindAllLabels() ([]entities.Label, error) {
 	var labels []entities.Label
 
 	err := l.db.Debug().Model(&entities.Label{}).Preload("Programs").Find(&labels).Error
-	if err != nil {
-		log.Default().Printf("Error when query all labels: %s \n", err)
-		return nil, err
-	}
-
-	return labels, nil
+	return labels, err
 }
 
 func NewLabelRepositoryImpl(db *gorm.DB) LabelRepository {
