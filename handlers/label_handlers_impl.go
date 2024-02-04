@@ -30,7 +30,7 @@ func (h *labelHandlerImpl) FindLabelByID(c *gin.Context) {
 	}
 
 	serializer := serializers.LabelSerializer{C: c, Label: *label}
-	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
+	c.JSON(http.StatusOK, gin.H{"data": serializer.Response()})
 }
 
 // FindAllLabels implements LabelHandler.
