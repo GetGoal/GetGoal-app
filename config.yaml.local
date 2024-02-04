@@ -1,6 +1,0 @@
-app:
-  server:
-    port: 8080
-  
-search:
-  label_limit: 13
