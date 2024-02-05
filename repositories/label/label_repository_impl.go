@@ -3,12 +3,36 @@ package repositories
 import (
 	"log"
 
+	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/entities"
 	"gorm.io/gorm"
 )
 
 type labelRepositoryImpl struct {
 	db *gorm.DB
+}
+
+// FindLabelByName implements LabelRepository.
+func (*labelRepositoryImpl) FindLabelByName(name string) (entities.Label, error) {
+	panic("unimplemented")
+}
+
+// Save implements LabelRepository.
+func (*labelRepositoryImpl) Save(label *entities.Label) error {
+	panic("unimplemented")
+}
+
+// GetSearchLabel implements LabelRepository.
+func (l *labelRepositoryImpl) GetSearchLabel() ([]entities.Label, error) {
+	search_limit := config.GetConfig().Search.LabelLimit
+	log.Default().Printf("Search limit: %d \n", search_limit)
+
+	log.Default().Println("Query search label")
+
+	var labels []entities.Label
+	err := l.db.Debug().Model(&entities.Label{}).Preload("Programs").Order("RANDOM()").Limit(search_limit).Find(&labels).Error
+
+	return labels, err
 }
 
 // FindLabelByID implements LabelRepository.
