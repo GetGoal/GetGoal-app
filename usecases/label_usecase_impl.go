@@ -2,11 +2,21 @@ package usecases
 
 import (
 	"github.com/xbklyn/getgoal-app/entities"
-	"github.com/xbklyn/getgoal-app/repositories"
+	lrepositories "github.com/xbklyn/getgoal-app/repositories/label"
 )
 
 type labelUsecaseImpl struct {
-	labelRepository repositories.LabelRepository
+	labelRepository lrepositories.LabelRepository
+}
+
+// GetSeachLabel implements LabelUsecase.
+func (u *labelUsecaseImpl) GetSearchLabel() ([]entities.Label, error) {
+	labels, err := u.labelRepository.GetSearchLabel()
+
+	if err != nil {
+		return nil, err
+	}
+	return labels, nil
 }
 
 // FindLabelByID implements LabelUsecase.
@@ -30,6 +40,6 @@ func (u *labelUsecaseImpl) FindAllLabels() ([]entities.Label, error) {
 	return labels, nil
 }
 
-func NewLabelUsecaseImpl(labelRepository repositories.LabelRepository) LabelUsecase {
+func NewLabelUsecaseImpl(labelRepository lrepositories.LabelRepository) LabelUsecase {
 	return &labelUsecaseImpl{labelRepository: labelRepository}
 }

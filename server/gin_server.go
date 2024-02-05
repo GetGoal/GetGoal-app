@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/handlers"
-	"github.com/xbklyn/getgoal-app/repositories"
+	lrepositories "github.com/xbklyn/getgoal-app/repositories/label"
 	"github.com/xbklyn/getgoal-app/usecases"
 	"gorm.io/gorm"
 )
@@ -54,11 +54,12 @@ func NewGinServer(cfg *config.Config, db *gorm.DB) Server {
 
 func (s *ginServer) initializeLabelHandler(v1 *gin.RouterGroup) {
 	//Init all layers
-	repo := repositories.NewLabelRepositoryImpl(s.db)
+	repo := lrepositories.NewLabelRepositoryImpl(s.db)
 	usecase := usecases.NewLabelUsecaseImpl(repo)
 	handler := handlers.NewLabelHandlerImpl(usecase)
 
 	labelRouter := v1.Group("/labels")
 	labelRouter.GET("", handler.FindAllLabels)
 	labelRouter.GET("/:id", handler.FindLabelByID)
+	labelRouter.GET("/search", handler.GetSeachLabel)
 }
