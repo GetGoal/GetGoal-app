@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	cfg := config.GetConfig()
+	cfg := config.ReadConfig()
 
 	db := database.NewPostgresDB(&cfg)
 
