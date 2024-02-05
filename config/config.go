@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var config Config
+
 type (
 	Config struct {
 		App               App
@@ -44,7 +46,7 @@ type (
 	}
 )
 
-func GetConfig() Config {
+func ReadConfig() Config {
 
 	log.Default().Println("Reading environment variables...")
 	viper.AutomaticEnv() // Automatically read from environment variables
@@ -68,7 +70,7 @@ func GetConfig() Config {
 
 	log.Default().Printf("Using config file: %s \n", strings.Split(viper.ConfigFileUsed(), "/")[len(strings.Split(viper.ConfigFileUsed(), "/"))-1])
 
-	return Config{
+	config := Config{
 		App: App{
 			Port: viper.GetInt("app.server.port"),
 		},
@@ -86,4 +88,9 @@ func GetConfig() Config {
 			LabelLimit: viper.GetInt("search.label_limit"),
 		},
 	}
+	return config
+}
+
+func GetConfig() Config {
+	return config
 }
