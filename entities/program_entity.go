@@ -2,6 +2,8 @@ package entities
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Program struct {
@@ -24,4 +26,10 @@ type Program struct {
 
 func (program *Program) TableName() string {
 	return "program"
+}
+
+func (program *Program) BeforeUpdate(tx *gorm.DB) (err error) {
+	now := time.Now()
+	program.UpdatedAt = now
+	return nil
 }

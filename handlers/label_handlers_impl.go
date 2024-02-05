@@ -14,6 +14,18 @@ type labelHandlerImpl struct {
 	labelUsecase usecases.LabelUsecase
 }
 
+// GetSeachLabel implements LabelHandler.
+func (h *labelHandlerImpl) GetSeachLabel(c *gin.Context) {
+	label, err := h.labelUsecase.GetSearchLabel()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, common.NewError("Label", err))
+		return
+	}
+
+	serializer := serializers.LabelsSerializer{C: c, Labels: label, Count: len(label)}
+	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
+}
+
 // FindLabelByID implements LabelHandler.
 func (h *labelHandlerImpl) FindLabelByID(c *gin.Context) {
 	labelId, err := strconv.ParseUint(c.Param("id"), 10, 64)
