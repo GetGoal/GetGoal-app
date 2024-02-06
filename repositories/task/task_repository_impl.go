@@ -30,7 +30,7 @@ func (t *TaskRepositoryImpl) FindOneTask(condition interface{}) (entities.Task, 
 }
 
 // FindTaskByDateAndLabel implements TaskRepository.
-func (t *TaskRepositoryImpl) FindTaskByDateAndLabel(condition *entities.Task) ([]entities.Task, error) {
+func (t *TaskRepositoryImpl) FindTaskByDateAndEmail(condition *entities.Task) ([]entities.Task, error) {
 	log.Default().Println("Query task by date and label")
 	var tasks []entities.Task
 
