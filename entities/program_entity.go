@@ -17,11 +17,11 @@ type Program struct {
 	UpdatedAt          time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 	DeletedAt          *time.Time `gorm:"column:deleted_at;index" json:"deleted_at"`
 
-	// // Relationships
-	// Labels      []Label       `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
-	// Tasks       []Task        `gorm:"foreignKey:ProgramID" json:"tasks"`
-	// UserAccount []UserAccount `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:user_id;JoinReferences:user_account_id" json:"user_account"`
-	// // ActionType  []ActionType  `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:ActionID;JoinReferences:ActionID" json:"action_type"`
+	// Relationships
+	Labels      []Label       `gorm:"many2many:label_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:LabelID;JoinReferences:LabelID" json:"labels"`
+	Tasks       []Task        `gorm:"foreignKey:ProgramID" json:"tasks"`
+	UserAccount []UserAccount `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:user_id;JoinReferences:user_account_id" json:"user_account"`
+	ActionType  []ActionType  `gorm:"many2many:user_program;foreignKey:ProgramID;joinForeignKey:ProgramID;References:ActionID;JoinReferences:ActionID" json:"action_type"`
 }
 
 func (program *Program) TableName() string {
