@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
-	serializers "github.com/xbklyn/getgoal-app/models/serializers/labels"
-	"github.com/xbklyn/getgoal-app/usecases"
+	lserializers "github.com/xbklyn/getgoal-app/models/serializers/labels"
+	lusecases "github.com/xbklyn/getgoal-app/usecases/label"
 )
 
 type labelHandlerImpl struct {
-	labelUsecase usecases.LabelUsecase
+	labelUsecase lusecases.LabelUsecase
 }
 
 // GetSeachLabel implements LabelHandler.
@@ -22,7 +22,7 @@ func (h *labelHandlerImpl) GetSeachLabel(c *gin.Context) {
 		return
 	}
 
-	serializer := serializers.LabelsSerializer{C: c, Labels: label, Count: len(label)}
+	serializer := lserializers.LabelsSerializer{C: c, Labels: label, Count: len(label)}
 	c.JSON(http.StatusOK, gin.H{"Label": serializer.Response()})
 }
 
@@ -41,7 +41,7 @@ func (h *labelHandlerImpl) FindLabelByID(c *gin.Context) {
 		return
 	}
 
-	serializer := serializers.LabelSerializer{C: c, Label: *label}
+	serializer := lserializers.LabelSerializer{C: c, Label: *label}
 	c.JSON(http.StatusOK, gin.H{"data": serializer.Response()})
 }
 
@@ -54,10 +54,10 @@ func (h *labelHandlerImpl) FindAllLabels(c *gin.Context) {
 		return
 	}
 
-	serializer := serializers.LabelsSerializer{C: c, Labels: labels, Count: len(labels)}
+	serializer := lserializers.LabelsSerializer{C: c, Labels: labels, Count: len(labels)}
 	c.JSON(http.StatusOK, gin.H{"data": serializer.Response()})
 }
 
-func NewLabelHandlerImpl(labelUsecase usecases.LabelUsecase) LabelHandler {
+func NewLabelHandlerImpl(labelUsecase lusecases.LabelUsecase) LabelHandler {
 	return &labelHandlerImpl{labelUsecase: labelUsecase}
 }

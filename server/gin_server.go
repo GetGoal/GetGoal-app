@@ -7,7 +7,7 @@ import (
 	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/handlers"
 	lrepositories "github.com/xbklyn/getgoal-app/repositories/label"
-	"github.com/xbklyn/getgoal-app/usecases"
+	lusecases "github.com/xbklyn/getgoal-app/usecases/label"
 	"gorm.io/gorm"
 )
 
@@ -59,7 +59,7 @@ func NewGinServer(cfg *config.Config, db *gorm.DB) Server {
 func (s *ginServer) initializeLabelHandler(v1 *gin.RouterGroup) {
 	//Init all layers
 	repo := lrepositories.NewLabelRepositoryImpl(s.db)
-	usecase := usecases.NewLabelUsecaseImpl(repo)
+	usecase := lusecases.NewLabelUsecaseImpl(repo)
 	handler := handlers.NewLabelHandlerImpl(usecase)
 
 	labelRouter := v1.Group("/labels")
