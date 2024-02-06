@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
-	lserializers "github.com/xbklyn/getgoal-app/models/serializers/labels"
+	lserializers "github.com/xbklyn/getgoal-app/models/serializers/label"
 	lusecases "github.com/xbklyn/getgoal-app/usecases/label"
 )
 
