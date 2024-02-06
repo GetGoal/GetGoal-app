@@ -25,7 +25,6 @@ func (*labelRepositoryImpl) Save(label *entities.Label) error {
 // GetSearchLabel implements LabelRepository.
 func (l *labelRepositoryImpl) GetSearchLabel() ([]entities.Label, error) {
 	search_limit := config.GetConfig().Search.LabelLimit
-	log.Default().Printf("Search limit: %d \n", search_limit)
 
 	log.Default().Println("Query search label")
 

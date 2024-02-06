@@ -70,7 +70,7 @@ func ReadConfig() Config {
 
 	log.Default().Printf("Using config file: %s \n", strings.Split(viper.ConfigFileUsed(), "/")[len(strings.Split(viper.ConfigFileUsed(), "/"))-1])
 
-	config := Config{
+	config = Config{
 		App: App{
 			Port: viper.GetInt("app.server.port"),
 		},
@@ -88,9 +88,11 @@ func ReadConfig() Config {
 			LabelLimit: viper.GetInt("search.label_limit"),
 		},
 	}
+	log.Default().Print(config)
 	return config
 }
 
 func GetConfig() Config {
+	log.Default().Print(config)
 	return config
 }
