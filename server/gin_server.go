@@ -7,10 +7,13 @@ import (
 	"github.com/xbklyn/getgoal-app/config"
 	ahandlers "github.com/xbklyn/getgoal-app/handlers/action"
 	lhandlers "github.com/xbklyn/getgoal-app/handlers/label"
+	handlers "github.com/xbklyn/getgoal-app/handlers/program"
 	arepositories "github.com/xbklyn/getgoal-app/repositories/action"
 	lrepositories "github.com/xbklyn/getgoal-app/repositories/label"
+	repositories "github.com/xbklyn/getgoal-app/repositories/program"
 	ausecases "github.com/xbklyn/getgoal-app/usecases/action"
 	lusecases "github.com/xbklyn/getgoal-app/usecases/label"
+	usecases "github.com/xbklyn/getgoal-app/usecases/program"
 	"gorm.io/gorm"
 )
 
@@ -45,6 +48,7 @@ func (s *ginServer) Start() {
 
 	s.initializeLabelHandler(v1)
 	s.initializeActionHandler(v1)
+	s.initializeProgramHandler(v1)
 	s.app.Run(serverURL)
 }
 
@@ -82,4 +86,18 @@ func (s *ginServer) initializeActionHandler(v1 *gin.RouterGroup) {
 	actionRouter := v1.Group("/actions")
 	actionRouter.GET("", handler.FindAllActions)
 	actionRouter.GET("/:id", handler.FindActionByID)
+}
+
+func (s *ginServer) initializeProgramHandler(v1 *gin.RouterGroup) {
+	//Init all layers
+	repo := repositories.NewProgramRepositoryImpl(s.db)
+	usecase := usecases.NewProgramUsecaseImpl(repo)
+	handler := handlers.NewProgramHandlerImpl(usecase)
+
+	programRouter := v1.Group("/programs")
+	programRouter.GET("", handler.FindAllPrograms)
+	programRouter.GET("/:id", handler.FindProgramByID)
+	programRouter.GET("/search", handler.GetSearchProgram)
+	programRouter.GET("/search/filter", handler.FilterProgram)
+	programRouter.POST("", handler.AddNewProgram)
 }

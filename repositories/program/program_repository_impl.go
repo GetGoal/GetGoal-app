@@ -14,6 +14,21 @@ type ProgramRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// FindProgramById implements ProgramRepository.
+func (p *ProgramRepositoryImpl) FindProgramById(id uint64) (entities.Program, error) {
+	log.Default().Println("Query program by id")
+	var program entities.Program
+
+	err := p.db.Debug().Model(&entities.Program{}).
+		Preload("Labels").
+		Preload("Tasks").
+		Preload("UserAccount").
+		Preload("UserAccount.ActionType").
+		First(&program, id).Error
+
+	return program, err
+}
+
 // FilterProgram implements ProgramRepository.
 func (p *ProgramRepositoryImpl) FilterProgram(filter string) ([]entities.Program, error) {
 	log.Default().Println("Query all programs with filter")

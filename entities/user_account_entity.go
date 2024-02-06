@@ -16,7 +16,8 @@ type UserAccount struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 
 	//Relationship
-	Tasks *[]Task `gorm:"foreignKey:UserAccountID" json:"tasks"`
+	Tasks      *[]Task      `gorm:"foreignKey:UserAccountID" json:"tasks"`
+	ActionType []ActionType `gorm:"many2many:user_program;foreignKey:user_id;joinForeignKey:user_account_id;References:ActionID;JoinReferences:ActionID" json:"action_types"`
 }
 
 func (user *UserAccount) TableName() string {
