@@ -45,6 +45,10 @@ func (s *ginServer) Start() {
 }
 
 func NewGinServer(cfg *config.Config, db *gorm.DB) Server {
+	if cfg.Env == "prod" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	return &ginServer{
 		app: gin.New(),
 		db:  db,
