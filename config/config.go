@@ -88,11 +88,9 @@ func ReadConfig() Config {
 			LabelLimit: viper.GetInt("search.label_limit"),
 		},
 	}
-	log.Default().Print(config)
 	return config
 }
 
 func GetConfig() Config {
-	log.Default().Print(config)
 	return config
 }
