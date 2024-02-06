@@ -9,6 +9,12 @@ type labelUsecaseImpl struct {
 	labelRepository lrepositories.LabelRepository
 }
 
+// Save implements LabelUsecase.
+func (u *labelUsecaseImpl) Save(label *entities.Label) error {
+	err := u.labelRepository.Save(label)
+	return err
+}
+
 // GetSeachLabel implements LabelUsecase.
 func (u *labelUsecaseImpl) GetSearchLabel() ([]entities.Label, error) {
 	labels, err := u.labelRepository.GetSearchLabel()
@@ -20,7 +26,7 @@ func (u *labelUsecaseImpl) GetSearchLabel() ([]entities.Label, error) {
 }
 
 // FindLabelByID implements LabelUsecase.
-func (u *labelUsecaseImpl) FindLabelByID(id int) (*entities.Label, error) {
+func (u *labelUsecaseImpl) FindLabelByID(id uint64) (*entities.Label, error) {
 	label, err := u.labelRepository.FindLabelByID(id)
 
 	if err != nil {

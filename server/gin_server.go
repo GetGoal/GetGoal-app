@@ -5,8 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/config"
-	"github.com/xbklyn/getgoal-app/handlers"
+	ahandlers "github.com/xbklyn/getgoal-app/handlers/action"
+	lhandlers "github.com/xbklyn/getgoal-app/handlers/label"
+	arepositories "github.com/xbklyn/getgoal-app/repositories/action"
 	lrepositories "github.com/xbklyn/getgoal-app/repositories/label"
+	ausecases "github.com/xbklyn/getgoal-app/usecases/action"
 	lusecases "github.com/xbklyn/getgoal-app/usecases/label"
 	"gorm.io/gorm"
 )
@@ -41,6 +44,7 @@ func (s *ginServer) Start() {
 	v1 := api.Group("/v1")
 
 	s.initializeLabelHandler(v1)
+	s.initializeActionHandler(v1)
 	s.app.Run(serverURL)
 }
 
@@ -60,10 +64,22 @@ func (s *ginServer) initializeLabelHandler(v1 *gin.RouterGroup) {
 	//Init all layers
 	repo := lrepositories.NewLabelRepositoryImpl(s.db)
 	usecase := lusecases.NewLabelUsecaseImpl(repo)
-	handler := handlers.NewLabelHandlerImpl(usecase)
+	handler := lhandlers.NewLabelHandlerImpl(usecase)
 
 	labelRouter := v1.Group("/labels")
 	labelRouter.GET("", handler.FindAllLabels)
 	labelRouter.GET("/:id", handler.FindLabelByID)
 	labelRouter.GET("/search", handler.GetSeachLabel)
+	labelRouter.POST("", handler.AddNewLabel)
+}
+
+func (s *ginServer) initializeActionHandler(v1 *gin.RouterGroup) {
+	//Init all layers
+	repo := arepositories.NewActionRepositoryImpl(s.db)
+	usecase := ausecases.NewActionUsecaseImpl(repo)
+	handler := ahandlers.NewActionHandlerImpl(usecase)
+
+	actionRouter := v1.Group("/actions")
+	actionRouter.GET("", handler.FindAllActions)
+	actionRouter.GET("/:id", handler.FindActionByID)
 }

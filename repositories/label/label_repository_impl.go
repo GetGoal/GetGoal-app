@@ -48,7 +48,7 @@ func (l *labelRepositoryImpl) GetSearchLabel() ([]entities.Label, error) {
 }
 
 // FindLabelByID implements LabelRepository.
-func (l *labelRepositoryImpl) FindLabelByID(id int) (entities.Label, error) {
+func (l *labelRepositoryImpl) FindLabelByID(id uint64) (entities.Label, error) {
 	log.Default().Printf("Query label by id: %d \n", id)
 
 	var label entities.Label
