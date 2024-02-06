@@ -1,7 +1,9 @@
 package repositories
 
 import (
+	"errors"
 	"log"
+	"strings"
 
 	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/entities"
@@ -13,13 +15,24 @@ type labelRepositoryImpl struct {
 }
 
 // FindLabelByName implements LabelRepository.
-func (*labelRepositoryImpl) FindLabelByName(name string) (entities.Label, error) {
-	panic("unimplemented")
+func (l *labelRepositoryImpl) FindLabelByName(name string) (entities.Label, error) {
+	log.Default().Printf("Query label by name: %s \n", name)
+	var label entities.Label
+
+	err := l.db.Debug().Model(&entities.Label{}).Preload("Programs").Where("LOWER(REPLACE(label_name, ' ', '')) = LOWER(?)", strings.ToLower(strings.ReplaceAll(name, " ", ""))).First(&label).Error
+
+	return label, err
 }
 
 // Save implements LabelRepository.
-func (*labelRepositoryImpl) Save(label *entities.Label) error {
-	panic("unimplemented")
+func (l *labelRepositoryImpl) Save(label *entities.Label) error {
+	if _, err := l.FindLabelByName(label.LabelName); err != nil {
+
+		err := l.db.Debug().Create(label).Error
+		return err
+	}
+
+	return errors.New("label with this name already existed")
 }
 
 // GetSearchLabel implements LabelRepository.

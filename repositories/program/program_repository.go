@@ -7,5 +7,5 @@ type ProgramRepository interface {
 	FindOneProgram(condition interface{}) (entities.Program, error)
 	FindSearchProgram(text string) ([]entities.Program, error)
 	FilterProgram(filter string) ([]entities.Program, error)
-	Save(program *entities.Program) error
+	Save(program *entities.Program, label_names []string) error
 }
