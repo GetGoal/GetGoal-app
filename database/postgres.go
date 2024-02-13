@@ -5,18 +5,12 @@ import (
 	"log"
 
 	"github.com/xbklyn/getgoal-app/config"
-	"github.com/xbklyn/getgoal-app/migrations"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type postgresDB struct {
 	Db *gorm.DB
-}
-
-// Migrate implements Database.
-func (p *postgresDB) Migrate() {
-	migrations.LabelMigrate(p.Db)
 }
 
 func (p *postgresDB) GetDb() *gorm.DB {

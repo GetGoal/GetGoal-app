@@ -12,4 +12,6 @@ func main() {
 	db := database.NewPostgresDB(&cfg)
 
 	server.NewGinServer(&cfg, db.GetDb()).Start()
+
+	// server.FiberServer(&cfg, db.GetDb()).Start()
 }
