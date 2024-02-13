@@ -1,4 +1,4 @@
-package repositoryentity
+package repository
 
 import "github.com/xbklyn/getgoal-app/entity"
 
