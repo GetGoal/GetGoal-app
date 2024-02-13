@@ -5,8 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	file "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/controller"
+	_ "github.com/xbklyn/getgoal-app/docs"
 	"github.com/xbklyn/getgoal-app/model"
 	repo "github.com/xbklyn/getgoal-app/repository/impl"
 	service "github.com/xbklyn/getgoal-app/service/impl"
@@ -33,7 +36,15 @@ func (s *Gin) Start() {
 
 	serverURL := fmt.Sprintf(":%d", s.cfg.App.Port)
 
-	//heatlh check
+	s.app.GET("/swagger/*any", ginSwagger.WrapHandler(file.Handler))
+
+	// HealthCheckHandler godoc
+	// @summary Health Check
+	// @description Health checking for the service
+	// @id HealthCheckHandler
+	// @produce json
+	// @response 200 {string} string "OK"
+	// @router /healthcheck [get]
 	s.app.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, model.GeneralResponse{
 			Code:    http.StatusOK,

@@ -28,6 +28,16 @@ func (controller LabelController) Route(api *gin.RouterGroup) {
 	api.DELETE("/labels/:id", controller.Delete)
 }
 
+// FindAllLable godoc
+// @summary Find All Label
+// @description Find All Label
+// @tags Label
+// @id FindAllLabel
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels [get]
 func (controller LabelController) FindAllLabels(c *gin.Context) {
 	labels, err := controller.LabelService.FindAllLabels()
 	if err != nil {
@@ -49,6 +59,17 @@ func (controller LabelController) FindAllLabels(c *gin.Context) {
 	})
 }
 
+// FindLabelById godoc
+// @summary Find Label By ID
+// @description Search label by provided ID
+// @tags Label
+// @id FindLabelByID
+// @param id path int true "Label ID"
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels/:id [get]
 func (controller LabelController) FindLabelByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -81,6 +102,16 @@ func (controller LabelController) FindLabelByID(c *gin.Context) {
 	})
 }
 
+// GetSearchLabel godoc
+// @summary Search Label Filter
+// @description Get label with random order and limit
+// @tags Label
+// @id GetSearchLabel
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels/search [get]
 func (controller LabelController) GetSearchLabel(c *gin.Context) {
 	labels, err := controller.LabelService.GetSearchLabel()
 	if err != nil {
@@ -103,6 +134,17 @@ func (controller LabelController) GetSearchLabel(c *gin.Context) {
 	})
 }
 
+// SaveLabel godoc
+// @summary Save Label
+// @description Create new label
+// @tags Label
+// @id SaveLabel
+// @accept json
+// @param label body model.LabelRequest true "Label Request"
+// @produce json
+// @response 201 {object} model.GeneralResponse "Created"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels [post]
 func (controller LabelController) Save(c *gin.Context) {
 	label := new(model.LabelRequest)
 	if err := common.Bind(c, label); err != nil {
@@ -134,6 +176,18 @@ func (controller LabelController) Save(c *gin.Context) {
 	})
 }
 
+// Update godoc
+// @summary Update Label
+// @description Update existing label
+// @tags Label
+// @id UpdateLabel
+// @accept json
+// @produce json
+// @param id path int true "Label ID"
+// @param label body model.LabelRequest true "Label Request"
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels/:id [put]
 func (controller LabelController) Update(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -175,6 +229,18 @@ func (controller LabelController) Update(c *gin.Context) {
 		Error:   nil,
 	})
 }
+
+// Delete godoc
+// @summary Delete Label
+// @description Delete existing label
+// @tags Label
+// @id DeleteLabel
+// @accept json
+// @produce json
+// @param id path int true "Label ID"
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/labels/:id [delete]
 func (controller LabelController) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
