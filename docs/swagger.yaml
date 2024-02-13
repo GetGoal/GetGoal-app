@@ -1,0 +1,173 @@
+definitions:
+  model.GeneralResponse:
+    properties:
+      code:
+        type: integer
+      count:
+        type: integer
+      data: {}
+      error: {}
+      message:
+        type: string
+    type: object
+  model.LabelRequest:
+    properties:
+      label_name:
+        maxLength: 30
+        minLength: 4
+        type: string
+    required:
+    - label_name
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/labels:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing label
+      operationId: DeleteLabel
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete Label
+      tags:
+      - Label
+    get:
+      consumes:
+      - application/json
+      description: Find All Label
+      operationId: FindAllLabel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Label
+      tags:
+      - Label
+    post:
+      consumes:
+      - application/json
+      description: Create new label
+      operationId: SaveLabel
+      parameters:
+      - description: Label Request
+        in: body
+        name: label
+        required: true
+        schema:
+          $ref: '#/definitions/model.LabelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save Label
+      tags:
+      - Label
+  /api/v1/labels/:id:
+    get:
+      consumes:
+      - application/json
+      description: Search label by provided ID
+      operationId: FindLabelByID
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Label By ID
+      tags:
+      - Label
+    put:
+      consumes:
+      - application/json
+      description: Update existing label
+      operationId: UpdateLabel
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Label Request
+        in: body
+        name: label
+        required: true
+        schema:
+          $ref: '#/definitions/model.LabelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update Label
+      tags:
+      - Label
+  /api/v1/labels/search:
+    get:
+      consumes:
+      - application/json
+      description: Get label with random order and limit
+      operationId: GetSearchLabel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Search Label Filter
+      tags:
+      - Label
+swagger: "2.0"
