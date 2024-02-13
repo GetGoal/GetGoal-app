@@ -19,35 +19,43 @@ definitions:
     required:
     - label_name
     type: object
+  model.TaskCreateOrUpdate:
+    properties:
+      category:
+        type: string
+      is_set_noti:
+        default: 0
+        type: integer
+      link:
+        type: string
+      media_url:
+        type: string
+      start_time:
+        type: string
+      task_description:
+        type: string
+      task_name:
+        maxLength: 250
+        type: string
+      time_before_notify:
+        type: integer
+    required:
+    - task_name
+    type: object
+  model.ToDoRequest:
+    properties:
+      date:
+        type: string
+      email:
+        type: string
+    required:
+    - date
+    - email
+    type: object
 info:
   contact: {}
 paths:
   /api/v1/labels:
-    delete:
-      consumes:
-      - application/json
-      description: Delete existing label
-      operationId: DeleteLabel
-      parameters:
-      - description: Label ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.GeneralResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.GeneralResponse'
-      summary: Delete Label
-      tags:
-      - Label
     get:
       consumes:
       - application/json
@@ -94,6 +102,31 @@ paths:
       tags:
       - Label
   /api/v1/labels/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing label
+      operationId: DeleteLabel
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete Label
+      tags:
+      - Label
     get:
       consumes:
       - application/json
@@ -170,4 +203,206 @@ paths:
       summary: Search Label Filter
       tags:
       - Label
+  /api/v1/tasks:
+    get:
+      consumes:
+      - application/json
+      description: Find All Tasks
+      operationId: FindAllTask
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      description: Create new task
+      operationId: SaevTask
+      parameters:
+      - description: Task Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save Task
+      tags:
+      - Task
+  /api/v1/tasks/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Existing Task
+      operationId: DeleteTask
+      parameters:
+      - description: Task Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete Task
+      tags:
+      - Task
+    get:
+      consumes:
+      - application/json
+      description: Find a task by passing ID
+      operationId: FindTaskById
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find task by ID
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Update a task by passing ID
+      operationId: UpdateTask
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Task Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update Task
+      tags:
+      - Task
+  /api/v1/tasks/plan/:program_id:
+    get:
+      consumes:
+      - application/json
+      description: List task related to that program_id for planning
+      operationId: PlanTask
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: list task to plan program
+      tags:
+      - Task
+  /api/v1/tasks/to-do:
+    get:
+      consumes:
+      - application/json
+      description: Find Task by Email and Date
+      operationId: FindTaskByEmailDate
+      parameters:
+      - description: Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.ToDoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Task by Email and Date
+      tags:
+      - Task
 swagger: "2.0"
