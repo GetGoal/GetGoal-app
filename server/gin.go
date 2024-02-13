@@ -64,7 +64,7 @@ func NewGinServer(cfg *config.Config, db *gorm.DB) Server {
 	}
 
 	return &Gin{
-		app: gin.New(),
+		app: gin.Default(),
 		db:  db,
 		cfg: cfg,
 	}
