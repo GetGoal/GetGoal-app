@@ -8,4 +8,6 @@ type LabelRepo interface {
 	FindLabelByName(name string) (entity.Label, error)
 	GetSearchLabel() ([]entity.Label, error)
 	Save(label *entity.Label) (entity.Label, error)
+	Update(id uint64, label entity.Label) (entity.Label, error)
+	Delete(id uint64) error
 }

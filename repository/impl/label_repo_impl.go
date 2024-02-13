@@ -20,6 +20,22 @@ type labelRepoImpl struct {
 	db *gorm.DB
 }
 
+// Delete implements repositoryentity.LabelRepo.
+func (l *labelRepoImpl) Delete(id uint64) error {
+	log.Default().Printf("Delete label by id: %d \n", id)
+
+	err := l.db.Debug().Where("label_id = ?", id).Delete(&entity.Label{}).Error
+	return err
+}
+
+// Update implements repositoryentity.LabelRepo.
+func (l *labelRepoImpl) Update(id uint64, label entity.Label) (entity.Label, error) {
+	log.Default().Printf("Update label: %s \n", label.LabelName)
+
+	err := l.db.Debug().Model(&entity.Label{}).Where("label_id = ?", id).Updates(&entity.Label{LabelName: label.LabelName}).Error
+	return label, err
+}
+
 // FindLabelByName implements LabelRepository.
 func (l *labelRepoImpl) FindLabelByName(name string) (entity.Label, error) {
 	log.Default().Printf("Query label by name: %s \n", name)

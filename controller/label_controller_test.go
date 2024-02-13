@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -71,6 +72,23 @@ func (m *mockLabelService) Save(label model.LabelRequest) (*entity.Label, error)
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}, nil
+}
+
+func (m *mockLabelService) Update(id uint64, label model.LabelRequest) (*entity.Label, error) {
+	if id == 1 {
+		if label.LabelName == "" {
+			return nil, errors.New("label_name is required")
+		}
+		return &entity.Label{LabelID: id, LabelName: "Updated Label"}, nil
+	}
+	return nil, errors.New("label not found")
+}
+
+func (m *mockLabelService) Delete(id uint64) error {
+	if id == 1 {
+		return nil
+	}
+	return errors.New("label not found")
 }
 
 var (
@@ -186,13 +204,104 @@ func TestFindLabelByLabelID_LabelNotFound(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/labels/2", nil)
 	r.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	var response model.GeneralResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusInternalServerError, response.Code)
-	assert.Equal(t, "Something Went Wrong", response.Message)
+	assert.Equal(t, http.StatusBadRequest, response.Code)
+	assert.Equal(t, "Bad Request", response.Message)
 	assert.Equal(t, 0, response.Count) // Check the count of labels
 	assert.Contains(t, response.Error, "label not found")
+}
+func TestUpdateLabel_Success(t *testing.T) {
+	setup()
+
+	id := uint64(1)
+	payload := `{"label_name":"Updated Label"}`
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", "/api/labels/"+strconv.FormatUint(id, 10), strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response model.GeneralResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Updated Label", response.Data.(map[string]interface{})["label_name"])
+}
+
+func TestUpdateLabel_InvalidID(t *testing.T) {
+	setup()
+
+	id := uint64(100) // Assuming ID doesn't exist
+	payload := `{"label_name":"Updated Label"}`
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", "/api/labels/"+strconv.FormatUint(id, 10), strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var response model.GeneralResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "label not found", response.Error)
+}
+
+func TestUpdateLabel_InvalidPayload(t *testing.T) {
+	setup()
+
+	id := uint64(1)
+	payload := `{"invalid_field":"Updated Label"}` // Invalid payload
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", "/api/labels/"+strconv.FormatUint(id, 10), strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var response model.GeneralResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Bad Request", response.Message)
+	assert.Contains(t, response.Error, "label_name is required")
+}
+
+func TestDeleteLabel_Success(t *testing.T) {
+	setup()
+
+	id := uint64(1)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/api/labels/"+strconv.FormatUint(id, 10), nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response model.GeneralResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Deleted id 1 successfully", response.Message)
+}
+
+func TestDeleteLabel_InvalidID(t *testing.T) {
+	setup()
+
+	id := uint64(100) // Assuming ID doesn't exist
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/api/labels/"+strconv.FormatUint(id, 10), nil)
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var response model.GeneralResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "label not found", response.Error)
 }

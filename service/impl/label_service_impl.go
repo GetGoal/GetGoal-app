@@ -12,6 +12,34 @@ type labelServiceImpl struct {
 	LabelRepo repository.LabelRepo
 }
 
+// Delete implements service.LabelService.
+func (service *labelServiceImpl) Delete(id uint64) error {
+
+	_, err := service.LabelRepo.FindLabelByID(id)
+	if err != nil {
+		return err
+	}
+	serviceErr := service.LabelRepo.Delete(id)
+	return serviceErr
+}
+
+// Update implements service.LabelService.
+func (service *labelServiceImpl) Update(id uint64, labelModel model.LabelRequest) (*entity.Label, error) {
+	err := common.Validate(labelModel)
+	if err != nil {
+		return nil, err
+	}
+	existed, err := service.LabelRepo.FindLabelByID(id)
+	if err != nil {
+		return nil, err
+	}
+	existed.LabelName = labelModel.LabelName
+
+	label, serviceErr := service.LabelRepo.Update(id, existed)
+	return &label, serviceErr
+
+}
+
 // FindAllLabels implements service.LabelService.
 func (service *labelServiceImpl) FindAllLabels() ([]entity.Label, error) {
 	labels, err := service.LabelRepo.FindAllLabels()
