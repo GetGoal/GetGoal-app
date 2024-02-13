@@ -16,11 +16,15 @@ type UserProgram struct {
 }
 
 func (userProgram *UserProgram) TableName() string {
-	return "user_account"
+	return "user_program"
 }
 
 func (up *UserProgram) BeforeUpdate(tx *gorm.DB) (err error) {
 	now := time.Now()
 	up.UpdatedAt = now
 	return nil
+}
+
+func (up *UserProgram) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&UserProgram{})
 }

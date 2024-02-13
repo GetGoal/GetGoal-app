@@ -39,3 +39,6 @@ func (task *Task) BeforeUpdate(tx *gorm.DB) (err error) {
 	task.UpdatedAt = now
 	return nil
 }
+func (task *Task) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&Task{})
+}

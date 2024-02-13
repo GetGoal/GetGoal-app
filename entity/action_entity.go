@@ -3,7 +3,6 @@ package entity
 import (
 	"time"
 
-	"github.com/xbklyn/getgoal-app/common"
 	"gorm.io/gorm"
 )
 
@@ -15,11 +14,6 @@ type ActionType struct {
 	DeletedAt  *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 }
 
-func Migrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&ActionType{})
-}
-
 func (actionType *ActionType) TableName() string {
 	return "action_type"
 }
@@ -28,4 +22,8 @@ func (actionType *ActionType) BeforeUpdate(tx *gorm.DB) (err error) {
 	now := time.Now()
 	actionType.UpdatedAt = now
 	return nil
+}
+
+func (actionType *ActionType) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&ActionType{})
 }

@@ -32,3 +32,7 @@ func (program *Program) BeforeUpdate(tx *gorm.DB) (err error) {
 	program.UpdatedAt = now
 	return nil
 }
+
+func (program *Program) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&Program{})
+}

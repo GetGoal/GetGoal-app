@@ -26,3 +26,7 @@ func (label *Label) BeforeUpdate(tx *gorm.DB) (err error) {
 	label.UpdatedAt = now
 	return nil
 }
+
+func (label *Label) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&Label{})
+}

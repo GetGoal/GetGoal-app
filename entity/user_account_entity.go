@@ -29,3 +29,7 @@ func (user *UserAccount) BeforeUpdate(tx *gorm.DB) (err error) {
 	user.UpdatedAt = now
 	return nil
 }
+
+func (user *UserAccount) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&UserAccount{})
+}
