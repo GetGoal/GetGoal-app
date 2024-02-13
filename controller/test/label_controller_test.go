@@ -1,4 +1,4 @@
-package controller
+package controller_test
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/xbklyn/getgoal-app/controller"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
 )
@@ -94,14 +95,14 @@ func (m *mockLabelService) Delete(id uint64) error {
 var (
 	r               *gin.Engine
 	labelService    *mockLabelService
-	labelController *LabelController
+	labelController *controller.LabelController
 )
 
 func setup() {
 	gin.SetMode(gin.TestMode)
 	r = gin.New()
 	labelService = &mockLabelService{}
-	labelController = NewLabelController(labelService)
+	labelController = controller.NewLabelController(labelService)
 	api := r.Group("/api")
 	labelController.Route(api)
 }
