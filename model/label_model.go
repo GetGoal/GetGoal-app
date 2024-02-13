@@ -3,9 +3,9 @@ package model
 import "github.com/xbklyn/getgoal-app/entity"
 
 type LabelModel struct {
-	LabelID   uint64   `json:"label_id"`
-	LabelName string   `json:"label_name"`
-	ProgramID []uint64 `json:"program_id"`
+	LabelID    uint64   `json:"label_id"`
+	LabelName  string   `json:"label_name"`
+	ProgramIDs []uint64 `json:"program_id"`
 }
 
 func ConvertToLabelModel(entityLabel entity.Label) LabelModel {
@@ -14,9 +14,9 @@ func ConvertToLabelModel(entityLabel entity.Label) LabelModel {
 		programIDs = append(programIDs, program.ProgramID)
 	}
 	return LabelModel{
-		LabelID:   entityLabel.LabelID,
-		LabelName: entityLabel.LabelName,
-		ProgramID: programIDs,
+		LabelID:    entityLabel.LabelID,
+		LabelName:  entityLabel.LabelName,
+		ProgramIDs: programIDs,
 	}
 }
 

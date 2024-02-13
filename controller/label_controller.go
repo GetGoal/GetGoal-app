@@ -114,9 +114,9 @@ func (controller LabelController) Save(c *gin.Context) {
 	}
 	labelCreate, err := controller.LabelService.Save(*label)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, model.GeneralResponse{
-			Code:    http.StatusInternalServerError,
-			Message: "Something Went Wrong",
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad Request",
 			Data:    nil,
 			Error:   err.Error(),
 		})
