@@ -27,12 +27,18 @@ func (s *Gin) Start() {
 
 	//repo
 	labelRepo := repo.NewlabelRepoImpl(s.db)
+	taskRepo := repo.NewTaskRepoImpl(s.db)
+	// programRepo := repo.NewProgramRepoImpl(s.db)
+	userRepo := repo.NewUserRepoImpl(s.db)
+	userProgramRepo := repo.NewUserProgramRepoImpl(s.db)
 
 	//service
 	labelService := service.NewLabelServiceImpl(&labelRepo)
+	taskService := service.NewTaskServiceImpl(taskRepo, userRepo, userProgramRepo)
 
 	//controller
 	labelController := controller.NewLabelController(labelService)
+	taskController := controller.NewTaskController(taskService)
 
 	serverURL := fmt.Sprintf(":%d", s.cfg.App.Port)
 
@@ -65,6 +71,7 @@ func (s *Gin) Start() {
 
 	//routes
 	labelController.Route(v1)
+	taskController.Route(v1)
 
 	s.app.Run(serverURL)
 }

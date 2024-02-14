@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	// "gopkg.in/go-playground/validator.v8"
 	"github.com/go-playground/validator/v10"
@@ -68,4 +69,8 @@ func Validate(modelValidate interface{}) error {
 		return errors.New(string(jsonMessage))
 	}
 	return nil
+}
+
+func GetTimeNow() time.Time {
+	return time.Now()
 }
