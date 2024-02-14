@@ -42,7 +42,8 @@ func (s *Gin) Start() {
 
 	serverURL := fmt.Sprintf(":%d", s.cfg.App.Port)
 
-	s.app.GET("/swagger/*any", ginSwagger.WrapHandler(file.Handler))
+	env := s.cfg.Env
+	s.app.GET(env+"/swagger/*any", ginSwagger.WrapHandler(file.Handler))
 
 	// HealthCheckHandler godoc
 	// @summary Health Check
