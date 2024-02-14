@@ -27,6 +27,7 @@ func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Tas
 	if err != nil {
 		return nil, err
 	}
+
 	task.TaskStatus = status
 	task, serviceErr := service.TaskRepo.Update(id, task)
 	return &task, serviceErr
@@ -63,7 +64,7 @@ func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinPro
 			return nil, saveErr
 		}
 	}
-	upErr := service.UserProgramRepo.Save(1, programId, user.UserID)
+	upErr := service.UserProgramRepo.Save(2, programId, user.UserID)
 	if upErr != nil {
 		return nil, upErr
 	}

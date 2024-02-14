@@ -305,7 +305,7 @@ func TestFindTaskByID_TaskNotFound(t *testing.T) {
 func TestSaveTask_Success(t *testing.T) {
 	setupTaskController()
 
-	payload := `{"task_name":"New Task", "description":"Test Description"}`
+	payload := `{"task_name":"New Task", "description":"Test Description" owner_id:1}`
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/v1/tasks", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")

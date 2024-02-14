@@ -15,7 +15,7 @@ type TaskCreateOrUpdate struct {
 	TaskDescription   string    `json:"task_description"`
 	Link              string    `json:"link"`
 	MediaURL          string    ` json:"media_url"`
-	Owner             uint      `json:"owner" binding:"required" validate:"required"`
+	Owner             uint      `json:"owner" binding:"required"`
 }
 
 type ToDoRequest struct {
