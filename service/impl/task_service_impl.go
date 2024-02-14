@@ -20,6 +20,17 @@ type TaskServiceImpl struct {
 	UserProgramRepo repository.UserProgramRepo
 }
 
+// UpdateStatus implements service.TaskService.
+func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Task, error) {
+	task, err := service.TaskRepo.FindTaskByID(id)
+	if err != nil {
+		return nil, err
+	}
+	task.TaskStatus = status
+	task, serviceErr := service.TaskRepo.Update(id, task)
+	return &task, serviceErr
+}
+
 // JoinProgram implements service.TaskService.
 func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinProgramModifications) (*[]entity.Task, error) {
 	user, err := service.UserRepo.FindUserByEmail(model.Email)

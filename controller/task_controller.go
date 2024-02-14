@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -27,6 +26,8 @@ func (controller TaskController) Route(api *gin.RouterGroup) {
 	api.GET("/tasks/plan/:id", controller.FindTaskFromProgramId)
 	api.POST("/tasks", controller.Save)
 	api.POST("/tasks/join-program/:program_id", controller.CreateTaskFromProgram)
+	api.PUT("/tasks/done/:id", controller.UpdateStatusDone)
+	api.PUT("/tasks/un-done/:id", controller.UpdateStatusTodo)
 	api.PUT("/tasks/:id", controller.Update)
 	api.DELETE("/tasks/:id", controller.Delete)
 }
@@ -228,7 +229,7 @@ func (controller TaskController) Update(c *gin.Context) {
 // @id DeleteTask
 // @accept json
 // @produce json
-// @param task body model.TaskCreateOrUpdate true "Task Data"
+// @param id path int true "Task ID"
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @response 404 {object} model.GeneralResponse "Not Found"
@@ -412,6 +413,19 @@ func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 	})
 }
 
+// Join program  godoc
+// @summary join program
+// @description Create tasks from program
+// @tags Task
+// @id JoinProgram
+// @accept json
+// @produce json
+// @param id path int true "Program ID"
+// @param modifications body model.JoinProgramModifications true "Modifications"
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @response 404 {object} model.GeneralResponse "Not Found"
+// @Router /api/v1/tasks/join-program/:program_id [post]
 func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 	programId, err := strconv.ParseUint(c.Param("program_id"), 10, 64)
 	if err != nil {
@@ -435,8 +449,6 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 	}
 
 	tasks, err := controller.TaskService.JoinProgram(programId, modifications)
-	fmt.Println("tasks")
-	fmt.Println(tasks)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
@@ -444,6 +456,58 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 				Message: "Not Found",
 				Data:    nil,
 				Error:   "program not found",
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	tasksDTO := model.ConvertToTaskModels(*tasks)
+	c.JSON(http.StatusCreated, model.GeneralResponse{
+		Code:    http.StatusCreated,
+		Message: "Success",
+		Count:   len(tasksDTO),
+		Data:    tasksDTO,
+		Error:   nil,
+	})
+}
+
+// UpdateDone  godoc
+// @summary update status to done
+// @description update status to 1 (done)
+// @tags Task
+// @id UpdateDone
+// @accept json
+// @produce json
+// @param id path int true "Task  ID"
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @response 404 {object} model.GeneralResponse "Not Found"
+// @Router /api/v1/tasks/done/:id [put]
+func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	task, err := controlller.TaskService.UpdateStatus(id, 1)
+	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   "task not found",
 			})
 			return
 		}
@@ -455,12 +519,64 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 		})
 		return
 	}
-	tasksDTO := model.ConvertToTaskModels(*tasks)
+	taskDTO := model.ConvertToTaskModel(*task)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(tasksDTO),
-		Data:    tasksDTO,
+		Count:   1,
+		Data:    taskDTO,
+		Error:   nil,
+	})
+}
+
+// UpdateTodo  godoc
+// @summary update status to todo
+// @description update status to 0 (todo)
+// @tags Task
+// @id UpdateTodo
+// @accept json
+// @produce json
+// @param id path int true "Task  ID"
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @response 404 {object} model.GeneralResponse "Not Found"
+// @Router /api/v1/tasks/todo/:id [put]
+func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	task, err := controlller.TaskService.UpdateStatus(id, 0)
+	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   "task not found",
+			})
+			return
+		}
+		c.JSON(http.StatusBadGateway, model.GeneralResponse{
+			Code:    http.StatusBadGateway,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	taskDTO := model.ConvertToTaskModel(*task)
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   1,
+		Data:    taskDTO,
 		Error:   nil,
 	})
 }

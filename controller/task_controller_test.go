@@ -12,12 +12,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/xbklyn/getgoal-app/controller"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
 )
 
-type mockTaskService struct{}
+type mockTaskService struct {
+	mock.Mock
+}
+
+// JoinProgram implements service.TaskService.
+func (m *mockTaskService) JoinProgram(programID uint64, modifications model.JoinProgramModifications) (*[]entity.Task, error) {
+	args := m.Called(programID, modifications)
+	return args.Get(0).(*[]entity.Task), args.Error(1)
+}
 
 func (m *mockTaskService) FindAllTasks() ([]entity.Task, error) {
 	// Mock data for testing
@@ -199,34 +208,14 @@ func (m *mockTaskService) Delete(id uint64) error {
 	return errors.New("task not found")
 }
 
-func (m *mockTaskService) JoinProgram(programId uint64, modifications model.JoinProgramModifications) (*[]entity.Task, error) {
+func (m *mockTaskService) UpdateStatus(id uint64, status int) (*entity.Task, error) {
 	// Mock data for testing
-	if programId == 1 && modifications.Email == "test@example.com" {
-		tasks := []entity.Task{
-			{
-				TaskID:            1,
-				TaskName:          "Task 1",
-				TaskStatus:        1,
-				IsSetNotification: 1,
-				StartTime:         time.Now(),
-				EndTime:           nil,
-				Category:          "Category 1",
-				TimeBeforeNotify:  5,
-				TaskDescription:   "Task 1 Description",
-				Link:              "http://example.com",
-				MediaURL:          "http://media.example.com",
-				CreatedAt:         time.Now(),
-				UpdatedAt:         time.Now(),
-				DeletedAt:         nil,
-				ProgramID:         nil,
-				Program:           nil,
-				UserAccountID:     1,
-				UserAccount:       entity.UserAccount{},
-			},
-		}
-		return &tasks, nil
+	if id == 1 {
+		task := entity.Task{}
+		return &task, nil
 	}
-	return nil, errors.New("no tasks found for the given program ID and email")
+	return nil, errors.New("task not found")
+
 }
 
 var (
@@ -420,4 +409,92 @@ func TestDeleteTask_InvalidID(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, response.Code)
 	assert.Contains(t, response.Message, "Invalid ID")
+}
+
+func TestJoinProgram_Success(t *testing.T) {
+	// Set up test environment
+	mockTaskService := &mockTaskService{}
+	controller := controller.TaskController{TaskService: mockTaskService}
+	programID := uint64(123)
+	modifications := model.JoinProgramModifications{
+		Email: "test@example.com",
+		Modifications: []model.Modification{
+			{
+				IsSetNotification: 1,
+				StartTime:         "2024-02-14T12:00:00Z",
+				TimeBeforeNotify:  30,
+			},
+		},
+	}
+	expectedTasks := &[]entity.Task{}
+
+	// Set up expected behavior of the mock
+	mockTaskService.On("JoinProgram", programID, modifications).Return(expectedTasks, nil)
+
+	// Make the actual function call
+	tasks, err := controller.TaskService.JoinProgram(programID, modifications)
+
+	// Check if the function behaves as expected
+	assert.Equal(t, expectedTasks, tasks)
+	assert.NoError(t, err)
+}
+
+func TestJoinProgram_ValidInput(t *testing.T) {
+	// Set up test environment
+	mockTaskService := &mockTaskService{}
+	controller := controller.TaskController{TaskService: mockTaskService}
+
+	// Define test case
+	programID := uint64(123)
+	modifications := model.JoinProgramModifications{
+		Email: "test@example.com",
+		Modifications: []model.Modification{
+			{
+				IsSetNotification: 1,
+				StartTime:         "2024-02-14T12:00:00Z",
+				TimeBeforeNotify:  30,
+			},
+		},
+	}
+	expectedTasks := &[]entity.Task{}
+
+	// Set up expected behavior of the mock
+	mockTaskService.On("JoinProgram", programID, modifications).Return(expectedTasks, nil)
+
+	// Make the actual function call
+	tasks, err := controller.TaskService.JoinProgram(programID, modifications)
+
+	// Check if the function behaves as expected
+	assert.Equal(t, expectedTasks, tasks)
+	assert.Equal(t, nil, err)
+}
+
+func TestJoinProgram_InvalidProgramID(t *testing.T) {
+	// Set up test environment
+	mockTaskService := &mockTaskService{}
+	controller := controller.TaskController{TaskService: mockTaskService}
+
+	// Define test case
+	programID := uint64(0) // Invalid program ID
+	modifications := model.JoinProgramModifications{
+		Email: "test@example.com",
+		Modifications: []model.Modification{
+			{
+				IsSetNotification: 1,
+				StartTime:         "2024-02-14T12:00:00Z",
+				TimeBeforeNotify:  30,
+			},
+		},
+	}
+	expectedError := errors.New("invalid program ID")
+
+	// Set up expected behavior of the mock
+	mockTaskService.On("JoinProgram", programID, modifications).Return(&[]entity.Task{}, expectedError)
+
+	// Make the actual function call
+	tasks, err := controller.TaskService.JoinProgram(programID, modifications)
+
+	// Check if the function behaves as expected
+	assert.Equal(t, &[]entity.Task{}, tasks)
+	assert.Equal(t, expectedError, err)
 }

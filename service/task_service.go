@@ -13,5 +13,6 @@ type TaskService interface {
 	Save(task model.TaskCreateOrUpdate) (*entity.Task, error)
 	JoinProgram(programId uint64, model model.JoinProgramModifications) (*[]entity.Task, error)
 	Update(id uint64, task model.TaskCreateOrUpdate) (*entity.Task, error)
+	UpdateStatus(id uint64, status int) (*entity.Task, error)
 	Delete(id uint64) error
 }
