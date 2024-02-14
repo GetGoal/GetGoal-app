@@ -46,7 +46,7 @@ type (
 	}
 )
 
-func ReadConfig() Config {
+func ReadConfig(path string) Config {
 
 	log.Default().Println("Reading environment variables...")
 	viper.AutomaticEnv() // Automatically read from environment variables
@@ -55,7 +55,7 @@ func ReadConfig() Config {
 	log.Default().Println("Reading config file...")
 	viper.SetConfigName("config.local")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./")
+	viper.AddConfigPath(path)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Default().Printf("Fatal error when loading config.local file: %s \n", err)

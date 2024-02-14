@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	// "gopkg.in/go-playground/validator.v8"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
