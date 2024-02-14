@@ -290,8 +290,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
@@ -416,12 +416,109 @@ const docTemplate = `{
                 "operationId": "DeleteTask",
                 "parameters": [
                     {
-                        "description": "Task Data",
-                        "name": "task",
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tasks/done/:id": {
+            "put": {
+                "description": "update status to 1 (done)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "update status to done",
+                "operationId": "UpdateDone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task  ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tasks/join-program/:program_id": {
+            "post": {
+                "description": "Create tasks from program",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "join program",
+                "operationId": "JoinProgram",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Program ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Modifications",
+                        "name": "modifications",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.TaskCreateOrUpdate"
+                            "$ref": "#/definitions/model.JoinProgramModifications"
                         }
                     }
                 ],
@@ -538,6 +635,51 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/tasks/todo/:id": {
+            "put": {
+                "description": "update status to 0 (todo)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "update status to todo",
+                "operationId": "UpdateTodo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task  ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -557,6 +699,23 @@ const docTemplate = `{
                 }
             }
         },
+        "model.JoinProgramModifications": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "modifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Modification"
+                    }
+                }
+            }
+        },
         "model.LabelRequest": {
             "type": "object",
             "required": [
@@ -567,6 +726,23 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 30,
                     "minLength": 4
+                }
+            }
+        },
+        "model.Modification": {
+            "type": "object",
+            "required": [
+                "start_time"
+            ],
+            "properties": {
+                "is_set_noti": {
+                    "type": "integer"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "time_before_notify": {
+                    "type": "integer"
                 }
             }
         },

@@ -10,6 +10,17 @@ definitions:
       message:
         type: string
     type: object
+  model.JoinProgramModifications:
+    properties:
+      email:
+        type: string
+      modifications:
+        items:
+          $ref: '#/definitions/model.Modification'
+        type: array
+    required:
+    - email
+    type: object
   model.LabelRequest:
     properties:
       label_name:
@@ -18,6 +29,17 @@ definitions:
         type: string
     required:
     - label_name
+    type: object
+  model.Modification:
+    properties:
+      is_set_noti:
+        type: integer
+      start_time:
+        type: string
+      time_before_notify:
+        type: integer
+    required:
+    - start_time
     type: object
   model.TaskCreateOrUpdate:
     properties:
@@ -238,8 +260,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/model.GeneralResponse'
         "400":
@@ -256,12 +278,11 @@ paths:
       description: Delete Existing Task
       operationId: DeleteTask
       parameters:
-      - description: Task Data
-        in: body
-        name: task
+      - description: Task ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/model.TaskCreateOrUpdate'
+        type: integer
       produces:
       - application/json
       responses:
@@ -344,6 +365,72 @@ paths:
       summary: Update Task
       tags:
       - Task
+  /api/v1/tasks/done/:id:
+    put:
+      consumes:
+      - application/json
+      description: update status to 1 (done)
+      operationId: UpdateDone
+      parameters:
+      - description: Task  ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: update status to done
+      tags:
+      - Task
+  /api/v1/tasks/join-program/:program_id:
+    post:
+      consumes:
+      - application/json
+      description: Create tasks from program
+      operationId: JoinProgram
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Modifications
+        in: body
+        name: modifications
+        required: true
+        schema:
+          $ref: '#/definitions/model.JoinProgramModifications'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: join program
+      tags:
+      - Task
   /api/v1/tasks/plan/:program_id:
     get:
       consumes:
@@ -403,6 +490,36 @@ paths:
           schema:
             $ref: '#/definitions/model.GeneralResponse'
       summary: Find Task by Email and Date
+      tags:
+      - Task
+  /api/v1/tasks/todo/:id:
+    put:
+      consumes:
+      - application/json
+      description: update status to 0 (todo)
+      operationId: UpdateTodo
+      parameters:
+      - description: Task  ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: update status to todo
       tags:
       - Task
 swagger: "2.0"
