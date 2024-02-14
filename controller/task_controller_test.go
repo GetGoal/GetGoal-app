@@ -305,7 +305,7 @@ func TestFindTaskByID_TaskNotFound(t *testing.T) {
 func TestSaveTask_Success(t *testing.T) {
 	setupTaskController()
 
-	payload := `{"task_name":"New Task", "description":"Test Description" owner_id:1}`
+	payload := `{"task_name":"New Task", "description":"Test Description","owner": 4}`
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/v1/tasks", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
@@ -318,12 +318,13 @@ func TestSaveTask_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, response.Code)
 	assert.Equal(t, "Success", response.Message)
+	assert.Equal(t, nil, response.Error)
 }
 
 func TestSaveTask_InvalidPayload(t *testing.T) {
 	setupTaskController()
 
-	payload := `{"invalid_field":"New Task"}`
+	payload := `{"invalid_field":"New Task", "owner": 4}`
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/v1/tasks", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
@@ -343,7 +344,7 @@ func TestUpdateTask_Success(t *testing.T) {
 	setupTaskController()
 
 	id := uint64(1)
-	payload := `{"task_name":"Updated Task", "description":"Updated Description"}`
+	payload := `{"task_name":"Updated Task", "description":"Updated Description", "owner":4}`
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("PUT", "/api/v1/tasks/"+strconv.FormatUint(id, 10), strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
