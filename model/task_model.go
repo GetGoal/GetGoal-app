@@ -15,6 +15,7 @@ type TaskCreateOrUpdate struct {
 	TaskDescription   string    `json:"task_description"`
 	Link              string    `json:"link"`
 	MediaURL          string    ` json:"media_url"`
+	Owner             uint      `json:"owner" binding:"required" validate:"required"`
 }
 
 type ToDoRequest struct {
@@ -58,7 +59,7 @@ func ConvertToTaskModel(entityTask entity.Task) TaskModel {
 			Link:              entityTask.Link,
 			MediaURL:          entityTask.MediaURL,
 			RelatedProgram:    uint(*entityTask.ProgramID),
-			OwnerID:           uint(entityTask.UserAccount.UserID),
+			OwnerID:           uint(entityTask.UserAccountID),
 		}
 	}
 	return TaskModel{
@@ -71,7 +72,7 @@ func ConvertToTaskModel(entityTask entity.Task) TaskModel {
 		TaskDescription:   entityTask.TaskDescription,
 		Link:              entityTask.Link,
 		MediaURL:          entityTask.MediaURL,
-		OwnerID:           uint(entityTask.UserAccount.UserID),
+		OwnerID:           uint(entityTask.UserAccountID),
 	}
 }
 

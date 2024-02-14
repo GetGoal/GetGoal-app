@@ -540,7 +540,7 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @response 404 {object} model.GeneralResponse "Not Found"
-// @Router /api/v1/tasks/todo/:id [put]
+// @Router /api/v1/tasks/un-done/:id [put]
 func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

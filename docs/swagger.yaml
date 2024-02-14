@@ -52,6 +52,8 @@ definitions:
         type: string
       media_url:
         type: string
+      owner:
+        type: integer
       start_time:
         type: string
       task_description:
@@ -62,6 +64,7 @@ definitions:
       time_before_notify:
         type: integer
     required:
+    - owner
     - task_name
     type: object
   model.ToDoRequest:
@@ -492,7 +495,7 @@ paths:
       summary: Find Task by Email and Date
       tags:
       - Task
-  /api/v1/tasks/todo/:id:
+  /api/v1/tasks/un-done/:id:
     put:
       consumes:
       - application/json

@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
@@ -131,6 +132,11 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate) (*entity.Tas
 	if err != nil {
 		return nil, err
 	}
+
+	user, err := service.UserRepo.FindUserByID(uint64(task.Owner))
+	if err != nil {
+		return nil, err
+	}
 	taskEntity := entity.Task{
 		TaskName:          task.TaskName,
 		TaskDescription:   task.TaskDescription,
@@ -139,6 +145,8 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate) (*entity.Tas
 		IsSetNotification: task.IsSetNotification,
 		TimeBeforeNotify:  task.TimeBeforeNotify,
 		CreatedAt:         common.GetTimeNow(),
+		UserAccountID:     int(user.UserID),
+		UserAccount:       user,
 	}
 
 	taskEntity, serviceErr := service.TaskRepo.Save(&taskEntity)
@@ -155,6 +163,9 @@ func (service *TaskServiceImpl) Update(id uint64, task model.TaskCreateOrUpdate)
 	existed, err := service.TaskRepo.FindTaskByID(id)
 	if err != nil {
 		return nil, err
+	}
+	if existed.UserAccountID != int(task.Owner) {
+		return nil, fmt.Errorf("you are not allowed to update this task")
 	}
 	existed.TaskName = task.TaskName
 	existed.TaskDescription = task.TaskDescription

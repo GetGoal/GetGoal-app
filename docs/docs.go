@@ -636,7 +636,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/tasks/todo/:id": {
+        "/api/v1/tasks/un-done/:id": {
             "put": {
                 "description": "update status to 0 (todo)",
                 "consumes": [
@@ -749,6 +749,7 @@ const docTemplate = `{
         "model.TaskCreateOrUpdate": {
             "type": "object",
             "required": [
+                "owner",
                 "task_name"
             ],
             "properties": {
@@ -764,6 +765,9 @@ const docTemplate = `{
                 },
                 "media_url": {
                     "type": "string"
+                },
+                "owner": {
+                    "type": "integer"
                 },
                 "start_time": {
                     "type": "string"
