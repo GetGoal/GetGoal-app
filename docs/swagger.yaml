@@ -41,6 +41,40 @@ definitions:
     required:
     - start_time
     type: object
+  model.ProgramCreateOrUpdate:
+    properties:
+      expected_time:
+        type: integer
+      labels:
+        items:
+          $ref: '#/definitions/model.LabelRequest'
+        type: array
+      media_url:
+        type: string
+      program_desc:
+        type: string
+      program_name:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+        type: array
+      user_id:
+        type: integer
+    required:
+    - expected_time
+    - media_url
+    - program_desc
+    - program_name
+    - tasks
+    type: object
+  model.Search:
+    properties:
+      search_text:
+        type: string
+    required:
+    - search_text
+    type: object
   model.TaskCreateOrUpdate:
     properties:
       category:
@@ -228,6 +262,132 @@ paths:
       summary: Search Label Filter
       tags:
       - Label
+  /api/v1/programs:
+    get:
+      description: Find All program
+      operationId: FindAllProgram
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All program
+      tags:
+      - Program
+    post:
+      description: Save new program
+      operationId: SaveProgram
+      parameters:
+      - description: Program Create or Update
+        in: body
+        name: program
+        required: true
+        schema:
+          $ref: '#/definitions/model.ProgramCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save new program
+      tags:
+      - Program
+  /api/v1/programs/:id:
+    get:
+      description: Find program by id
+      operationId: FindProgramById
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Program by ID
+      tags:
+      - Program
+  /api/v1/programs/filter:
+    post:
+      description: Find program by id
+      operationId: FindProgramByLabel
+      parameters:
+      - description: label name
+        in: body
+        name: labels
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Program by ID
+      tags:
+      - Program
+  /api/v1/search:
+    post:
+      description: Find program by id
+      operationId: FindProgramByText
+      parameters:
+      - description: Search Text
+        in: body
+        name: text
+        required: true
+        schema:
+          $ref: '#/definitions/model.Search'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Program by ID
+      tags:
+      - Program
   /api/v1/tasks:
     get:
       consumes:
