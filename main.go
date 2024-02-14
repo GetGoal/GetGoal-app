@@ -15,7 +15,7 @@ import (
 
 // @schemes https http
 func main() {
-	cfg := config.ReadConfig()
+	cfg := config.ReadConfig("./")
 
 	db := database.NewPostgresDB(&cfg)
 
