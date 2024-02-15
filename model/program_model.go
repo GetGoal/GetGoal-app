@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/xbklyn/getgoal-app/entity"
 )
 
@@ -22,6 +24,7 @@ type ProgramDTO struct {
 	ExpectedTime       string           `json:"expected_time"`
 	Tasks              []TaskModel      `json:"tasks"`
 	Labels             []LabelIDAndName `json:"labels"`
+	CreatedAt          time.Time        `json:"created_at"`
 }
 
 type Search struct {
@@ -53,6 +56,7 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 		ExpectedTime:       entityProgram.ExpectedTime,
 		Tasks:              tasks,
 		Labels:             labels,
+		CreatedAt:          entityProgram.CreatedAt,
 	}
 }
 
