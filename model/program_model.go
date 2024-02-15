@@ -25,6 +25,7 @@ type ProgramDTO struct {
 	Tasks              []TaskModel      `json:"tasks"`
 	Labels             []LabelIDAndName `json:"labels"`
 	CreatedAt          time.Time        `json:"created_at"`
+	UpdatedAt          time.Time        `json:"updated_at"`
 }
 
 type Search struct {
@@ -57,6 +58,7 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 		Tasks:              tasks,
 		Labels:             labels,
 		CreatedAt:          entityProgram.CreatedAt,
+		UpdatedAt:          entityProgram.UpdatedAt,
 	}
 }
 
