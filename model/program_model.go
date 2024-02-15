@@ -19,6 +19,7 @@ type ProgramDTO struct {
 	ProgramID          uint64           `json:"program_id"`
 	ProgramName        string           `json:"program_name"`
 	MediaURL           string           `json:"media_url"`
+	Rating             float64          `json:"rating"`
 	ProgramDescription string           `json:"program_desc"`
 	ExpectedTime       int              `json:"expected_time"`
 	Tasks              []TaskModel      `json:"tasks"`
@@ -49,6 +50,7 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 	return ProgramDTO{
 		ProgramID:          entityProgram.ProgramID,
 		ProgramName:        entityProgram.ProgramName,
+		Rating:             entityProgram.Rating,
 		MediaURL:           entityProgram.MediaURL,
 		ProgramDescription: entityProgram.ProgramDescription,
 		ExpectedTime:       extime,

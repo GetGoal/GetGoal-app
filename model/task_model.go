@@ -35,6 +35,7 @@ type JoinProgramModifications struct {
 type TaskModel struct {
 	TaskID            uint64    `json:"task_id"`
 	TaskName          string    `json:"task_name"`
+	TaskStatus        int       `json:"task_status"`
 	IsSetNotification int       `json:"is_set_noti"`
 	StartTime         time.Time `json:"start_time"`
 	Category          string    `json:"category"`
