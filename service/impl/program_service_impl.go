@@ -1,8 +1,6 @@
 package impl
 
 import (
-	"strconv"
-
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
@@ -90,7 +88,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		ProgramName:        programModel.ProgramName,
 		ProgramDescription: programModel.ProgramDescription,
 		MediaURL:           programModel.MediaURL,
-		ExpectedTime:       strconv.Itoa(programModel.ExpectedTime),
+		ExpectedTime:       programModel.ExpectedTime,
 		Labels:             labels,
 	}
 
@@ -132,6 +130,11 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	updated, sErr := service.ProgramRepo.Update(program.ProgramID, program)
 	if sErr != nil {
 		return entity.Program{}, sErr
+	}
+
+	upErr := service.UserProgramRepo.Save(1, program.ProgramID, user.UserID)
+	if upErr != nil {
+		return entity.Program{}, upErr
 	}
 	return updated, nil
 }

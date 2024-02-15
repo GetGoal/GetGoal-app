@@ -1,8 +1,6 @@
 package model
 
 import (
-	"strconv"
-
 	"github.com/xbklyn/getgoal-app/entity"
 )
 
@@ -10,7 +8,7 @@ type ProgramCreateOrUpdate struct {
 	ProgramName        string               `json:"program_name" binding:"required" validate:"required"`
 	MediaURL           string               `json:"media_url" binding:"required"`
 	ProgramDescription string               `json:"program_desc" binding:"required"`
-	ExpectedTime       int                  `json:"expected_time" binding:"required"`
+	ExpectedTime       string               `json:"expected_time" binding:"required"`
 	Tasks              []TaskCreateOrUpdate `json:"tasks" binding:"required"`
 	Labels             []LabelRequest       `json:"labels"`
 	UserID             uint                 `json:"user_id"`
@@ -21,7 +19,7 @@ type ProgramDTO struct {
 	MediaURL           string           `json:"media_url"`
 	Rating             float64          `json:"rating"`
 	ProgramDescription string           `json:"program_desc"`
-	ExpectedTime       int              `json:"expected_time"`
+	ExpectedTime       string           `json:"expected_time"`
 	Tasks              []TaskModel      `json:"tasks"`
 	Labels             []LabelIDAndName `json:"labels"`
 }
@@ -46,14 +44,13 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 			LabelName: label.LabelName,
 		})
 	}
-	extime, _ := strconv.Atoi(entityProgram.ExpectedTime)
 	return ProgramDTO{
 		ProgramID:          entityProgram.ProgramID,
 		ProgramName:        entityProgram.ProgramName,
 		Rating:             entityProgram.Rating,
 		MediaURL:           entityProgram.MediaURL,
 		ProgramDescription: entityProgram.ProgramDescription,
-		ExpectedTime:       extime,
+		ExpectedTime:       entityProgram.ExpectedTime,
 		Tasks:              tasks,
 		Labels:             labels,
 	}
