@@ -339,7 +339,7 @@
                 "tags": [
                     "Program"
                 ],
-                "summary": "Find Program by ID",
+                "summary": "Filter Program",
                 "operationId": "FindProgramByLabel",
                 "parameters": [
                     {
@@ -380,7 +380,7 @@
                 "tags": [
                     "Program"
                 ],
-                "summary": "Find Program by ID",
+                "summary": "Search Program",
                 "operationId": "FindProgramByText",
                 "parameters": [
                     {

@@ -110,7 +110,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 }
 
 // Find program by Label  godoc
-// @summary Find Program by ID
+// @summary Filter Program
 // @description Filter program by labels
 // @tags Program
 // @id FindProgramByLabel
@@ -163,7 +163,7 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 }
 
 // Find program by Text  godoc
-// @summary Find Program by ID
+// @summary Search Program
 // @description Search program
 // @tags Program
 // @id FindProgramByText

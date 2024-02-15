@@ -356,7 +356,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.GeneralResponse'
-      summary: Find Program by ID
+      summary: Filter Program
       tags:
       - Program
   /api/v1/search:
@@ -385,7 +385,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/model.GeneralResponse'
-      summary: Find Program by ID
+      summary: Search Program
       tags:
       - Program
   /api/v1/tasks:

@@ -350,7 +350,7 @@ const docTemplate = `{
                 "tags": [
                     "Program"
                 ],
-                "summary": "Find Program by ID",
+                "summary": "Filter Program",
                 "operationId": "FindProgramByLabel",
                 "parameters": [
                     {
@@ -391,7 +391,7 @@ const docTemplate = `{
                 "tags": [
                     "Program"
                 ],
-                "summary": "Find Program by ID",
+                "summary": "Search Program",
                 "operationId": "FindProgramByText",
                 "parameters": [
                     {
