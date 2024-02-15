@@ -11,7 +11,7 @@ type UserAccount struct {
 	FirstName               string     `gorm:"column:first_name;type:varchar(70);not null" json:"first_name"`
 	LastName                string     `gorm:"column:last_name;type:varchar(70);not null" json:"last_name"`
 	Email                   string     `gorm:"column:email;type:varchar(100);not null" json:"email"`
-	EmailValidationStatusID int        `gorm:"column:email_validation_id;type:varchar(100);not null" json:"email_validation_status_id"`
+	EmailValidationStatusID int        `gorm:"column:email_validation_status_id;type:varchar(100);not null" json:"email_validation_status_id"`
 	PasswordHash            string     `gorm:"column:password_hash;type:varchar(250);not null" json:"password_hash"`
 	PasswordSalt            string     `gorm:"column:password_salt;type:varchar(250);not null" json:"password_salt"`
 	ConfirmationToken       string     `gorm:"column:confirmation_token;type:varchar(250);not null" json:"confirmation_token"`
