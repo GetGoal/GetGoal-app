@@ -111,7 +111,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 
 // Find program by Label  godoc
 // @summary Find Program by ID
-// @description Find program by id
+// @description Filter program by labels
 // @tags Program
 // @id FindProgramByLabel
 // @param labels body []string true "label name"
@@ -164,7 +164,7 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 
 // Find program by Text  godoc
 // @summary Find Program by ID
-// @description Find program by id
+// @description Search program
 // @tags Program
 // @id FindProgramByText
 // @param text body model.Search true "Search Text"

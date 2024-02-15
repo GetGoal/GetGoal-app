@@ -343,7 +343,7 @@ const docTemplate = `{
         },
         "/api/v1/programs/filter": {
             "post": {
-                "description": "Find program by id",
+                "description": "Filter program by labels",
                 "produces": [
                     "application/json"
                 ],
@@ -384,7 +384,7 @@ const docTemplate = `{
         },
         "/api/v1/search": {
             "post": {
-                "description": "Find program by id",
+                "description": "Search program",
                 "produces": [
                     "application/json"
                 ],

@@ -334,7 +334,7 @@ paths:
       - Program
   /api/v1/programs/filter:
     post:
-      description: Find program by id
+      description: Filter program by labels
       operationId: FindProgramByLabel
       parameters:
       - description: label name
@@ -361,7 +361,7 @@ paths:
       - Program
   /api/v1/search:
     post:
-      description: Find program by id
+      description: Search program
       operationId: FindProgramByText
       parameters:
       - description: Search Text
