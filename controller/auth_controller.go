@@ -153,6 +153,16 @@ func (controller *AuthController) SignIn(c *gin.Context) {
 	})
 }
 
+// Sign Out godoc
+// @summary Sign Out
+// @description Sign out and black list token
+// @tags Authentication
+// @id SignOut
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/auth/sign-out [post]
 func (controller *AuthController) SignOut(c *gin.Context) {
 	err := controller.AuthService.SignOut()
 	if err != nil {

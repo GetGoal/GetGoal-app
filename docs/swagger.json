@@ -86,6 +86,36 @@
                 }
             }
         },
+        "/api/v1/auth/sign-out": {
+            "post": {
+                "description": "Sign out and black list token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign Out",
+                "operationId": "SignOut",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/verify": {
             "post": {
                 "description": "check verficatoin code from email",

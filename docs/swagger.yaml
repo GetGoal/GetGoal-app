@@ -205,6 +205,26 @@ paths:
       summary: Sign In
       tags:
       - Authentication
+  /api/v1/auth/sign-out:
+    post:
+      consumes:
+      - application/json
+      description: Sign out and black list token
+      operationId: SignOut
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Sign Out
+      tags:
+      - Authentication
   /api/v1/auth/verify:
     post:
       consumes:
