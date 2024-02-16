@@ -1,4 +1,11 @@
 definitions:
+  model.Credentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   model.GeneralResponse:
     properties:
       code:
@@ -44,7 +51,7 @@ definitions:
   model.ProgramCreateOrUpdate:
     properties:
       expected_time:
-        type: integer
+        type: string
       labels:
         items:
           $ref: '#/definitions/model.LabelRequest'
@@ -74,6 +81,25 @@ definitions:
         type: string
     required:
     - search_text
+    type: object
+  model.SignUpRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        maxLength: 250
+        type: string
+      last_name:
+        maxLength: 250
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
     type: object
   model.TaskCreateOrUpdate:
     properties:
@@ -111,9 +137,101 @@ definitions:
     - date
     - email
     type: object
+  model.VerifyRequest:
+    properties:
+      code:
+        minLength: 6
+        type: string
+      email:
+        type: string
+    required:
+    - code
+    - email
+    type: object
 info:
   contact: {}
 paths:
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register new user
+      operationId: Save user
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Register new user
+      tags:
+      - Authentication
+  /api/v1/auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign in with email and password
+      operationId: SignIn
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Sign In
+      tags:
+      - Authentication
+  /api/v1/auth/verify:
+    post:
+      consumes:
+      - application/json
+      description: check verficatoin code from email
+      operationId: Verifyuser
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.VerifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Verify new user
+      tags:
+      - Authentication
   /api/v1/labels:
     get:
       consumes:
@@ -659,7 +777,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: update status to 0 (todo)
+      description: update status to 1 (todo)
       operationId: UpdateTodo
       parameters:
       - description: Task  ID

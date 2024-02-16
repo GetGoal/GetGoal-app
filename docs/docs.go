@@ -15,6 +15,129 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/auth/register": {
+            "post": {
+                "description": "Register new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register new user",
+                "operationId": "Save user",
+                "parameters": [
+                    {
+                        "description": "Sign Up Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/sign-in": {
+            "post": {
+                "description": "Sign in with email and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign In",
+                "operationId": "SignIn",
+                "parameters": [
+                    {
+                        "description": "Sign Up Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/verify": {
+            "post": {
+                "description": "check verficatoin code from email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify new user",
+                "operationId": "Verifyuser",
+                "parameters": [
+                    {
+                        "description": "Sign Up Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.VerifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/labels": {
             "get": {
                 "description": "Find All Label",
@@ -828,7 +951,7 @@ const docTemplate = `{
         },
         "/api/v1/tasks/un-done/:id": {
             "put": {
-                "description": "update status to 0 (todo)",
+                "description": "update status to 1 (todo)",
                 "consumes": [
                     "application/json"
                 ],
@@ -873,6 +996,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Credentials": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "model.GeneralResponse": {
             "type": "object",
             "properties": {
@@ -947,7 +1081,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "expected_time": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "labels": {
                     "type": "array",
@@ -983,6 +1117,32 @@ const docTemplate = `{
             "properties": {
                 "search_text": {
                     "type": "string"
+                }
+            }
+        },
+        "model.SignUpRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 250
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 250
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
                 }
             }
         },
@@ -1033,6 +1193,22 @@ const docTemplate = `{
             "properties": {
                 "date": {
                     "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.VerifyRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "minLength": 6
                 },
                 "email": {
                     "type": "string"
