@@ -43,6 +43,37 @@ type AuthServiceImpl struct {
 	Mailer   service.MailerService
 }
 
+// SignIn implements service.AuthService.
+func (service *AuthServiceImpl) SignIn(request model.Credentials) (string, string, error) {
+	if err := common.Validate(request); err != nil {
+		return "", "", err
+	}
+	//find user by email
+	user, err := service.UserRepo.FindUserByEmail(request.Email)
+	if err != nil {
+		return "", "", err
+	}
+	//check if user is verified
+	if user.EmailValidationStatusID != 1 {
+		return "", "", errors.New("user is not verified")
+	}
+	//check if password is correct
+	match, err := verifyPassword(request.Password, user.PasswordSalt)
+	if err != nil {
+		return "", "", err
+	}
+	if !match {
+		return "", "", errors.New("invalid password")
+	}
+	//generate access token
+	access, refresh, err := common.GenerateToken(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	return access, refresh, nil
+}
+
 // Verify implements service.AuthService.
 func (service *AuthServiceImpl) Verify(request model.VerifyRequest) error {
 	//find user by email
