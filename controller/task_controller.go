@@ -52,13 +52,15 @@ func (controller TaskController) FindAllTasks(c *gin.Context) {
 			Error:   err.Error(),
 		})
 	}
-
-	taskDTO := model.ConvertToTaskModels(tasks)
+	tasksDTO := make([]model.TaskModel, 0)
+	if len(tasks) > 0 {
+		tasksDTO = model.ConvertToTaskModels(tasks)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(taskDTO),
-		Data:    taskDTO,
+		Count:   len(tasksDTO),
+		Data:    tasksDTO,
 		Error:   nil,
 	})
 }
@@ -328,7 +330,10 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 		return
 	}
 
-	tasksDTO := model.ConvertToTaskModels(tasks)
+	tasksDTO := make([]model.TaskModel, 0)
+	if len(tasks) > 0 {
+		tasksDTO = model.ConvertToTaskModels(tasks)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -403,7 +408,10 @@ func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 			continue
 		}
 	}
-	tasksDTO := model.ConvertToTaskModels(tasks)
+	tasksDTO := make([]model.TaskModel, 0)
+	if len(tasks) > 0 {
+		tasksDTO = model.ConvertToTaskModels(tasks)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -467,7 +475,10 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 		})
 		return
 	}
-	tasksDTO := model.ConvertToTaskModels(*tasks)
+	tasksDTO := make([]model.TaskModel, 0)
+	if len(*tasks) > 0 {
+		tasksDTO = model.ConvertToTaskModels(*tasks)
+	}
 	c.JSON(http.StatusCreated, model.GeneralResponse{
 		Code:    http.StatusCreated,
 		Message: "Success",

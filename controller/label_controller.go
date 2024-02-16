@@ -49,7 +49,10 @@ func (controller LabelController) FindAllLabels(c *gin.Context) {
 		})
 		return
 	}
-	labelsDTO := model.ConvertToLabelModels(labels)
+	labelsDTO := make([]model.LabelModel, 0)
+	if len(labels) > 0 {
+		labelsDTO = model.ConvertToLabelModels(labels)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    fiber.StatusOK,
 		Message: "Success",
@@ -124,7 +127,10 @@ func (controller LabelController) GetSearchLabel(c *gin.Context) {
 		return
 	}
 
-	labelsDTO := model.ConvertToLabelModels(labels)
+	labelsDTO := make([]model.LabelModel, 0)
+	if len(labels) > 0 {
+		labelsDTO = model.ConvertToLabelModels(labels)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",

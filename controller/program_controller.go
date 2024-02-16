@@ -47,7 +47,10 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 		return
 	}
 
-	programsDTO := model.ConvertToProgramDTOs(programs)
+	programsDTO := make([]model.ProgramDTO, 0)
+	if len(programs) > 0 {
+		programsDTO = model.ConvertToProgramDTOs(programs)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -152,7 +155,11 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 		})
 		return
 	}
-	programsDTO := model.ConvertToProgramDTOs(programs)
+
+	programsDTO := make([]model.ProgramDTO, 0)
+	if len(programs) > 0 {
+		programsDTO = model.ConvertToProgramDTOs(programs)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -206,7 +213,11 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 		})
 		return
 	}
-	programsDTO := model.ConvertToProgramDTOs(programs)
+
+	programsDTO := make([]model.ProgramDTO, 0)
+	if len(programs) > 0 {
+		programsDTO = model.ConvertToProgramDTOs(programs)
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
