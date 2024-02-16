@@ -35,12 +35,28 @@ var p = &params{
 }
 
 func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService) service.AuthService {
-	return &AuthServiceImpl{userRepo, mailer}
+	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}}
 }
 
 type AuthServiceImpl struct {
-	UserRepo repository.UserRepo
-	Mailer   service.MailerService
+	UserRepo         repository.UserRepo
+	Mailer           service.MailerService
+	BlackListedToken map[string]bool
+	Claims           common.Claims
+}
+
+// IsTokenBlacklisted implements service.AuthService.
+func (service *AuthServiceImpl) IsTokenBlacklisted(tokenString string) bool {
+	// Check if token is blacklisted
+	_, blacklisted := service.BlackListedToken[tokenString]
+	return blacklisted
+}
+
+// SignOut implements service.AuthService.
+func (service *AuthServiceImpl) SignOut() error {
+
+	//sign out user
+	return nil
 }
 
 // SignIn implements service.AuthService.

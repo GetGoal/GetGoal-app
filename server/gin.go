@@ -10,6 +10,7 @@ import (
 	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/controller"
 	_ "github.com/xbklyn/getgoal-app/docs"
+	"github.com/xbklyn/getgoal-app/middleware"
 	"github.com/xbklyn/getgoal-app/model"
 	repo "github.com/xbklyn/getgoal-app/repository/impl"
 	service "github.com/xbklyn/getgoal-app/service/impl"
@@ -75,11 +76,17 @@ func (s *Gin) Start() {
 
 	v1 := api.Group("/v1")
 
-	//routes
+	//No header required
+	authController.RouteAnonymous(v1)
+
+	//Enable middleware
+	v1.Use(middleware.JWTAuthMiddleware(authService.(*service.AuthServiceImpl), []byte(s.cfg.JwtKeys.AccessSecret)))
+
+	//Header required
 	labelController.Route(v1)
 	taskController.Route(v1)
 	programController.Route(v1)
-	authController.Routes(v1)
+	authController.Route(v1)
 
 	s.app.Run(serverURL)
 }

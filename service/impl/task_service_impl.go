@@ -19,6 +19,7 @@ type TaskServiceImpl struct {
 	TaskRepo        repository.TaskRepo
 	UserRepo        repository.UserRepo
 	UserProgramRepo repository.UserProgramRepo
+	AuthService     service.AuthService
 }
 
 // UpdateStatus implements service.TaskService.

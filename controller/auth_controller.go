@@ -17,10 +17,14 @@ func NewAuthController(authService service.AuthService) AuthController {
 	return AuthController{authService}
 }
 
-func (controller *AuthController) Routes(api *gin.RouterGroup) {
+func (controller *AuthController) RouteAnonymous(api *gin.RouterGroup) {
 	api.POST("/auth/register", controller.Register)
 	api.POST("/auth/verify", controller.Verify)
 	api.POST("/auth/sign-in", controller.SignIn)
+}
+
+func (controller *AuthController) Route(api *gin.RouterGroup) {
+	api.POST("/auth/sign-out", controller.SignOut)
 }
 
 // Register user godoc
@@ -145,6 +149,25 @@ func (controller *AuthController) SignIn(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Sign in Success",
 		Data:    tokens,
+		Error:   nil,
+	})
+}
+
+func (controller *AuthController) SignOut(c *gin.Context) {
+	err := controller.AuthService.SignOut()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Sign out Success",
+		Data:    nil,
 		Error:   nil,
 	})
 }
