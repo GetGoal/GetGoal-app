@@ -37,7 +37,7 @@ func GenerateToken(user entity.UserAccount) (string, string, error) {
 }
 
 func generateAccessToken(user entity.UserAccount) (string, error) {
-	expirationTime := time.Now().Add(30 * time.Second)
+	expirationTime := time.Now().Add(15 * time.Minute)
 	claims := &Claims{
 		UserID:    user.UserID,
 		Email:     user.Email,
