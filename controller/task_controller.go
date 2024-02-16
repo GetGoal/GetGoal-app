@@ -511,7 +511,7 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 		})
 		return
 	}
-	task, err := controlller.TaskService.UpdateStatus(id, 1)
+	task, err := controlller.TaskService.UpdateStatus(id, 2)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
@@ -542,7 +542,7 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 
 // UpdateTodo  godoc
 // @summary update status to todo
-// @description update status to 0 (todo)
+// @description update status to 1 (todo)
 // @tags Task
 // @id UpdateTodo
 // @accept json
@@ -563,7 +563,7 @@ func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 		})
 		return
 	}
-	task, err := controlller.TaskService.UpdateStatus(id, 0)
+	task, err := controlller.TaskService.UpdateStatus(id, 1)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
