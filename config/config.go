@@ -16,6 +16,8 @@ type (
 		Env               string
 		Search            Search
 		EnvFromDockerFile DockerEnv
+		Mailer            MailerConfig
+		JwtKeys           JwtKey
 	}
 
 	App struct {
@@ -43,6 +45,17 @@ type (
 		DbPass   string
 		DbName   string
 		TimeZone string
+	}
+
+	MailerConfig struct {
+		Host     string
+		Port     int
+		Email    string
+		Password string
+	}
+	JwtKey struct {
+		AccessSecret  string
+		RefreshSecret string
 	}
 )
 
@@ -86,6 +99,16 @@ func ReadConfig(path string) Config {
 		Env: viper.GetString("env"),
 		Search: Search{
 			LabelLimit: viper.GetInt("search.label_limit"),
+		},
+		Mailer: MailerConfig{
+			Host:     viper.GetString("mailer.host"),
+			Port:     viper.GetInt("mailer.port"),
+			Email:    viper.GetString("mailer.email"),
+			Password: viper.GetString("mailer.password"),
+		},
+		JwtKeys: JwtKey{
+			AccessSecret:  viper.GetString("secrets.jwt.accesskey"),
+			RefreshSecret: viper.GetString("secrets.jwt.refreshkey"),
 		},
 	}
 	return config
