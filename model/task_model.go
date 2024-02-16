@@ -52,6 +52,7 @@ func ConvertToTaskModel(entityTask entity.Task) TaskModel {
 		return TaskModel{
 			TaskID:            entityTask.TaskID,
 			TaskName:          entityTask.TaskName,
+			TaskStatus:        entityTask.TaskStatus,
 			IsSetNotification: entityTask.IsSetNotification,
 			StartTime:         entityTask.StartTime,
 			Category:          entityTask.Category,
