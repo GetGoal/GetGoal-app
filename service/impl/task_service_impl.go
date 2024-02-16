@@ -29,7 +29,7 @@ func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Tas
 	}
 
 	task.TaskStatus = status
-	task, serviceErr := service.TaskRepo.Update(id, task)
+	_, serviceErr := service.TaskRepo.Update(id, task)
 	return &task, serviceErr
 }
 
