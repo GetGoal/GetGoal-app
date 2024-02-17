@@ -346,6 +346,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
       summary: Find Label By ID
       tags:
       - Label

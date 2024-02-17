@@ -272,6 +272,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
                     }
                 }
             },
