@@ -15,6 +15,6 @@ database:
   timezone: Asia/Bangkok
 
   secrets:
-  jwt:
-    accesskey: cp23ssa1
-    refreshkey: refreshcp23ssa1
+    jwt:
+      accesskey: cp23ssa1
+      refreshkey: refreshcp23ssa1
