@@ -195,7 +195,7 @@ func (controller TaskController) Update(c *gin.Context) {
 		return
 	}
 
-	taskE, err := controller.TaskService.Update(id, task)
+	taskE, err := controller.TaskService.Update(id, task, c)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{

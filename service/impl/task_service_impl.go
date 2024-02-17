@@ -22,7 +22,6 @@ type TaskServiceImpl struct {
 	UserRepo        repository.UserRepo
 	UserProgramRepo repository.UserProgramRepo
 	AuthService     service.AuthService
-	c               *gin.Context
 }
 
 // UpdateStatus implements service.TaskService.
@@ -144,7 +143,7 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate, c *gin.Conte
 	if err != nil {
 		return nil, err
 	}
-	claims := service.c.MustGet("claims").(*common.Claims)
+	claims := c.MustGet("claims").(*common.Claims)
 	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
 	if err != nil {
 		return nil, err
@@ -166,8 +165,8 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate, c *gin.Conte
 }
 
 // Update implements service.TaskService.
-func (service *TaskServiceImpl) Update(id uint64, task model.TaskCreateOrUpdate) (*entity.Task, error) {
-	claims := service.c.MustGet("claims").(*common.Claims)
+func (service *TaskServiceImpl) Update(id uint64, task model.TaskCreateOrUpdate, c *gin.Context) (*entity.Task, error) {
+	claims := c.MustGet("claims").(*common.Claims)
 
 	err := common.Validate(task)
 	if err != nil {
