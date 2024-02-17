@@ -1,9 +1,11 @@
 package impl
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
@@ -20,6 +22,7 @@ type TaskServiceImpl struct {
 	UserRepo        repository.UserRepo
 	UserProgramRepo repository.UserProgramRepo
 	AuthService     service.AuthService
+	c               *gin.Context
 }
 
 // UpdateStatus implements service.TaskService.
@@ -36,7 +39,8 @@ func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Tas
 
 // JoinProgram implements service.TaskService.
 func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinProgramModifications) (*[]entity.Task, error) {
-	user, err := service.UserRepo.FindUserByEmail(model.Email)
+	claims := service.c.MustGet("claims").(*common.Claims)
+	user, err := service.UserRepo.FindUserByEmail(claims.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -74,9 +78,13 @@ func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinPro
 
 // Delete implements service.TaskService.
 func (service *TaskServiceImpl) Delete(id uint64) error {
-	_, err := service.TaskRepo.FindTaskByID(id)
+	claims := service.c.MustGet("claims").(*common.Claims)
+	existed, err := service.TaskRepo.FindTaskByID(id)
 	if err != nil {
 		return err
+	}
+	if existed.UserAccountID != int(claims.UserID) {
+		return errors.New("you are not allowed to update this task")
 	}
 	serviceErr := service.TaskRepo.Delete(id)
 	return serviceErr
@@ -94,11 +102,13 @@ func (service *TaskServiceImpl) FindAllTasks() ([]entity.Task, error) {
 
 // FindTaskByEmailAndDate implements service.TaskService.
 func (service *TaskServiceImpl) FindTaskByEmailAndDate(model model.ToDoRequest) ([]entity.Task, error) {
+
+	claims := service.c.MustGet("claims").(*common.Claims)
 	err := common.Validate(model)
 	if err != nil {
 		return nil, err
 	}
-	user, err := service.UserRepo.FindUserByEmail(model.Email)
+	user, err := service.UserRepo.FindUserByEmail(claims.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +144,8 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate) (*entity.Tas
 	if err != nil {
 		return nil, err
 	}
-
-	user, err := service.UserRepo.FindUserByID(uint64(task.Owner))
+	claims := service.c.MustGet("claims").(*common.Claims)
+	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +167,8 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate) (*entity.Tas
 
 // Update implements service.TaskService.
 func (service *TaskServiceImpl) Update(id uint64, task model.TaskCreateOrUpdate) (*entity.Task, error) {
+	claims := service.c.MustGet("claims").(*common.Claims)
+
 	err := common.Validate(task)
 	if err != nil {
 		return nil, err
@@ -166,7 +178,7 @@ func (service *TaskServiceImpl) Update(id uint64, task model.TaskCreateOrUpdate)
 	if err != nil {
 		return nil, err
 	}
-	if existed.UserAccountID != int(task.Owner) {
+	if existed.UserAccountID != int(claims.UserID) {
 		return nil, fmt.Errorf("you are not allowed to update this task")
 	}
 	existed.TaskName = task.TaskName

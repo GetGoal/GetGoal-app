@@ -210,8 +210,8 @@ func TestFindLabelByLabelID_LabelNotFound(t *testing.T) {
 	var response model.GeneralResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusBadRequest, response.Code)
-	assert.Equal(t, "Bad Request", response.Message)
+	assert.Equal(t, http.StatusNotFound, response.Code)
+	assert.Equal(t, "Not Found", response.Message)
 	assert.Equal(t, 0, response.Count) // Check the count of labels
 	assert.Contains(t, response.Error, "label not found")
 }
