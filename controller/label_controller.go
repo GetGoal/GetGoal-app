@@ -72,6 +72,7 @@ func (controller LabelController) FindAllLabels(c *gin.Context) {
 // @produce json
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
+// @response 404 {object} model.GeneralResponse "Not Found"
 // @Router /api/v1/labels/:id [get]
 func (controller LabelController) FindLabelByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -86,9 +87,9 @@ func (controller LabelController) FindLabelByID(c *gin.Context) {
 	}
 	label, err := controller.LabelService.FindLabelByID(uint64(id))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, model.GeneralResponse{
-			Code:    http.StatusBadRequest,
-			Message: "Bad Request",
+		c.JSON(http.StatusNotFound, model.GeneralResponse{
+			Code:    http.StatusNotFound,
+			Message: "Not Found",
 			Data:    nil,
 			Error:   err.Error(),
 		})
@@ -193,6 +194,7 @@ func (controller LabelController) Save(c *gin.Context) {
 // @param label body model.LabelRequest true "Label Request"
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
+// @response 404 {object} model.GeneralResponse "Not Found"
 // @Router /api/v1/labels/:id [put]
 func (controller LabelController) Update(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -218,6 +220,15 @@ func (controller LabelController) Update(c *gin.Context) {
 
 	labelUpdate, err := controller.LabelService.Update(uint64(id), *label)
 	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad Request",

@@ -23,5 +23,4 @@ func main() {
 
 	gin.Start()
 
-	// server.FiberServer(&cfg, db.GetDb()).Start()
 }

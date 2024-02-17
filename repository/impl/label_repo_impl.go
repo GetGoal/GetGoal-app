@@ -22,10 +22,11 @@ type labelRepoImpl struct {
 
 // Delete implements repositoryentity.LabelRepo.
 func (l *labelRepoImpl) Delete(id uint64) error {
-	log.Default().Printf("Delete label by id: %d \n", id)
-
-	err := l.db.Debug().Where("label_id = ?", id).Delete(&entity.Label{}).Error
-	return err
+	lErr := l.db.Where("label_id = ?", id).Delete(&entity.Label{}).Error
+	if lErr != nil {
+		return lErr
+	}
+	return nil
 }
 
 // Update implements repositoryentity.LabelRepo.
