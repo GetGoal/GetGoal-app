@@ -158,6 +158,7 @@ func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate, c *gin.Conte
 		CreatedAt:         common.GetTimeNow(),
 		UserAccountID:     int(user.UserID),
 		UserAccount:       user,
+		TaskStatus:        1,
 	}
 
 	taskEntity, serviceErr := service.TaskRepo.Save(&taskEntity)
