@@ -13,3 +13,8 @@ database:
   dbname: getgoal
   sslmode: false
   timezone: Asia/Bangkok
+
+  secrets:
+  jwt:
+    accesskey: cp23ssa1
+    refreshkey: refreshcp23ssa1
