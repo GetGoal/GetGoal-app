@@ -139,7 +139,7 @@ func (controller TaskController) Save(c *gin.Context) {
 		})
 		return
 	}
-	taskE, err := controller.TaskService.Save(task)
+	taskE, err := controller.TaskService.Save(task, c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -247,7 +247,7 @@ func (controller TaskController) Delete(c *gin.Context) {
 		})
 		return
 	}
-	err = controller.TaskService.Delete(id)
+	err = controller.TaskService.Delete(id, c)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
@@ -310,7 +310,7 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 		})
 		return
 	}
-	tasks, err := controller.TaskService.FindTaskByEmailAndDate(toDoRequest)
+	tasks, err := controller.TaskService.FindTaskByEmailAndDate(toDoRequest, c)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
@@ -456,7 +456,7 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 		return
 	}
 
-	tasks, err := controller.TaskService.JoinProgram(programId, modifications)
+	tasks, err := controller.TaskService.JoinProgram(programId, modifications, c)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, model.GeneralResponse{

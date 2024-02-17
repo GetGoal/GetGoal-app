@@ -38,8 +38,8 @@ func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Tas
 }
 
 // JoinProgram implements service.TaskService.
-func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinProgramModifications) (*[]entity.Task, error) {
-	claims := service.c.MustGet("claims").(*common.Claims)
+func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinProgramModifications, c *gin.Context) (*[]entity.Task, error) {
+	claims := c.MustGet("claims").(*common.Claims)
 	user, err := service.UserRepo.FindUserByEmail(claims.Email)
 	if err != nil {
 		return nil, err
@@ -77,8 +77,8 @@ func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinPro
 }
 
 // Delete implements service.TaskService.
-func (service *TaskServiceImpl) Delete(id uint64) error {
-	claims := service.c.MustGet("claims").(*common.Claims)
+func (service *TaskServiceImpl) Delete(id uint64, c *gin.Context) error {
+	claims := c.MustGet("claims").(*common.Claims)
 	existed, err := service.TaskRepo.FindTaskByID(id)
 	if err != nil {
 		return err
@@ -101,9 +101,9 @@ func (service *TaskServiceImpl) FindAllTasks() ([]entity.Task, error) {
 }
 
 // FindTaskByEmailAndDate implements service.TaskService.
-func (service *TaskServiceImpl) FindTaskByEmailAndDate(model model.ToDoRequest) ([]entity.Task, error) {
+func (service *TaskServiceImpl) FindTaskByEmailAndDate(model model.ToDoRequest, c *gin.Context) ([]entity.Task, error) {
 
-	claims := service.c.MustGet("claims").(*common.Claims)
+	claims := c.MustGet("claims").(*common.Claims)
 	err := common.Validate(model)
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (service *TaskServiceImpl) GetTaskFromProgramId(programId uint64) ([]entity
 }
 
 // Save implements service.TaskService.
-func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate) (*entity.Task, error) {
+func (service *TaskServiceImpl) Save(task model.TaskCreateOrUpdate, c *gin.Context) (*entity.Task, error) {
 	err := common.Validate(task)
 	if err != nil {
 		return nil, err
