@@ -35,7 +35,7 @@ func (controller *AuthController) Route(api *gin.RouterGroup) {
 // @accept json
 // @produce json
 // @param request body model.SignUpRequest true "Sign Up Request"
-// @response 200 {object} model.GeneralResponse "OK"
+// @response 201 {object} model.GeneralResponse "Created"
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/auth/register [post]
 func (controller *AuthController) Register(c *gin.Context) {
@@ -50,7 +50,7 @@ func (controller *AuthController) Register(c *gin.Context) {
 		})
 		return
 	}
-	user, err := controller.AuthService.SignUp(request)
+	_, err := controller.AuthService.SignUp(request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -60,10 +60,10 @@ func (controller *AuthController) Register(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, model.GeneralResponse{
-		Code:    http.StatusOK,
+	c.JSON(http.StatusCreated, model.GeneralResponse{
+		Code:    http.StatusCreated,
 		Message: "Sign up Success",
-		Data:    user,
+		Data:    nil,
 		Error:   nil,
 	})
 }
