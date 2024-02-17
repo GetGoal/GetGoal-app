@@ -57,7 +57,7 @@ func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinPro
 		updatedTasks[i].TaskID = 0
 		updatedTasks[i].ProgramID = nil
 
-		updatedTasks[i].TaskStatus = 0
+		updatedTasks[i].TaskStatus = 1
 		updatedTasks[i].UserAccountID = int(user.UserID)
 		updatedTasks[i].StartTime = parseTime
 		updatedTasks[i].IsSetNotification = model.Modifications[i].IsSetNotification
