@@ -64,7 +64,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		return entity.Program{}, err
 	}
 
-	cliams := c.MustGet("claims").(common.Claims)
+	cliams := c.MustGet("claims").(*common.Claims)
 	var labels []entity.Label
 	for _, labelModel := range programModel.Labels {
 		err := common.Validate(labelModel)
