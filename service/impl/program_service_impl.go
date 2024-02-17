@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
@@ -57,11 +58,13 @@ func (service *ProgramServiceImpl) FindProgramByText(str string) ([]entity.Progr
 }
 
 // Save implements service.ProgramService.
-func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate) (entity.Program, error) {
+func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error) {
 	err := common.Validate(programModel)
 	if err != nil {
 		return entity.Program{}, err
 	}
+
+	cliams := c.MustGet("claims").(common.Claims)
 	var labels []entity.Label
 	for _, labelModel := range programModel.Labels {
 		err := common.Validate(labelModel)
@@ -96,7 +99,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	if err != nil {
 		return entity.Program{}, err
 	}
-	user, err := service.UserRepo.FindUserByID(uint64(programModel.UserID))
+	user, err := service.UserRepo.FindUserByID(uint64(cliams.UserID))
 	if err != nil {
 		return entity.Program{}, err
 	}
@@ -140,7 +143,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 }
 
 // Update implements service.ProgramService.
-func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreateOrUpdate) (entity.Program, error) {
+func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error) {
 	panic("unimplemented")
 }
 

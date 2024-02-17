@@ -248,7 +248,7 @@ func (controller ProgramController) SaveProgram(c *gin.Context) {
 		})
 		return
 	}
-	programCreate, err := controller.ProgramService.Save(*program)
+	programCreate, err := controller.ProgramService.Save(*program, c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,

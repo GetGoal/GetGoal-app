@@ -13,7 +13,6 @@ type ProgramCreateOrUpdate struct {
 	ExpectedTime       string               `json:"expected_time" binding:"required"`
 	Tasks              []TaskCreateOrUpdate `json:"tasks" binding:"required"`
 	Labels             []LabelRequest       `json:"labels"`
-	UserID             uint                 `json:"user_id"`
 }
 type ProgramDTO struct {
 	ProgramID          uint64           `json:"program_id"`
