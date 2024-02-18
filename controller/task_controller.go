@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -45,6 +46,7 @@ func (controller TaskController) Route(api *gin.RouterGroup) {
 func (controller TaskController) FindAllTasks(c *gin.Context) {
 	tasks, err := controller.TaskService.FindAllTasks()
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadGateway, model.GeneralResponse{
 			Code:    http.StatusBadGateway,
 			Message: "Something Went Wrong",
@@ -80,6 +82,7 @@ func (controller TaskController) FindAllTasks(c *gin.Context) {
 func (controller TaskController) FindTaskByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -91,6 +94,7 @@ func (controller TaskController) FindTaskByID(c *gin.Context) {
 	task, err := controller.TaskService.FindTaskByID(id)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -99,6 +103,7 @@ func (controller TaskController) FindTaskByID(c *gin.Context) {
 			})
 			return
 		}
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -131,6 +136,7 @@ func (controller TaskController) FindTaskByID(c *gin.Context) {
 func (controller TaskController) Save(c *gin.Context) {
 	var task model.TaskCreateOrUpdate
 	if err := c.ShouldBindJSON(&task); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad Request",
@@ -141,6 +147,7 @@ func (controller TaskController) Save(c *gin.Context) {
 	}
 	taskE, err := controller.TaskService.Save(task, c)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -176,6 +183,7 @@ func (controller TaskController) Save(c *gin.Context) {
 func (controller TaskController) Update(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -186,6 +194,7 @@ func (controller TaskController) Update(c *gin.Context) {
 	}
 	var task model.TaskCreateOrUpdate
 	if err := c.ShouldBindJSON(&task); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad Request",
@@ -198,6 +207,7 @@ func (controller TaskController) Update(c *gin.Context) {
 	taskE, err := controller.TaskService.Update(id, task, c)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -206,6 +216,7 @@ func (controller TaskController) Update(c *gin.Context) {
 			})
 			return
 		}
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -239,6 +250,7 @@ func (controller TaskController) Update(c *gin.Context) {
 func (controller TaskController) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -250,6 +262,7 @@ func (controller TaskController) Delete(c *gin.Context) {
 	err = controller.TaskService.Delete(id, c)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -258,6 +271,7 @@ func (controller TaskController) Delete(c *gin.Context) {
 			})
 			return
 		}
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -289,6 +303,7 @@ func (controller TaskController) Delete(c *gin.Context) {
 func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 	var toDoRequest model.ToDoRequest
 	if err := c.ShouldBindJSON(&toDoRequest); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Body",
@@ -302,6 +317,7 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 	pattern := `^\d{4}-\d{2}-\d{2}$`
 	match, _ := regexp.MatchString(pattern, toDoRequest.Date)
 	if !match {
+		log.Default().Printf("Error: date format should be YYYY-MM-DD")
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Date",
@@ -313,6 +329,7 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 	tasks, err := controller.TaskService.FindTaskByEmailAndDate(toDoRequest, c)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -321,8 +338,9 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusBadGateway, model.GeneralResponse{
-			Code:    http.StatusBadGateway,
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
 			Error:   err.Error(),
@@ -358,6 +376,7 @@ func (controller TaskController) FindTaskFromEmailAndDate(c *gin.Context) {
 func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 	programId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -369,6 +388,7 @@ func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 	tasks, err := controller.TaskService.GetTaskFromProgramId(programId)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -377,8 +397,9 @@ func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusBadGateway, model.GeneralResponse{
-			Code:    http.StatusBadGateway,
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
 			Error:   err.Error(),
@@ -437,6 +458,7 @@ func (controller TaskController) FindTaskFromProgramId(c *gin.Context) {
 func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 	programId, err := strconv.ParseUint(c.Param("program_id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -447,6 +469,7 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 	}
 	var modifications model.JoinProgramModifications
 	if err := c.ShouldBindJSON(&modifications); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Body",
@@ -459,6 +482,7 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 	tasks, err := controller.TaskService.JoinProgram(programId, modifications, c)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -467,6 +491,7 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 			})
 			return
 		}
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -503,6 +528,7 @@ func (controller TaskController) CreateTaskFromProgram(c *gin.Context) {
 func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -514,6 +540,7 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 	task, err := controlller.TaskService.UpdateStatus(id, 2)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -522,8 +549,9 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusBadGateway, model.GeneralResponse{
-			Code:    http.StatusBadGateway,
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
 			Error:   err.Error(),
@@ -555,6 +583,7 @@ func (controlller TaskController) UpdateStatusDone(c *gin.Context) {
 func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -566,6 +595,7 @@ func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 	task, err := controlller.TaskService.UpdateStatus(id, 1)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -574,8 +604,9 @@ func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusBadGateway, model.GeneralResponse{
-			Code:    http.StatusBadGateway,
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
 			Error:   err.Error(),

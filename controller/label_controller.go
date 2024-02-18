@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -41,6 +42,7 @@ func (controller LabelController) Route(api *gin.RouterGroup) {
 func (controller LabelController) FindAllLabels(c *gin.Context) {
 	labels, err := controller.LabelService.FindAllLabels()
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -77,6 +79,7 @@ func (controller LabelController) FindAllLabels(c *gin.Context) {
 func (controller LabelController) FindLabelByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Id",
@@ -87,6 +90,7 @@ func (controller LabelController) FindLabelByID(c *gin.Context) {
 	}
 	label, err := controller.LabelService.FindLabelByID(uint64(id))
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusNotFound, model.GeneralResponse{
 			Code:    http.StatusNotFound,
 			Message: "Not Found",

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -38,6 +39,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 	programs, err := controller.ProgramService.FindAllPrograms()
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
@@ -74,6 +76,7 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 func (controller ProgramController) FindProgramByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid ID",
@@ -86,6 +89,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 	program, err := controller.ProgramService.FindProgramByID(id)
 	if err != nil {
 		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
 			c.JSON(http.StatusNotFound, model.GeneralResponse{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
@@ -94,6 +98,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 			})
 			return
 		}
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",

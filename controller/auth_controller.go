@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,7 @@ func (controller *AuthController) Register(c *gin.Context) {
 
 	var request model.SignUpRequest
 	if err := common.Bind(c, &request); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Request",
@@ -52,6 +54,7 @@ func (controller *AuthController) Register(c *gin.Context) {
 	}
 	_, err := controller.AuthService.SignUp(request)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad request",
@@ -82,6 +85,7 @@ func (controller *AuthController) Register(c *gin.Context) {
 func (controller *AuthController) Verify(c *gin.Context) {
 	var request model.VerifyRequest
 	if err := common.Bind(c, &request); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Request",
@@ -92,6 +96,7 @@ func (controller *AuthController) Verify(c *gin.Context) {
 	}
 	err := controller.AuthService.Verify(request)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad request",
@@ -122,6 +127,7 @@ func (controller *AuthController) Verify(c *gin.Context) {
 func (controller *AuthController) SignIn(c *gin.Context) {
 	var request model.Credentials
 	if err := common.Bind(c, &request); err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid Request",
@@ -132,6 +138,7 @@ func (controller *AuthController) SignIn(c *gin.Context) {
 	}
 	access, refresh, err := controller.AuthService.SignIn(request)
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad request",
@@ -166,6 +173,7 @@ func (controller *AuthController) SignIn(c *gin.Context) {
 func (controller *AuthController) SignOut(c *gin.Context) {
 	err := controller.AuthService.SignOut()
 	if err != nil {
+		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Bad request",
