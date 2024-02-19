@@ -25,6 +25,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.POST("/programs/search", controller.FindProgramByText)
 	api.POST("/programs/filter", controller.FindProgramByLabel)
 	api.POST("/programs", controller.SaveProgram)
+	api.DELETE("/programs/:id", controller.DeleteProgram)
 }
 
 // Find all programs  godoc
@@ -269,6 +270,49 @@ func (controller ProgramController) SaveProgram(c *gin.Context) {
 		Message: "Success",
 		Count:   1,
 		Data:    programDTO,
+		Error:   nil,
+	})
+}
+
+// Delte Program  godoc
+// @summary Delete program
+// @description Delete program
+// @tags Program
+// @id Delete Prorgam
+// @param id path int true "Program ID"
+// @produce json
+// @response 201 {object} model.GeneralResponse "Created"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/programs [delete]
+func (controller ProgramController) DeleteProgram(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	err = controller.ProgramService.Delete(id)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    nil,
 		Error:   nil,
 	})
 }
