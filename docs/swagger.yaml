@@ -1,0 +1,919 @@
+definitions:
+  model.Credentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.GeneralResponse:
+    properties:
+      code:
+        type: integer
+      count:
+        type: integer
+      data: {}
+      error: {}
+      message:
+        type: string
+    type: object
+  model.JoinProgramModifications:
+    properties:
+      email:
+        type: string
+      modifications:
+        items:
+          $ref: '#/definitions/model.Modification'
+        type: array
+    required:
+    - email
+    type: object
+  model.LabelRequest:
+    properties:
+      label_name:
+        maxLength: 30
+        minLength: 4
+        type: string
+    required:
+    - label_name
+    type: object
+  model.Modification:
+    properties:
+      is_set_noti:
+        type: integer
+      start_time:
+        type: string
+      time_before_notify:
+        type: integer
+    required:
+    - start_time
+    type: object
+  model.ProgramCreateOrUpdate:
+    properties:
+      expected_time:
+        type: string
+      labels:
+        items:
+          $ref: '#/definitions/model.LabelRequest'
+        type: array
+      media_url:
+        type: string
+      program_desc:
+        type: string
+      program_name:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+        type: array
+    required:
+    - expected_time
+    - media_url
+    - program_desc
+    - program_name
+    - tasks
+    type: object
+  model.Search:
+    properties:
+      search_text:
+        type: string
+    required:
+    - search_text
+    type: object
+  model.SignUpRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        maxLength: 250
+        type: string
+      last_name:
+        maxLength: 250
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+  model.TaskCreateOrUpdate:
+    properties:
+      category:
+        type: string
+      is_set_noti:
+        default: 0
+        type: integer
+      link:
+        type: string
+      media_url:
+        type: string
+      start_time:
+        type: string
+      task_description:
+        type: string
+      task_name:
+        maxLength: 250
+        type: string
+      time_before_notify:
+        type: integer
+    required:
+    - task_name
+    type: object
+  model.ToDoRequest:
+    properties:
+      date:
+        type: string
+      email:
+        type: string
+    required:
+    - date
+    - email
+    type: object
+  model.VerifyRequest:
+    properties:
+      code:
+        minLength: 6
+        type: string
+      email:
+        type: string
+    required:
+    - code
+    - email
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register new user
+      operationId: Save user
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Register new user
+      tags:
+      - Authentication
+  /api/v1/auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign in with email and password
+      operationId: SignIn
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Sign In
+      tags:
+      - Authentication
+  /api/v1/auth/sign-out:
+    post:
+      consumes:
+      - application/json
+      description: Sign out and black list token
+      operationId: SignOut
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Sign Out
+      tags:
+      - Authentication
+  /api/v1/auth/verify:
+    post:
+      consumes:
+      - application/json
+      description: check verficatoin code from email
+      operationId: Verifyuser
+      parameters:
+      - description: Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.VerifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Verify new user
+      tags:
+      - Authentication
+  /api/v1/labels:
+    get:
+      consumes:
+      - application/json
+      description: Find All Label
+      operationId: FindAllLabel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Label
+      tags:
+      - Label
+    post:
+      consumes:
+      - application/json
+      description: Create new label
+      operationId: SaveLabel
+      parameters:
+      - description: Label Request
+        in: body
+        name: label
+        required: true
+        schema:
+          $ref: '#/definitions/model.LabelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save Label
+      tags:
+      - Label
+  /api/v1/labels/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing label
+      operationId: DeleteLabel
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete Label
+      tags:
+      - Label
+    get:
+      consumes:
+      - application/json
+      description: Search label by provided ID
+      operationId: FindLabelByID
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Label By ID
+      tags:
+      - Label
+    put:
+      consumes:
+      - application/json
+      description: Update existing label
+      operationId: UpdateLabel
+      parameters:
+      - description: Label ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Label Request
+        in: body
+        name: label
+        required: true
+        schema:
+          $ref: '#/definitions/model.LabelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update Label
+      tags:
+      - Label
+  /api/v1/labels/search:
+    get:
+      consumes:
+      - application/json
+      description: Get label with random order and limit
+      operationId: GetSearchLabel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Search Label Filter
+      tags:
+      - Label
+  /api/v1/programs:
+    get:
+      description: Find All program
+      operationId: FindAllProgram
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All program
+      tags:
+      - Program
+    post:
+      description: Save new program
+      operationId: SaveProgram
+      parameters:
+      - description: Program Create or Update
+        in: body
+        name: program
+        required: true
+        schema:
+          $ref: '#/definitions/model.ProgramCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save new program
+      tags:
+      - Program
+  /api/v1/programs/:id:
+    delete:
+      description: Delete program
+      operationId: Delete Prorgam
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete program
+      tags:
+      - Program
+    get:
+      description: Find program by id
+      operationId: FindProgramById
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Program by ID
+      tags:
+      - Program
+    put:
+      description: Update program
+      operationId: Update Prorgam
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Program Create or Update
+        in: body
+        name: program
+        required: true
+        schema:
+          $ref: '#/definitions/model.ProgramCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update program
+      tags:
+      - Program
+  /api/v1/programs/filter:
+    post:
+      description: Filter program by labels
+      operationId: FindProgramByLabel
+      parameters:
+      - description: label name
+        in: body
+        name: labels
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Filter Program
+      tags:
+      - Program
+  /api/v1/programs/user:
+    get:
+      description: Get  program by user id
+      operationId: Get Prorgam by User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Get program by user id
+      tags:
+      - Program
+  /api/v1/search:
+    post:
+      description: Search program
+      operationId: FindProgramByText
+      parameters:
+      - description: Search Text
+        in: body
+        name: text
+        required: true
+        schema:
+          $ref: '#/definitions/model.Search'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Search Program
+      tags:
+      - Program
+  /api/v1/tasks:
+    get:
+      consumes:
+      - application/json
+      description: Find All Tasks
+      operationId: FindAllTask
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      description: Create new task
+      operationId: SaevTask
+      parameters:
+      - description: Task Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Save Task
+      tags:
+      - Task
+  /api/v1/tasks/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Existing Task
+      operationId: DeleteTask
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete Task
+      tags:
+      - Task
+    get:
+      consumes:
+      - application/json
+      description: Find a task by passing ID
+      operationId: FindTaskById
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find task by ID
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Update a task by passing ID
+      operationId: UpdateTask
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Task Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update Task
+      tags:
+      - Task
+  /api/v1/tasks/1234:
+    get:
+      consumes:
+      - application/json
+      description: Find All Tasks
+      operationId: FindAllTask (Deprecated)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Tasks
+      tags:
+      - Task
+  /api/v1/tasks/done/:id:
+    put:
+      consumes:
+      - application/json
+      description: update status to 1 (done)
+      operationId: UpdateDone
+      parameters:
+      - description: Task  ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: update status to done
+      tags:
+      - Task
+  /api/v1/tasks/join-program/:program_id:
+    post:
+      consumes:
+      - application/json
+      description: Create tasks from program
+      operationId: JoinProgram
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Modifications
+        in: body
+        name: modifications
+        required: true
+        schema:
+          $ref: '#/definitions/model.JoinProgramModifications'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: join program
+      tags:
+      - Task
+  /api/v1/tasks/plan/:program_id:
+    get:
+      consumes:
+      - application/json
+      description: List task related to that program_id for planning
+      operationId: PlanTask
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: list task to plan program
+      tags:
+      - Task
+  /api/v1/tasks/to-do:
+    get:
+      consumes:
+      - application/json
+      description: Find Task by Email and Date
+      operationId: FindTaskByEmailDate
+      parameters:
+      - description: Data
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.ToDoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find Task by Email and Date
+      tags:
+      - Task
+  /api/v1/tasks/un-done/:id:
+    put:
+      consumes:
+      - application/json
+      description: update status to 1 (todo)
+      operationId: UpdateTodo
+      parameters:
+      - description: Task  ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: update status to todo
+      tags:
+      - Task
+swagger: "2.0"

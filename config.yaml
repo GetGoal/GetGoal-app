@@ -1,0 +1,26 @@
+app:
+  server:
+    port: 8080
+  
+search:
+  label_limit: 13
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: secret
+  dbname: getgoal
+  sslmode: false
+  timezone: Asia/Bangkok
+
+secrets:
+  jwt:
+    accesskey: cp23ssa1
+    refreshkey: refreshcp23ssa1
+
+mailer:
+  port: 587
+  host: smtp.gmail.com
+  email: cp23ssa1.getgoal@gmail.com
+  password: vxnm aowx wunn wtzz
