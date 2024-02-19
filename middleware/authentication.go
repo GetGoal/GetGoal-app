@@ -71,7 +71,18 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 					})
 					return
 				}
-
+				newClaims, err := validateAccessToken(newAccessToken, jwtKey, service)
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, model.GeneralResponse{
+						Code:    http.StatusUnauthorized,
+						Message: "Invalid token",
+						Data:    nil,
+						Error:   err.Error(),
+					})
+					return
+				}
+				c.Set("claims", newClaims)
+				c.Set("access_token", newAccessToken)
 				// Set new access token in response headers
 				c.Writer.Header().Set("Authorization", "Bearer "+newAccessToken)
 				// Optionally, set new refresh token in response headers
