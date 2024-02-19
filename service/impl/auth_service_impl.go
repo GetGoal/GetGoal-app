@@ -66,8 +66,8 @@ func (service *AuthServiceImpl) SignIn(request model.Credentials) (string, strin
 	}
 	//find user by email
 	user, err := service.UserRepo.FindUserByEmail(request.Email)
-	if err != nil {
-		return "", "", err
+	if user.UserID == 0 {
+		return "", "", errors.New("user not found")
 	}
 	//check if user is verified
 	if user.EmailValidationStatusID != 1 {
