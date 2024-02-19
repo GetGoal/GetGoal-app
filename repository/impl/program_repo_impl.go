@@ -21,7 +21,8 @@ func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, err
 		Preload("Labels").
 		Preload("Tasks").
 		Joins("JOIN user_program ON program.program_id = user_program.program_id").
-		Where("user_program.user_id = ?", id).
+		Where("user_program.user_account_id = ?", id).
+		Where("user_program.action_id = 1").
 		Find(&programs).Error
 	return programs, err
 }

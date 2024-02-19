@@ -10,6 +10,17 @@ type taskRepoImpl struct {
 	db *gorm.DB
 }
 
+// FindTaskByUserId implements repository.TaskRepo.
+func (t *taskRepoImpl) FindTaskByUserId(userID uint64) ([]entity.Task, error) {
+	var tasks []entity.Task
+	err := t.db.Model(&entity.Task{}).
+		Preload("Program").
+		Preload("UserAccount").
+		Where("user_account_id = ?", userID).
+		Find(&tasks).Error
+	return tasks, err
+}
+
 // Delete implements repository.TaskRepo.
 func (t *taskRepoImpl) Delete(id uint64) error {
 	err := t.db.Model(&entity.Task{}).Where("task_id = ?", id).Delete(&entity.Task{}).Error

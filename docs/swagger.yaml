@@ -739,6 +739,26 @@ paths:
       summary: Update Task
       tags:
       - Task
+  /api/v1/tasks/1234:
+    get:
+      consumes:
+      - application/json
+      description: Find All Tasks
+      operationId: FindAllTask (Deprecated)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Find All Tasks
+      tags:
+      - Task
   /api/v1/tasks/done/:id:
     put:
       consumes:
