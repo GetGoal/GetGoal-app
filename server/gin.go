@@ -39,11 +39,13 @@ func (s *Gin) Start() {
 	programService := service.NewProgramServiceImpl(programRepo, taskRepo, labelRepo, userRepo, userProgramRepo)
 	mailerService := service.NewMailerServiceImpl()
 	authService := service.NewAuthServiceImpl(userRepo, mailerService)
+	userService := service.NewUserServiceImpl(userRepo)
 	//controller
 
 	labelController := controller.NewLabelController(labelService)
 	taskController := controller.NewTaskController(taskService)
 	programController := controller.NewProgramController(programService)
+	userController := controller.NewUserController(userService)
 	authController := controller.NewAuthController(authService)
 
 	serverURL := fmt.Sprintf(":%d", s.cfg.App.Port)
@@ -86,6 +88,7 @@ func (s *Gin) Start() {
 	labelController.Route(v1)
 	taskController.Route(v1)
 	programController.Route(v1)
+	userController.Route(v1)
 	authController.Route(v1)
 
 	s.app.Run(serverURL)
