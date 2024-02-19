@@ -125,6 +125,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 			TaskDescription:   task.TaskDescription,
 			Category:          task.Category,
 			StartTime:         task.StartTime,
+			TaskStatus:        1,
 			IsSetNotification: task.IsSetNotification,
 			TimeBeforeNotify:  task.TimeBeforeNotify,
 			CreatedAt:         common.GetTimeNow(),
