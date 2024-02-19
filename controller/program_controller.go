@@ -329,7 +329,7 @@ func (controller ProgramController) DeleteProgram(c *gin.Context) {
 // @produce json
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
-// @Router /api/v1/programs/:id [update]
+// @Router /api/v1/programs/:id [put]
 func (controller ProgramController) UpdateProgram(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

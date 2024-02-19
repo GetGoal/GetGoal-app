@@ -539,8 +539,8 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete program",
+            "put": {
+                "description": "Update program",
                 "produces": [
                     "application/json"
                 ],
@@ -548,7 +548,7 @@ const docTemplate = `{
                     "Program"
                 ],
                 "summary": "Update program",
-                "operationId": "Delete Prorgam",
+                "operationId": "Update Prorgam",
                 "parameters": [
                     {
                         "type": "integer",
@@ -568,8 +568,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
