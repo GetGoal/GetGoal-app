@@ -469,6 +469,35 @@ paths:
       tags:
       - Program
   /api/v1/programs/:id:
+    delete:
+      description: Delete program
+      operationId: Delete Prorgam
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Program Create or Update
+        in: body
+        name: program
+        required: true
+        schema:
+          $ref: '#/definitions/model.ProgramCreateOrUpdate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Update program
+      tags:
+      - Program
     get:
       description: Find program by id
       operationId: FindProgramById
@@ -521,6 +550,24 @@ paths:
           schema:
             $ref: '#/definitions/model.GeneralResponse'
       summary: Filter Program
+      tags:
+      - Program
+  /api/v1/programs/user:
+    get:
+      description: Get  program by user id
+      operationId: Get Prorgam by User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Get program by user id
       tags:
       - Program
   /api/v1/search:
