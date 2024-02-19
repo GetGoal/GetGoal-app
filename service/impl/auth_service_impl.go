@@ -65,7 +65,7 @@ func (service *AuthServiceImpl) SignIn(request model.Credentials) (string, strin
 		return "", "", err
 	}
 	//find user by email
-	user, err := service.UserRepo.FindUserByEmail(request.Email)
+	user, _ := service.UserRepo.FindUserByEmail(request.Email)
 	if user.UserID == 0 {
 		return "", "", errors.New("user not found")
 	}
