@@ -24,6 +24,16 @@ type TaskServiceImpl struct {
 	AuthService     service.AuthService
 }
 
+// FindTaskByUserId implements service.TaskService.
+func (service *TaskServiceImpl) FindTaskByUserId(c *gin.Context) ([]entity.Task, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	tasks, err := service.TaskRepo.FindTaskByUserId(claims.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
+}
+
 // UpdateStatus implements service.TaskService.
 func (service *TaskServiceImpl) UpdateStatus(id uint64, status int) (*entity.Task, error) {
 	task, err := service.TaskRepo.FindTaskByID(id)

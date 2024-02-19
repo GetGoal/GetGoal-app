@@ -21,7 +21,7 @@ func NewTaskController(s service.TaskService) *TaskController {
 }
 
 func (controller TaskController) Route(api *gin.RouterGroup) {
-	api.GET("/tasks", controller.FindAllTasks)
+	api.GET("/tasks", controller.FindTaskByUserId)
 	api.GET("/tasks/:id", controller.FindTaskByID)
 	api.GET("/tasks/to-do", controller.FindTaskFromEmailAndDate)
 	api.GET("/tasks/plan/:id", controller.FindTaskFromProgramId)
@@ -33,16 +33,16 @@ func (controller TaskController) Route(api *gin.RouterGroup) {
 	api.DELETE("/tasks/:id", controller.Delete)
 }
 
-// FindAllTask godoc
+// FindAllTask (depocrated) godoc
 // @summary Find All Tasks
 // @description Find All Tasks
 // @tags Task
-// @id FindAllTask
+// @id FindAllTask (Deprecated)
 // @accept json
 // @produce json
 // @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
-// @Router /api/v1/tasks [get]
+// @Router /api/v1/tasks/1234 [get]
 func (controller TaskController) FindAllTasks(c *gin.Context) {
 	tasks, err := controller.TaskService.FindAllTasks()
 	if err != nil {
@@ -619,6 +619,40 @@ func (controlller TaskController) UpdateStatusTodo(c *gin.Context) {
 		Message: "Success",
 		Count:   1,
 		Data:    taskDTO,
+		Error:   nil,
+	})
+}
+
+// FindAllTask godoc
+// @summary Find All Tasks
+// @description Find All Tasks
+// @tags Task
+// @id FindAllTask
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/tasks [get]
+func (controller TaskController) FindTaskByUserId(c *gin.Context) {
+	tasks, err := controller.TaskService.FindTaskByUserId(c)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadGateway, model.GeneralResponse{
+			Code:    http.StatusBadGateway,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+	}
+	tasksDTO := make([]model.TaskModel, 0)
+	if len(tasks) > 0 {
+		tasksDTO = model.ConvertToTaskModels(tasks)
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   len(tasksDTO),
+		Data:    tasksDTO,
 		Error:   nil,
 	})
 }
