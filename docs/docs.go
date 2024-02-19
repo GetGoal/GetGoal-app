@@ -462,40 +462,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete program",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Program"
-                ],
-                "summary": "Delete program",
-                "operationId": "Delete Prorgam",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Program ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/model.GeneralResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.GeneralResponse"
-                        }
-                    }
-                }
             }
         },
         "/api/v1/programs/:id": {
@@ -570,6 +536,40 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete program",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Program"
+                ],
+                "summary": "Delete program",
+                "operationId": "Delete Prorgam",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Program ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
