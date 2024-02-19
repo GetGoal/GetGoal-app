@@ -17,6 +17,7 @@ import (
 
 func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Default().Printf("Header: %v :", c.Request.Header)
 		// Extract token from request headers
 		tokenString := extractToken(c)
 		if tokenString == "" {
@@ -72,7 +73,7 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 				}
 
 				// Set new access token in response headers
-				c.Writer.Header().Set("Access-Token", newAccessToken)
+				c.Writer.Header().Set("Authorization", "Bearer "+newAccessToken)
 				// Optionally, set new refresh token in response headers
 				c.Writer.Header().Set("RefreshToken", newRefreshToken)
 
