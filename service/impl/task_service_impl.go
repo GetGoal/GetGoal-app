@@ -100,8 +100,10 @@ func (service *TaskServiceImpl) Delete(id uint64, c *gin.Context) error {
 }
 
 // FindAllTasks implements service.TaskService.
-func (service *TaskServiceImpl) FindAllTasks() ([]entity.Task, error) {
-	tasks, err := service.TaskRepo.FindAllTasks()
+func (service *TaskServiceImpl) FindAllTasks(c *gin.Context) ([]entity.Task, error) {
+
+	claims := c.MustGet("claims").(*common.Claims)
+	tasks, err := service.TaskRepo.FindTaskByUserId(claims.UserID)
 
 	if err != nil {
 		return nil, err

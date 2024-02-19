@@ -44,7 +44,7 @@ func (controller TaskController) Route(api *gin.RouterGroup) {
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/tasks/1234 [get]
 func (controller TaskController) FindAllTasks(c *gin.Context) {
-	tasks, err := controller.TaskService.FindAllTasks()
+	tasks, err := controller.TaskService.FindAllTasks(c)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadGateway, model.GeneralResponse{

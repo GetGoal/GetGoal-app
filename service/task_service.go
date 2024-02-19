@@ -7,7 +7,7 @@ import (
 )
 
 type TaskService interface {
-	FindAllTasks() ([]entity.Task, error)
+	FindAllTasks(c *gin.Context) ([]entity.Task, error)
 	FindTaskByID(id uint64) (*entity.Task, error)
 	FindTaskByEmailAndDate(model model.ToDoRequest, c *gin.Context) ([]entity.Task, error)
 	FindTaskByUserId(c *gin.Context) ([]entity.Task, error)
