@@ -753,6 +753,36 @@
                 }
             }
         },
+        "/api/v1/tasks/1234": {
+            "get": {
+                "description": "Find All Tasks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Find All Tasks",
+                "operationId": "FindAllTask (Deprecated)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/tasks/:id": {
             "get": {
                 "description": "Find a task by passing ID",
