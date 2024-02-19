@@ -7,14 +7,14 @@ import (
 )
 
 type TaskCreateOrUpdate struct {
-	TaskName          string    `json:"task_name" validate:"required,max=250"`
-	IsSetNotification int       `json:"is_set_noti" default:"0"`
-	StartTime         time.Time `json:"start_time"`
-	Category          string    `json:"category"`
+	TaskName          string    `json:"task_name" validate:"required,min=1,max=150"`
+	IsSetNotification int       `json:"is_set_noti" binding:"required" default:"0"`
+	StartTime         time.Time `json:"start_time" binding:"required"`
+	Category          string    `json:"category" validate:"min=1,max=50"`
 	TimeBeforeNotify  int       `json:"time_before_notify"`
-	TaskDescription   string    `json:"task_description"`
+	TaskDescription   string    `json:"task_description" validate:"min=1,max=250"`
 	Link              string    `json:"link"`
-	MediaURL          string    ` json:"media_url"`
+	MediaURL          string    `json:"media_url"`
 }
 
 type ToDoRequest struct {
