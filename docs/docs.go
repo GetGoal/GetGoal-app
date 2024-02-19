@@ -41,8 +41,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
@@ -324,6 +324,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
                     }
                 }
             },
@@ -440,6 +446,40 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.ProgramCreateOrUpdate"
                         }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete program",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Program"
+                ],
+                "summary": "Delete program",
+                "operationId": "Delete Prorgam",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Program ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1139,9 +1179,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.TaskCreateOrUpdate"
                     }
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1185,7 +1222,6 @@ const docTemplate = `{
         "model.TaskCreateOrUpdate": {
             "type": "object",
             "required": [
-                "owner",
                 "task_name"
             ],
             "properties": {
@@ -1201,9 +1237,6 @@ const docTemplate = `{
                 },
                 "media_url": {
                     "type": "string"
-                },
-                "owner": {
-                    "type": "integer"
                 },
                 "start_time": {
                     "type": "string"

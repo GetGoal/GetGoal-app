@@ -30,8 +30,8 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
@@ -313,6 +313,12 @@
                         "schema": {
                             "$ref": "#/definitions/model.GeneralResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
                     }
                 }
             },
@@ -429,6 +435,40 @@
                         "schema": {
                             "$ref": "#/definitions/model.ProgramCreateOrUpdate"
                         }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete program",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Program"
+                ],
+                "summary": "Delete program",
+                "operationId": "Delete Prorgam",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Program ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1128,9 +1168,6 @@
                     "items": {
                         "$ref": "#/definitions/model.TaskCreateOrUpdate"
                     }
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1174,7 +1211,6 @@
         "model.TaskCreateOrUpdate": {
             "type": "object",
             "required": [
-                "owner",
                 "task_name"
             ],
             "properties": {
@@ -1190,9 +1226,6 @@
                 },
                 "media_url": {
                     "type": "string"
-                },
-                "owner": {
-                    "type": "integer"
                 },
                 "start_time": {
                     "type": "string"

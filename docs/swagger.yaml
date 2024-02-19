@@ -66,8 +66,6 @@ definitions:
         items:
           $ref: '#/definitions/model.TaskCreateOrUpdate'
         type: array
-      user_id:
-        type: integer
     required:
     - expected_time
     - media_url
@@ -112,8 +110,6 @@ definitions:
         type: string
       media_url:
         type: string
-      owner:
-        type: integer
       start_time:
         type: string
       task_description:
@@ -124,7 +120,6 @@ definitions:
       time_before_notify:
         type: integer
     required:
-    - owner
     - task_name
     type: object
   model.ToDoRequest:
@@ -167,8 +162,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/model.GeneralResponse'
         "400":
@@ -381,6 +376,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
       summary: Update Label
       tags:
       - Label
@@ -405,6 +404,29 @@ paths:
       tags:
       - Label
   /api/v1/programs:
+    delete:
+      description: Delete program
+      operationId: Delete Prorgam
+      parameters:
+      - description: Program ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.GeneralResponse'
+      summary: Delete program
+      tags:
+      - Program
     get:
       description: Find All program
       operationId: FindAllProgram
