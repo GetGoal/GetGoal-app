@@ -21,6 +21,16 @@ type ProgramServiceImpl struct {
 	repository.UserProgramRepo
 }
 
+// FindProgramByUserId implements service.ProgramService.
+func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Program, error) {
+	programs, err := service.ProgramRepo.FetchProgramByUserId(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return programs, nil
+}
+
 // FindAllPrograms implements service.ProgramService.
 func (service *ProgramServiceImpl) FindAllPrograms() ([]entity.Program, error) {
 	programs, err := service.ProgramRepo.FindAllPrograms()

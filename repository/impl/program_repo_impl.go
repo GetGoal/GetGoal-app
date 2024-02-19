@@ -14,6 +14,18 @@ type programRepoImpl struct {
 	db *gorm.DB
 }
 
+// FetchProgramByUserId implements repository.ProgramRepo.
+func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Joins("JOIN user_program ON program.program_id = user_program.program_id").
+		Where("user_program.user_id = ?", id).
+		Find(&programs).Error
+	return programs, err
+}
+
 // Delete implements repository.ProgramRepo.
 func (p *programRepoImpl) Delete(id uint64) error {
 

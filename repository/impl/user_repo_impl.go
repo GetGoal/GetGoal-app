@@ -14,6 +14,13 @@ type userRepoImpl struct {
 	db *gorm.DB
 }
 
+// FetchProgramByUserId implements repository.UserRepo.
+func (*userRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+
+	return programs, nil
+}
+
 // Save implements repository.UserRepo.
 func (up *userRepoImpl) Save(user *entity.UserAccount) error {
 	err := up.db.Create(user).Error
