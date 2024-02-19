@@ -321,15 +321,15 @@ func (controller ProgramController) DeleteProgram(c *gin.Context) {
 
 // Update Program  godoc
 // @summary Update program
-// @description Delete program
+// @description Update program
 // @tags Program
-// @id Delete Prorgam
+// @id Update Prorgam
 // @param id path int true "Program ID"
 // @param program body model.ProgramCreateOrUpdate true "Program Create or Update"
 // @produce json
-// @response 201 {object} model.GeneralResponse "Created"
+// @response 200 {object} model.GeneralResponse "OK"
 // @response 400 {object} model.GeneralResponse "Bad Request"
-// @Router /api/v1/programs/:id [delete]
+// @Router /api/v1/programs/:id [update]
 func (controller ProgramController) UpdateProgram(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
