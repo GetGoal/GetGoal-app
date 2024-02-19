@@ -25,6 +25,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.POST("/programs/search", controller.FindProgramByText)
 	api.POST("/programs/filter", controller.FindProgramByLabel)
 	api.POST("/programs", controller.SaveProgram)
+	api.PUT("/programs/:id", controller.UpdateProgram)
 	api.DELETE("/programs/:id", controller.DeleteProgram)
 }
 
@@ -313,6 +314,60 @@ func (controller ProgramController) DeleteProgram(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Success",
 		Data:    nil,
+		Error:   nil,
+	})
+}
+
+// Update Program  godoc
+// @summary Update program
+// @description Delete program
+// @tags Program
+// @id Delete Prorgam
+// @param id path int true "Program ID"
+// @param program body model.ProgramCreateOrUpdate true "Program Create or Update"
+// @produce json
+// @response 201 {object} model.GeneralResponse "Created"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/programs [delete]
+func (controller ProgramController) UpdateProgram(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	program := new(model.ProgramCreateOrUpdate)
+	if err := common.Bind(c, program); err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	programCreate, err := controller.ProgramService.Update(id, *program, c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	programDTO := model.ConvertToProgramDTO(programCreate)
+	c.JSON(http.StatusCreated, model.GeneralResponse{
+		Code:    http.StatusCreated,
+		Message: "Success",
+		Count:   1,
+		Data:    programDTO,
 		Error:   nil,
 	})
 }

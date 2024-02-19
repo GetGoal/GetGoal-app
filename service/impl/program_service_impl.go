@@ -144,7 +144,74 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 
 // Update implements service.ProgramService.
 func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error) {
-	panic("unimplemented")
+	if err := common.Validate(program); err != nil {
+		return entity.Program{}, err
+	}
+	programToUpdate, err := service.ProgramRepo.FindProgramByID(id)
+	if err != nil {
+		return entity.Program{}, err
+	}
+
+	var labels []entity.Label
+	for _, labelModel := range program.Labels {
+		err := common.Validate(labelModel)
+		if err != nil {
+			return entity.Program{}, err
+		}
+		existedLabel, err := service.LabelRepo.FindLabelByName(labelModel.LabelName)
+		if err != nil {
+			labelToCreate := entity.Label{
+				LabelName: labelModel.LabelName,
+			}
+			label, err := service.LabelRepo.Save(&labelToCreate)
+			if err != nil {
+				return entity.Program{}, err
+			}
+
+			labels = append(labels, label)
+			continue
+		}
+
+		labels = append(labels, existedLabel)
+	}
+
+	var tasks []entity.Task
+	for index, task := range programToUpdate.Tasks {
+		err := common.Validate(task)
+		if err != nil {
+			return entity.Program{}, err
+		}
+		taskToUpdate, err := service.TaskRepo.FindTaskByID(task.TaskID)
+		if err != nil {
+			return entity.Program{}, err
+		}
+		taskToUpdate.TaskName = program.Tasks[index].TaskName
+		taskToUpdate.TaskDescription = program.Tasks[index].TaskDescription
+		taskToUpdate.Category = program.Tasks[index].Category
+		taskToUpdate.StartTime = program.Tasks[index].StartTime
+		taskToUpdate.IsSetNotification = program.Tasks[index].IsSetNotification
+		taskToUpdate.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
+
+		task, terr := service.TaskRepo.Update(task.TaskID, taskToUpdate)
+
+		tasks = append(tasks, task)
+		if terr != nil {
+			return entity.Program{}, terr
+		}
+	}
+
+	programToUpdate.ProgramName = program.ProgramName
+	programToUpdate.ProgramDescription = program.ProgramDescription
+	programToUpdate.MediaURL = program.MediaURL
+	programToUpdate.ExpectedTime = program.ExpectedTime
+	programToUpdate.Labels = labels
+	programToUpdate.Tasks = tasks
+
+	updated, sErr := service.ProgramRepo.Update(id, programToUpdate)
+	if sErr != nil {
+		return entity.Program{}, sErr
+	}
+	return updated, nil
 }
 
 // Delete implements service.ProgramService.
