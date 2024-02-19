@@ -15,16 +15,20 @@ ARG DB_NAME
 ARG DB_PASSWORD
 
 # Set environment
+
 ENV ENV=${ENV}
-ENV DB_HOST=${DB_HOST}
-ENV DB_USER=${DB_USER}
-ENV DB_PASSWORD=${DB_PASSWORD}
-ENV DB_NAME=${DB_NAME}
-ENV DB_PORT=${DB_PORT}
-ENV TZ=Asia/Bangkok
+ENV DATABASE_HOST=${DB_HOST}
+ENV DATABASE_PORT=${DB_PORT}
+ENV DATABASE_USER=${DB_USER}
+ENV DATABASE_PASSWORD=${DB_PASSWORD}
+ENV DATABASE_DBNAME=${DB_NAME}
+ENV DATABASE_SSLMODE=disable
+ENV DATABASE_TIMEZONE=Asia/Bangkok
 
 # Download and install any required third-party dependencies
 RUN go mod download
+
+RUN go mod tidy
 
 # Build the Go application
 RUN go build -o main .

@@ -1,25 +1,26 @@
 package main
 
 import (
-	"log"
-	"time"
-
-	"github.com/xbklyn/getgoal-app/SQL/migration"
-	"github.com/xbklyn/getgoal-app/common"
-	"github.com/xbklyn/getgoal-app/routes"
+	"github.com/xbklyn/getgoal-app/config"
+	"github.com/xbklyn/getgoal-app/database"
+	"github.com/xbklyn/getgoal-app/server"
 )
 
-func init() {
-	common.SetTimezone("Asia/Bangkok")
-	t := common.GetTime(time.Now())
-	log.Println(t)
-	common.LoadEnvVariables()
-	common.InitDB()
-}
+// @title Customers API
+// @version 1.0
+// @description.markdown
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @schemes https http
 func main() {
+	cfg := config.ReadConfig("./")
 
-	r := routes.GetRoutes()
+	db := database.NewPostgresDB(&cfg)
 
-	migration.Migrate()
-	r.Run()
+	gin := server.NewGinServer(&cfg, db.GetDb())
+
+	gin.Start()
+
 }

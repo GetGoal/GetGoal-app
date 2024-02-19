@@ -1,9 +1,11 @@
 package common
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"time"
 
-	// "gopkg.in/go-playground/validator.v8"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
@@ -48,4 +50,26 @@ func NewValidatorError(err error) CommonError {
 func Bind(c *gin.Context, obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
+}
+
+func Validate(modelValidate interface{}) error {
+	validate := validator.New()
+	err := validate.Struct(modelValidate)
+	if err != nil {
+		var messages []map[string]interface{}
+		for _, err := range err.(validator.ValidationErrors) {
+			messages = append(messages, map[string]interface{}{
+				"field":   err.Field(),
+				"message": "this field is " + err.Tag(),
+			})
+		}
+
+		jsonMessage, _ := json.MarshalIndent(messages, "", "  ")
+		return errors.New(string(jsonMessage))
+	}
+	return nil
+}
+
+func GetTimeNow() time.Time {
+	return time.Now()
 }
