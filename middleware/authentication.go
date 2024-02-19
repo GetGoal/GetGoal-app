@@ -74,7 +74,7 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 				// Set new access token in response headers
 				c.Writer.Header().Set("Access-Token", newAccessToken)
 				// Optionally, set new refresh token in response headers
-				c.Writer.Header().Set("Refresh-Token", newRefreshToken)
+				c.Writer.Header().Set("RefreshToken", newRefreshToken)
 
 				// Proceed with the request using the new access token
 				c.Next()
@@ -82,13 +82,14 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 			}
 			c.AbortWithStatusJSON(http.StatusUnauthorized, model.GeneralResponse{
 				Code:    http.StatusUnauthorized,
-				Message: "Invalid token this?",
+				Message: "Invalid token",
 				Data:    nil,
 				Error:   err.Error(),
 			})
 			return
 		}
 		c.Set("claims", claims)
+		c.Set("access_token", tokenString)
 
 		// Call the next handler
 		c.Next()

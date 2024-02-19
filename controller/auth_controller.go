@@ -171,7 +171,9 @@ func (controller *AuthController) SignIn(c *gin.Context) {
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/auth/sign-out [post]
 func (controller *AuthController) SignOut(c *gin.Context) {
-	err := controller.AuthService.SignOut()
+
+	token := c.MustGet("access_token").(string)
+	err := controller.AuthService.SignOut(token)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{

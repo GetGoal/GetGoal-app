@@ -53,9 +53,8 @@ func (service *AuthServiceImpl) IsTokenBlacklisted(tokenString string) bool {
 }
 
 // SignOut implements service.AuthService.
-func (service *AuthServiceImpl) SignOut() error {
-
-	//sign out user
+func (service *AuthServiceImpl) SignOut(token string) error {
+	service.BlackListedToken[token] = true
 	return nil
 }
 
