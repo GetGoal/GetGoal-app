@@ -7,12 +7,12 @@ import (
 )
 
 type ProgramCreateOrUpdate struct {
-	ProgramName        string               `json:"program_name" binding:"required" validate:"required"`
+	ProgramName        string               `json:"program_name" binding:"required" validate:"min=4,max=150"`
 	MediaURL           string               `json:"media_url" binding:"required"`
-	ProgramDescription string               `json:"program_desc" binding:"required"`
+	ProgramDescription string               `json:"program_desc" binding:"required" validate:"min=4,max=250"`
 	ExpectedTime       string               `json:"expected_time" binding:"required"`
 	Tasks              []TaskCreateOrUpdate `json:"tasks" binding:"required"`
-	Labels             []LabelRequest       `json:"labels"`
+	Labels             []LabelRequest       `json:"labels" binding:"required"`
 }
 type ProgramDTO struct {
 	ProgramID          uint64           `json:"program_id"`
