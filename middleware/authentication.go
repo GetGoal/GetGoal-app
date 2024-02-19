@@ -17,7 +17,6 @@ import (
 
 func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Default().Printf("Header: %v :", c.Request.Header)
 		// Extract token from request headers
 		tokenString := extractToken(c)
 		if tokenString == "" {
