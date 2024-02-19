@@ -72,8 +72,6 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 					return
 				}
 
-				c.Set("claims", claims)
-				c.Set("access_token", newAccessToken)
 				// Set new access token in response headers
 				c.Writer.Header().Set("Authorization", "Bearer "+newAccessToken)
 				// Optionally, set new refresh token in response headers
