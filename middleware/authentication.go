@@ -20,8 +20,8 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 		// Extract token from request headers
 		tokenString := extractToken(c)
 		if tokenString == "" {
-			c.JSON(http.StatusBadRequest, model.GeneralResponse{
-				Code:    http.StatusBadRequest,
+			c.JSON(http.StatusUnauthorized, model.GeneralResponse{
+				Code:    http.StatusUnauthorized,
 				Message: "No token provided",
 				Data:    nil,
 				Error:   "No token provided",
