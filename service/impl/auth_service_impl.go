@@ -58,6 +58,40 @@ func (service *AuthServiceImpl) SignOut(token string) error {
 	return nil
 }
 
+// SignInWithGoogle implements service.AuthService.
+func (service *AuthServiceImpl) SignInWithGoogle(request model.GoogleSignInRequest) (accessToken string, refreshToken string, err error) {
+	// validate request
+	if err := common.Validate(request); err != nil {
+		return "", "", err
+	}
+
+	//find user by email
+	user, _ := service.UserRepo.FindUserByEmail(request.Email)
+	if user.UserID == 0 {
+		return "", "", errors.New("user not found")
+	}
+	//check if provider is google
+	for _, provider := range user.ExternalProvider {
+		if provider.ProviderName != "google" {
+			return "", "", errors.New("user already registered with google")
+		}
+
+	}
+	//check if user is verified
+	if user.EmailValidationStatusID != 1 {
+		return "", "", errors.New("user is not verified")
+	}
+
+	//generate access token
+	access, refresh, err := common.GenerateToken(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	return access, refresh, nil
+
+}
+
 // SignIn implements service.AuthService.
 func (service *AuthServiceImpl) SignIn(request model.Credentials) (string, string, error) {
 	if err := common.Validate(request); err != nil {

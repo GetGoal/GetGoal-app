@@ -22,6 +22,7 @@ func (controller *AuthController) RouteAnonymous(api *gin.RouterGroup) {
 	api.POST("/auth/register", controller.Register)
 	api.POST("/auth/verify", controller.Verify)
 	api.POST("/auth/sign-in", controller.SignIn)
+	api.POST("/auth/external-sign-in", controller.ProviderSignIn)
 }
 
 func (controller *AuthController) Route(api *gin.RouterGroup) {
@@ -190,4 +191,61 @@ func (controller *AuthController) SignOut(c *gin.Context) {
 		Data:    nil,
 		Error:   nil,
 	})
+}
+
+func (controller *AuthController) ProviderSignIn(c *gin.Context) {
+	var request model.ProviderSignInRequest
+	if err := common.Bind(c, &request); err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	switch provider {
+	case "google":
+		var request model.GoogleSignInRequest
+		if err := common.Bind(c, &request); err != nil {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusBadRequest, model.GeneralResponse{
+				Code:    http.StatusBadRequest,
+				Message: "Invalid Request",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+		access, refresh, err := controller.AuthService.SignInWithGoogle(request)
+		if err != nil {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusBadRequest, model.GeneralResponse{
+				Code:    http.StatusBadRequest,
+				Message: "Bad request",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+
+		tokens := model.TokenResponse{
+			AccessToken:  access,
+			RefreshToken: refresh,
+		}
+		c.JSON(http.StatusOK, model.GeneralResponse{
+			Code:    http.StatusOK,
+			Message: "Sign in Success",
+			Data:    tokens,
+			Error:   nil,
+		})
+	default:
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Provider",
+			Data:    nil,
+			Error:   "Invalid Provider"})
+	}
+
 }

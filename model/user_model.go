@@ -7,6 +7,7 @@ type UserModel struct {
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
+	User      entity.UserAccount
 }
 
 func ConvertToUserDTO(entityUser entity.UserAccount) UserModel {
@@ -15,5 +16,6 @@ func ConvertToUserDTO(entityUser entity.UserAccount) UserModel {
 		Email:     entityUser.Email,
 		FirstName: entityUser.FirstName,
 		LastName:  entityUser.LastName,
+		User:      entityUser,
 	}
 }
