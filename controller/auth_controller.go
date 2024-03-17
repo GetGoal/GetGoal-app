@@ -240,12 +240,6 @@ func (controller *AuthController) ProviderSignIn(c *gin.Context) {
 			Data:    tokens,
 			Error:   nil,
 		})
-	default:
-		c.JSON(http.StatusBadRequest, model.GeneralResponse{
-			Code:    http.StatusBadRequest,
-			Message: "Invalid Provider",
-			Data:    nil,
-			Error:   "Invalid Provider"})
 	}
 
 }

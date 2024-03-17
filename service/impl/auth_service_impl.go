@@ -59,14 +59,24 @@ func (service *AuthServiceImpl) SignOut(token string) error {
 }
 
 // SignInWithGoogle implements service.AuthService.
-func (service *AuthServiceImpl) SignInWithGoogle(request model.GoogleSignInRequest) (accessToken string, refreshToken string, err error) {
+func (service *AuthServiceImpl) ExternalSignIn(request model.ProviderSignInRequest) (accessToken string, refreshToken string, err error) {
 	// validate request
 	if err := common.Validate(request); err != nil {
 		return "", "", err
 	}
 
+	switch request.Provider {
+	case "google":
+		accessToken, refreshToken, err = service.signInWithGoogle(request)
+		if err != nil {
+			return "", "", err
+		}
+		return accessToken, refreshToken, nil
+	default:
+		return "", "", errors.New("invalid provider")
+	}
 	//find user by email
-	user, _ := service.UserRepo.FindUserByEmail(request.Email)
+	user, _ := service.UserRepo.FindUserByEmail(request)
 	if user.UserID == 0 {
 		return "", "", errors.New("user not found")
 	}
