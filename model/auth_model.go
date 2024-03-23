@@ -21,13 +21,12 @@ type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
-
 type GoogleSignInRequest struct {
 	DisplayName    string `json:"display_name" binding:"required" validate:"min=1,max=70"`
 	Email          string `json:"email" binding:"required" validate:"email"`
 	ID             string `json:"id" binding:"required"`
 	PhotoURL       string `json:"photo_url" binding:"required"`
-	ServerAuthCode string `json:"server_auth_code" binding:"required"`
+	ServerAuthCode string `json:"server_auth_code" `
 }
 
 type ProviderSignInRequest struct {

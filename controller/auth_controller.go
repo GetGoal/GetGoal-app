@@ -198,48 +198,32 @@ func (controller *AuthController) ProviderSignIn(c *gin.Context) {
 	if err := common.Bind(c, &request); err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
-			Message: "Invalid Request",
+			Message: "Invalid Request to sign in",
 			Data:    nil,
 			Error:   err.Error(),
 		})
 		return
 	}
 
-	switch provider {
-	case "google":
-		var request model.GoogleSignInRequest
-		if err := common.Bind(c, &request); err != nil {
-			log.Default().Printf("Error: %v", err)
-			c.JSON(http.StatusBadRequest, model.GeneralResponse{
-				Code:    http.StatusBadRequest,
-				Message: "Invalid Request",
-				Data:    nil,
-				Error:   err.Error(),
-			})
-			return
-		}
-		access, refresh, err := controller.AuthService.SignInWithGoogle(request)
-		if err != nil {
-			log.Default().Printf("Error: %v", err)
-			c.JSON(http.StatusBadRequest, model.GeneralResponse{
-				Code:    http.StatusBadRequest,
-				Message: "Bad request",
-				Data:    nil,
-				Error:   err.Error(),
-			})
-			return
-		}
-
-		tokens := model.TokenResponse{
-			AccessToken:  access,
-			RefreshToken: refresh,
-		}
-		c.JSON(http.StatusOK, model.GeneralResponse{
-			Code:    http.StatusOK,
-			Message: "Sign in Success",
-			Data:    tokens,
-			Error:   nil,
+	access, refresh, err := controller.AuthService.ExternalSignIn(request)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad request",
+			Data:    nil,
+			Error:   err.Error(),
 		})
+		return
 	}
-
+	tokens := model.TokenResponse{
+		AccessToken:  access,
+		RefreshToken: refresh,
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Sign in Success",
+		Data:    tokens,
+		Error:   nil,
+	})
 }
