@@ -11,7 +11,7 @@ type ExternalProvider struct {
 	ProviderName       string     `gorm:"size:50;not null;unique" json:"provider_name"`
 	CreatedAt          time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt          time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeleteAt           *time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"delete_at"`
+	DeletedAt          *time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"deleted_at"`
 }
 
 func (ex *ExternalProvider) TableName() string {

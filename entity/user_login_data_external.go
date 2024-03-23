@@ -12,7 +12,7 @@ type UserLoginDataExternal struct {
 	ExternalProviderID      uint64     `gorm:"not null" json:"external_provider_id"`
 	CreatedAt               time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt               time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeleteAt                *time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"delete_at"`
+	DeletedAt               *time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"deleted_at"`
 }
 
 func (ex *UserLoginDataExternal) TableName() string {
