@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -56,6 +57,25 @@ func (service *AuthServiceImpl) IsTokenBlacklisted(tokenString string) bool {
 func (service *AuthServiceImpl) SignOut(token string) error {
 	service.BlackListedToken[token] = true
 	return nil
+}
+
+// SignInWithGoogle implements service.AuthService.
+func (service *AuthServiceImpl) ExternalSignIn(request model.ProviderSignInRequest) (accessToken string, refreshToken string, err error) {
+	// validate request
+	if err := common.Validate(request); err != nil {
+		return "", "", err
+	}
+
+	switch request.Provider {
+	case "google":
+		accessToken, refreshToken, err = service.signInWithGoogle(request.Google)
+		if err != nil {
+			return "", "", err
+		}
+		return accessToken, refreshToken, nil
+	default:
+		return "", "", errors.New("invalid provider")
+	}
 }
 
 // SignIn implements service.AuthService.
@@ -161,6 +181,60 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 		return entity.UserAccount{}, err
 	}
 	return user, nil
+}
+
+func (service *AuthServiceImpl) signInWithGoogle(request model.GoogleSignInRequest) (accessToken string, refreshToken string, err error) {
+	// validate request
+	if err := common.Validate(request); err != nil {
+		return "", "", err
+	}
+	// find user by email
+	user, _ := service.UserRepo.FindUserByEmail(request.Email)
+	if user.UserID == 0 {
+		log.Default().Println("Create new user with google credential")
+		// create user
+		user.FirstName = request.DisplayName
+		user.Email = request.Email
+		user.EmailValidationStatusID = 1
+
+		//display picture
+		// user. = request.PhotoURL
+		user.ExternalProvider = append(user.ExternalProvider, entity.ExternalProvider{
+			ExternalProviderID: 1,
+			ProviderName:       "google",
+		})
+		err := service.UserRepo.Save(&user)
+		if err != nil {
+			return "", "", err
+		}
+		// generate access token
+		access, refresh, err := common.GenerateToken(user)
+		if err != nil {
+			return "", "", err
+		}
+		return access, refresh, nil
+	}
+
+	// check if provider is google
+	var hasGoogle bool
+	for _, provider := range user.ExternalProvider {
+		if provider.ProviderName == "google" {
+			hasGoogle = true
+		}
+	}
+	if !hasGoogle {
+		return "", "", errors.New("user already registered with getgoal account, try logging in with this email")
+	}
+	// check if user is verified
+	if user.EmailValidationStatusID != 1 {
+		return "", "", errors.New("user is not verified")
+	}
+	// generate access token
+	access, refresh, err := common.GenerateToken(user)
+	if err != nil {
+		return "", "", err
+	}
+	return access, refresh, nil
 }
 
 func generateHashFromPassword(password string, p *params) (hashed string, encodedHash string, err error) {

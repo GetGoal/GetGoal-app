@@ -31,7 +31,9 @@ func (up *userRepoImpl) Save(user *entity.UserAccount) error {
 func (t *userRepoImpl) FindUserByID(id uint64) (entity.UserAccount, error) {
 	var user entity.UserAccount
 
-	err := t.db.Model(&entity.UserAccount{}).First(&user, id).Error
+	err := t.db.Model(&entity.UserAccount{}).
+		Preload("ExternalProvider").
+		First(&user, id).Error
 
 	return user, err
 }
@@ -41,6 +43,7 @@ func (t *userRepoImpl) FindUserByEmail(email string) (entity.UserAccount, error)
 	var user entity.UserAccount
 
 	err := t.db.Model(&entity.UserAccount{}).
+		Preload("ExternalProvider").
 		Where("email = ?", email).
 		Find(&user).Error
 
