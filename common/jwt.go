@@ -54,6 +54,25 @@ func generateAccessToken(user entity.UserAccount) (string, error) {
 	}
 	return accessToken, nil
 }
+func generateAccessTokenForResetPassword(user entity.UserAccount) (string, error) {
+	expirationTime := time.Now().Add(10 * time.Minute)
+	claims := &Claims{
+		UserID:    user.UserID,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken, err := token.SignedString([]byte(config.GetConfig().JwtKeys.AccessSecret))
+	if err != nil {
+		return "", err
+	}
+	return accessToken, nil
+
+}
 
 func generateRefreshToken(user entity.UserAccount) (string, error) {
 	refreshExpirationTime := time.Now().Add(7 * 24 * time.Hour)
@@ -101,6 +120,23 @@ func validateRefreshToken(tokenString string) (*RefreshClaims, error) {
 	}
 
 	claims, ok := token.Claims.(*RefreshClaims)
+	if !ok || !token.Valid {
+		return nil, err
+	}
+
+	return claims, nil
+}
+
+func ValidateAccessToken(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.GetConfig().JwtKeys.AccessSecret), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
 		return nil, err
 	}
