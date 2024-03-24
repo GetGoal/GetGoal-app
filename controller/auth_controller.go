@@ -193,6 +193,16 @@ func (controller *AuthController) SignOut(c *gin.Context) {
 	})
 }
 
+// Provider Sign In godoc
+// @summary Provider Sign In
+// @description Sign in outsider provider
+// @tags Authentication
+// @id ProviderSignIn
+// @accept json
+// @produce json
+// @response 200 {object} model.GeneralResponse "OK"
+// @response 400 {object} model.GeneralResponse "Bad Request"
+// @Router /api/v1/auth/external-sign-in [post]
 func (controller *AuthController) ProviderSignIn(c *gin.Context) {
 	var request model.ProviderSignInRequest
 	if err := common.Bind(c, &request); err != nil {
