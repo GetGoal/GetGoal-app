@@ -18,6 +18,7 @@ func NewUserController(userService service.UserService) UserController {
 
 func (controller UserController) Route(api *gin.RouterGroup) {
 	api.GET("/users/profile", controller.FindUserByEmail)
+	api.POST("")
 }
 func (controller UserController) FindUserByEmail(c *gin.Context) {
 	user, err := controller.UserService.FindUserByEmail(c)

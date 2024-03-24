@@ -1,11 +1,13 @@
 package impl
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
+	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
 )
@@ -16,6 +18,27 @@ func NewUserServiceImpl(userRepo repository.UserRepo) service.UserService {
 
 type UserServiceImpl struct {
 	UserRepo repository.UserRepo
+}
+
+// UpdateUser implements service.UserService.
+func (service UserServiceImpl) ResetPassword(credential model.Credentials) (*entity.UserAccount, error) {
+	user, _ := service.UserRepo.FindUserByEmail(credential.Email)
+	if user.UserID == 0 {
+		return nil, errors.New("user not found")
+	}
+	hashed, encodedHash, err := common.GenerateHashFromPassword(credential.Password)
+	if err != nil {
+		return &entity.UserAccount{}, err
+	}
+
+	user.PasswordHash = hashed
+	user.PasswordSalt = encodedHash
+
+	err = service.UserRepo.Update(user.UserID, user)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 // FindUserByEmail implements service.UserService.
