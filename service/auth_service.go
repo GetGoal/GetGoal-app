@@ -12,4 +12,5 @@ type AuthService interface {
 	SignOut(token string) error
 	Verify(request model.VerifyRequest) error
 	IsTokenBlacklisted(tokenString string) bool
+	ResetPassword(request model.ResetPasswordRequest) error
 }

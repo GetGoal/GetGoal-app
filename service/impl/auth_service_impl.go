@@ -46,6 +46,36 @@ type AuthServiceImpl struct {
 	Claims           common.Claims
 }
 
+// ResetPassword implements service.AuthService.
+func (service *AuthServiceImpl) ResetPassword(request model.ResetPasswordRequest) error {
+	//find user by email
+	user, _ := service.UserRepo.FindUserByEmail(request.Email)
+	if user.UserID == 0 {
+		return errors.New("email not found")
+	}
+	//check if len of provider is 0
+	if len(user.ExternalProvider) != 0 {
+		return errors.New("user is registered with external provider, please login using external provider instead")
+	}
+	//gen new access token
+	access, _, err := common.GenerateToken(user)
+	if err != nil {
+		return err
+	}
+
+	resetLink := fmt.Sprintf("%s?token=%s", config.GetConfig().Mailer.BaseURL, access)
+	//send email
+	data := model.ResetPasswordTemplateData{
+		ResetLink: resetLink,
+	}
+
+	if err := service.Mailer.SendEmail([]string{user.Email}, config.RESET_PASSWORD_SUBJECT, config.RESET_PASSWORD_TEMPLATE, data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // IsTokenBlacklisted implements service.AuthService.
 func (service *AuthServiceImpl) IsTokenBlacklisted(tokenString string) bool {
 	// Check if token is blacklisted
