@@ -41,7 +41,7 @@ func (controller UserController) FindUserByEmail(c *gin.Context) {
 }
 
 func (controller UserController) ResetPassword(c *gin.Context) {
-	var credential model.Credentials
+	var credential model.ChangePasswordRequest
 	if err := c.ShouldBindJSON(&credential); err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -52,7 +52,7 @@ func (controller UserController) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	user, err := controller.UserService.ResetPassword(credential)
+	user, err := controller.UserService.ResetPassword(c, credential)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,

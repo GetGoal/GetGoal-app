@@ -21,6 +21,10 @@ type ResetPasswordRequest struct {
 	Email string `json:"email" binding:"required" validate:"email"`
 }
 
+type ChangePasswordRequest struct {
+	NewPassword string `json:"password" binding:"required" validate:"min=8"`
+}
+
 type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`

@@ -21,14 +21,27 @@ type UserServiceImpl struct {
 }
 
 // UpdateUser implements service.UserService.
-func (service UserServiceImpl) ResetPassword(credential model.Credentials) (*entity.UserAccount, error) {
-	user, _ := service.UserRepo.FindUserByEmail(credential.Email)
+func (service UserServiceImpl) ResetPassword(c *gin.Context, credential model.ChangePasswordRequest) (*entity.UserAccount, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	user, _ := service.UserRepo.FindUserByEmail(claims.Email)
 	if user.UserID == 0 {
 		return nil, errors.New("user not found")
 	}
-	hashed, encodedHash, err := common.GenerateHashFromPassword(credential.Password)
+	if claims.Email != user.Email {
+		return nil, errors.New("unauthorized")
+	}
+
+	isMatchedOldPassword, err := common.VerifyPassword(credential.NewPassword, user.PasswordSalt)
 	if err != nil {
-		return &entity.UserAccount{}, err
+		return nil, err
+	}
+	if isMatchedOldPassword {
+		return nil, errors.New("new password cannot be the same as the old password")
+	}
+
+	hashed, encodedHash, err := common.GenerateHashFromPassword(credential.NewPassword)
+	if err != nil {
+		return nil, err
 	}
 
 	user.PasswordHash = hashed
@@ -38,7 +51,7 @@ func (service UserServiceImpl) ResetPassword(credential model.Credentials) (*ent
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return &user, nil
 }
 
 // FindUserByEmail implements service.UserService.

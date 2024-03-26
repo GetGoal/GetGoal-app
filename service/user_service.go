@@ -8,5 +8,5 @@ import (
 
 type UserService interface {
 	FindUserByEmail(c *gin.Context) (*entity.UserAccount, error)
-	ResetPassword(model.Credentials) (*entity.UserAccount, error)
+	ResetPassword(c *gin.Context, credentail model.ChangePasswordRequest) (*entity.UserAccount, error)
 }
