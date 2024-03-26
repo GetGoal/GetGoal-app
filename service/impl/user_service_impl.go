@@ -22,6 +22,9 @@ type UserServiceImpl struct {
 
 // UpdateUser implements service.UserService.
 func (service UserServiceImpl) ResetPassword(c *gin.Context, credential model.ChangePasswordRequest) (*entity.UserAccount, error) {
+	if err := common.Validate(credential); err != nil {
+		return nil, err
+	}
 	claims := c.MustGet("claims").(*common.Claims)
 	user, _ := service.UserRepo.FindUserByEmail(claims.Email)
 	if user.UserID == 0 {
