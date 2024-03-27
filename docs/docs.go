@@ -15,6 +15,36 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/auth/external-sign-in": {
+            "post": {
+                "description": "Sign in outsider provider",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Provider Sign In",
+                "operationId": "ProviderSignIn",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.GeneralResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/register": {
             "post": {
                 "description": "Register new user",
@@ -1174,12 +1204,17 @@ const docTemplate = `{
     "definitions": {
         "model.Credentials": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                 }
             }
         },
@@ -1250,6 +1285,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "expected_time",
+                "labels",
                 "media_url",
                 "program_desc",
                 "program_name",
@@ -1269,10 +1305,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "program_desc": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 250,
+                    "minLength": 4
                 },
                 "program_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 4
                 },
                 "tasks": {
                     "type": "array",
@@ -1307,11 +1347,13 @@ const docTemplate = `{
                 },
                 "first_name": {
                     "type": "string",
-                    "maxLength": 250
+                    "maxLength": 70,
+                    "minLength": 1
                 },
                 "last_name": {
                     "type": "string",
-                    "maxLength": 250
+                    "maxLength": 70,
+                    "minLength": 1
                 },
                 "password": {
                     "type": "string",
@@ -1322,11 +1364,14 @@ const docTemplate = `{
         "model.TaskCreateOrUpdate": {
             "type": "object",
             "required": [
+                "start_time",
                 "task_name"
             ],
             "properties": {
                 "category": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
                 },
                 "is_set_noti": {
                     "type": "integer",
@@ -1342,11 +1387,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "task_description": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 250,
+                    "minLength": 1
                 },
                 "task_name": {
                     "type": "string",
-                    "maxLength": 250
+                    "maxLength": 150,
+                    "minLength": 1
                 },
                 "time_before_notify": {
                     "type": "integer"

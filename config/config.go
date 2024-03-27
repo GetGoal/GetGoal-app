@@ -52,6 +52,7 @@ type (
 		Port     int
 		Email    string
 		Password string
+		BaseURL  string
 	}
 	JwtKey struct {
 		AccessSecret  string
@@ -105,6 +106,7 @@ func ReadConfig(path string) Config {
 			Port:     viper.GetInt("mailer.port"),
 			Email:    viper.GetString("mailer.email"),
 			Password: viper.GetString("mailer.password"),
+			BaseURL:  viper.GetString("mailer.url"),
 		},
 		JwtKeys: JwtKey{
 			AccessSecret:  viper.GetString("secrets.jwt.accesskey"),

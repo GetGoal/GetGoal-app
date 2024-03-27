@@ -1,11 +1,13 @@
 package impl
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
+	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
 )
@@ -16,6 +18,43 @@ func NewUserServiceImpl(userRepo repository.UserRepo) service.UserService {
 
 type UserServiceImpl struct {
 	UserRepo repository.UserRepo
+}
+
+// UpdateUser implements service.UserService.
+func (service UserServiceImpl) ResetPassword(c *gin.Context, credential model.ChangePasswordRequest) (*entity.UserAccount, error) {
+	if err := common.Validate(credential); err != nil {
+		return nil, err
+	}
+	claims := c.MustGet("claims").(*common.Claims)
+	user, _ := service.UserRepo.FindUserByEmail(claims.Email)
+	if user.UserID == 0 {
+		return nil, errors.New("user not found")
+	}
+	if claims.Email != user.Email {
+		return nil, errors.New("unauthorized")
+	}
+
+	isMatchedOldPassword, err := common.VerifyPassword(credential.NewPassword, user.PasswordSalt)
+	if err != nil {
+		return nil, err
+	}
+	if isMatchedOldPassword {
+		return nil, errors.New("new password cannot be the same as the old password")
+	}
+
+	hashed, encodedHash, err := common.GenerateHashFromPassword(credential.NewPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	user.PasswordHash = hashed
+	user.PasswordSalt = encodedHash
+
+	err = service.UserRepo.Update(user.UserID, user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 // FindUserByEmail implements service.UserService.
