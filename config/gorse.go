@@ -12,6 +12,6 @@ func (g *gorseDB) GetGorseClient() *client.GorseClient {
 }
 
 func NewGorseClient(cfg *Config) gorseDB {
-	gorse := client.NewGorseClient("http://127.0.0.1:8088", "")
+	gorse := client.NewGorseClient("http://cp23ssa1.sit.kmutt.ac.th:8088", "")
 	return gorseDB{Gorse: gorse}
 }
