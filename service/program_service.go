@@ -7,7 +7,7 @@ import (
 )
 
 type ProgramService interface {
-	FindAllPrograms() ([]entity.Program, error)
+	FindAllPrograms(c *gin.Context) ([]entity.Program, error)
 	FindProgramByID(id uint64) (*entity.Program, error)
 	FindProgramByText(str string) ([]entity.Program, error)
 	FindProgramByLabel(labels []string) ([]entity.Program, error)

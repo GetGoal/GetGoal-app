@@ -1,16 +1,21 @@
 package impl
 
 import (
+	"context"
+	"log"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewProgramServiceImpl(programRepo repository.ProgramRepo, taskRepo repository.TaskRepo, labelRepo repository.LabelRepo, userRepo repository.UserRepo, userProRepo repository.UserProgramRepo) service.ProgramService {
-	return &ProgramServiceImpl{programRepo, taskRepo, labelRepo, userRepo, userProRepo}
+func NewProgramServiceImpl(programRepo repository.ProgramRepo, taskRepo repository.TaskRepo, labelRepo repository.LabelRepo, userRepo repository.UserRepo, userProRepo repository.UserProgramRepo, gorse client.GorseClient) service.ProgramService {
+	return &ProgramServiceImpl{programRepo, taskRepo, labelRepo, userRepo, userProRepo, gorse}
 }
 
 type ProgramServiceImpl struct {
@@ -19,6 +24,7 @@ type ProgramServiceImpl struct {
 	repository.LabelRepo
 	repository.UserRepo
 	repository.UserProgramRepo
+	client.GorseClient
 }
 
 // FindProgramByUserId implements service.ProgramService.
@@ -27,13 +33,26 @@ func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Prog
 	if err != nil {
 		return nil, err
 	}
-
 	return programs, nil
 }
 
 // FindAllPrograms implements service.ProgramService.
-func (service *ProgramServiceImpl) FindAllPrograms() ([]entity.Program, error) {
-	programs, err := service.ProgramRepo.FindAllPrograms()
+func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	programIdList, err := service.GorseClient.GetRecommend(context.Background(), strconv.Itoa(int(claims.UserID)), "", 10)
+	if err != nil {
+		return nil, err
+	}
+	log.Default().Println(programIdList)
+
+	//convert string to uint64
+	var programIds []uint64
+	for _, id := range programIdList {
+		convertedId, _ := strconv.ParseUint(id, 10, 64)
+		programIds = append(programIds, convertedId)
+
+	}
+	programs, err := service.ProgramRepo.FindProgramByIDs(programIds)
 	if err != nil {
 		return nil, err
 	}

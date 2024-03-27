@@ -40,7 +40,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/programs [get]
 func (controller ProgramController) FindAllPrograms(c *gin.Context) {
-	programs, err := controller.ProgramService.FindAllPrograms()
+	programs, err := controller.ProgramService.FindAllPrograms(c)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
