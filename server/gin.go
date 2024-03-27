@@ -14,13 +14,15 @@ import (
 	"github.com/xbklyn/getgoal-app/model"
 	repo "github.com/xbklyn/getgoal-app/repository/impl"
 	service "github.com/xbklyn/getgoal-app/service/impl"
+	"github.com/zhenghaoz/gorse/client"
 	"gorm.io/gorm"
 )
 
 type Gin struct {
-	app *gin.Engine
-	cfg *config.Config
-	db  *gorm.DB
+	app   *gin.Engine
+	cfg   *config.Config
+	db    *gorm.DB
+	gorse *client.GorseClient
 }
 
 // Start implements Server.
@@ -36,7 +38,7 @@ func (s *Gin) Start() {
 	//service
 	labelService := service.NewLabelServiceImpl(&labelRepo)
 	taskService := service.NewTaskServiceImpl(taskRepo, userRepo, userProgramRepo)
-	programService := service.NewProgramServiceImpl(programRepo, taskRepo, labelRepo, userRepo, userProgramRepo)
+	programService := service.NewProgramServiceImpl(programRepo, taskRepo, labelRepo, userRepo, userProgramRepo, *s.gorse)
 	mailerService := service.NewMailerServiceImpl()
 	authService := service.NewAuthServiceImpl(userRepo, mailerService)
 	userService := service.NewUserServiceImpl(userRepo)
@@ -94,14 +96,15 @@ func (s *Gin) Start() {
 	s.app.Run(serverURL)
 }
 
-func NewGinServer(cfg *config.Config, db *gorm.DB) Server {
+func NewGinServer(cfg *config.Config, db *gorm.DB, gorse *client.GorseClient) Server {
 	if cfg.Env == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	return &Gin{
-		app: gin.Default(),
-		db:  db,
-		cfg: cfg,
+		app:   gin.Default(),
+		db:    db,
+		cfg:   cfg,
+		gorse: gorse,
 	}
 }

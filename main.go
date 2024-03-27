@@ -16,11 +16,14 @@ import (
 // @schemes https http
 func main() {
 	cfg := config.ReadConfig("./")
+	gorse := config.NewGorseClient(&cfg)
 
 	db := database.NewPostgresDB(&cfg)
-
-	gin := server.NewGinServer(&cfg, db.GetDb())
+	gin := server.NewGinServer(&cfg, db.GetDb(), gorse.GetGorseClient())
 
 	gin.Start()
 
+	// gors
+	// e := client.NewGorseClient(&cfg)
+	_ = gorse
 }
