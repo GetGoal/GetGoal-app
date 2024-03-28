@@ -262,30 +262,41 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	}
 
 	var tasks []entity.Task
-	for index, task := range programToUpdate.Tasks {
+	for index, task := range program.Tasks {
 		err := common.Validate(task)
 		if err != nil {
 			return entity.Program{}, err
 		}
-		taskToUpdate, err := service.TaskRepo.FindTaskByID(task.TaskID)
-		if err != nil {
-			return entity.Program{}, err
-		}
-		taskToUpdate.TaskName = program.Tasks[index].TaskName
-		taskToUpdate.TaskDescription = program.Tasks[index].TaskDescription
-		taskToUpdate.Category = program.Tasks[index].Category
-		taskToUpdate.StartTime = program.Tasks[index].StartTime
-		taskToUpdate.IsSetNotification = program.Tasks[index].IsSetNotification
-		taskToUpdate.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
+		existedTask, _ := service.TaskRepo.FindTaskByID(task.TaskID)
+		if existedTask.TaskID == 0 {
+			newTask := entity.Task{
+				TaskName:          task.TaskName,
+				TaskDescription:   task.TaskDescription,
+				Category:          task.Category,
+				StartTime:         task.StartTime,
+				IsSetNotification: task.IsSetNotification,
+				TimeBeforeNotify:  task.TimeBeforeNotify,
+			}
+			task, terr := service.TaskRepo.Save(&newTask)
+			tasks = append(tasks, task)
+			if terr != nil {
+				return entity.Program{}, terr
+			}
+		} else {
+			existedTask.TaskName = program.Tasks[index].TaskName
+			existedTask.TaskDescription = program.Tasks[index].TaskDescription
+			existedTask.Category = program.Tasks[index].Category
+			existedTask.StartTime = program.Tasks[index].StartTime
+			existedTask.IsSetNotification = program.Tasks[index].IsSetNotification
+			existedTask.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
 
-		task, terr := service.TaskRepo.Update(task.TaskID, taskToUpdate)
-
-		tasks = append(tasks, task)
-		if terr != nil {
-			return entity.Program{}, terr
+			task, terr := service.TaskRepo.Update(task.TaskID, existedTask)
+			tasks = append(tasks, task)
+			if terr != nil {
+				return entity.Program{}, terr
+			}
 		}
 	}
-
 	programToUpdate.ProgramName = program.ProgramName
 	programToUpdate.ProgramDescription = program.ProgramDescription
 	programToUpdate.MediaURL = program.MediaURL
