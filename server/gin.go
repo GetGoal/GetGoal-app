@@ -37,7 +37,7 @@ func (s *Gin) Start() {
 
 	//service
 	labelService := service.NewLabelServiceImpl(&labelRepo)
-	taskService := service.NewTaskServiceImpl(taskRepo, userRepo, userProgramRepo)
+	taskService := service.NewTaskServiceImpl(taskRepo, userRepo, userProgramRepo, *s.gorse)
 	programService := service.NewProgramServiceImpl(programRepo, taskRepo, labelRepo, userRepo, userProgramRepo, *s.gorse)
 	mailerService := service.NewMailerServiceImpl()
 	authService := service.NewAuthServiceImpl(userRepo, mailerService)

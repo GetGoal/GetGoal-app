@@ -152,7 +152,12 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		Labels:             labels,
 	}
 
+	var strLabel []string
+	for _, label := range labels {
+		strLabel = append(strLabel, label.LabelName)
+	}
 	program, err := service.ProgramRepo.Save(&programToCreate)
+
 	if err != nil {
 		return entity.Program{}, err
 	}
@@ -191,6 +196,15 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	updated, sErr := service.ProgramRepo.Update(program.ProgramID, program)
 	if sErr != nil {
 		return entity.Program{}, sErr
+	}
+
+	_, gErr := service.GorseClient.InsertItem(context.TODO(), client.Item{
+		ItemId:     strconv.Itoa(int(program.ProgramID)),
+		IsHidden:   false,
+		Categories: strLabel,
+	})
+	if gErr != nil {
+		return entity.Program{}, gErr
 	}
 
 	upErr := service.UserProgramRepo.Save(1, program.ProgramID, user.UserID)
