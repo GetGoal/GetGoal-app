@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
@@ -39,11 +40,18 @@ func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
 	if upErr != nil {
 		return upErr
 	}
-	_, err := service.GorseClient.InsertFeedback(context.Background(), []client.Feedback{{UserId: strconv.Itoa(int(userId)), ItemId: strconv.Itoa(int(id)), FeedbackType: "save_program"}})
+	_, err := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
+		UserId:       strconv.Itoa(int(userId)),
+		ItemId:       strconv.Itoa(int(id)),
+		FeedbackType: "save_program",
+		Timestamp:    time.Now().Format("2006-01-02"),
+	}})
 
 	if err != nil {
+		log.Default().Println("error in gorse")
 		return err
 	}
+
 	return nil
 }
 
