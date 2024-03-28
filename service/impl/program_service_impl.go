@@ -67,7 +67,7 @@ func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Prog
 // FindAllPrograms implements service.ProgramService.
 func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
 	claims := c.MustGet("claims").(*common.Claims)
-	programIdList, err := service.GorseClient.GetRecommend(context.Background(), strconv.Itoa(int(claims.UserID)), "", 10)
+	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(claims.UserID)), "", 10)
 	if err != nil {
 		return nil, err
 	}
