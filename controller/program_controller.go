@@ -25,7 +25,9 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.GET("/programs/user", controller.FindProgramByUserId)
 	api.POST("/programs/search", controller.FindProgramByText)
 	api.POST("/programs/filter", controller.FindProgramByLabel)
-	api.POST("/programs", controller.SaveProgram)
+	api.POST("/programs", controller.CreateProgram)
+	api.POST("/programs/save-program/:id", controller.SaveProgram)
+	api.POST("/programs/unsave-program/:id", controller.UpdateProgram)
 	api.PUT("/programs/:id", controller.UpdateProgram)
 	api.DELETE("/programs/:id", controller.DeleteProgram)
 }
@@ -245,7 +247,7 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 // @response 201 {object} model.GeneralResponse "Created"
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/programs [post]
-func (controller ProgramController) SaveProgram(c *gin.Context) {
+func (controller ProgramController) CreateProgram(c *gin.Context) {
 	program := new(model.ProgramCreateOrUpdate)
 	if err := common.Bind(c, program); err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -406,6 +408,40 @@ func (controller ProgramController) FindProgramByUserId(c *gin.Context) {
 		Message: "Success",
 		Count:   len(programs),
 		Data:    programsDTO,
+		Error:   nil,
+	})
+}
+
+func (controller ProgramController) SaveProgram(c *gin.Context) {
+	claims := c.MustGet("claims").(*common.Claims)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	err = controller.ProgramService.SaveProgram(claims.UserID, id)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    nil,
 		Error:   nil,
 	})
 }
