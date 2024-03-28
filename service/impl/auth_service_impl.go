@@ -1,10 +1,12 @@
 package impl
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
@@ -13,10 +15,11 @@ import (
 	"github.com/xbklyn/getgoal-app/model"
 	repository "github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService) service.AuthService {
-	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}}
+func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService, gorse client.GorseClient) service.AuthService {
+	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}, gorse}
 }
 
 type AuthServiceImpl struct {
@@ -24,6 +27,7 @@ type AuthServiceImpl struct {
 	Mailer           service.MailerService
 	BlackListedToken map[string]bool
 	Claims           common.Claims
+	Gorse            client.GorseClient
 }
 
 // ResetPassword implements service.AuthService.
@@ -170,7 +174,7 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 	user.FirstName = request.FirstName
 	user.LastName = request.LastName
 	user.Email = request.Email
-
+	user.Labels = request.Labels
 	user.PasswordHash = hashed
 	user.PasswordSalt = encodedHash
 
@@ -189,6 +193,13 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 	}
 	if err := service.Mailer.SendEmail([]string{user.Email}, config.VERIFICATION_SUBJECT+verificationCode, config.VERIFICATION_TEMPLATE, data); err != nil {
 		return entity.UserAccount{}, err
+	}
+	_, gErr := service.Gorse.InsertUser(context.TODO(), client.User{
+		UserId: strconv.Itoa(int(user.UserID)),
+		Labels: user.Labels,
+	})
+	if gErr != nil {
+		return entity.UserAccount{}, gErr
 	}
 	return user, nil
 }
