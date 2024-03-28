@@ -41,7 +41,7 @@ func (s *Gin) Start() {
 	programService := service.NewProgramServiceImpl(programRepo, taskRepo, labelRepo, userRepo, userProgramRepo, *s.gorse)
 	mailerService := service.NewMailerServiceImpl()
 	authService := service.NewAuthServiceImpl(userRepo, mailerService)
-	userService := service.NewUserServiceImpl(userRepo)
+	userService := service.NewUserServiceImpl(userRepo, programRepo)
 	//controller
 
 	labelController := controller.NewLabelController(labelService)

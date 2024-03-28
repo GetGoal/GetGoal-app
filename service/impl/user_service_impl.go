@@ -12,12 +12,23 @@ import (
 	"github.com/xbklyn/getgoal-app/service"
 )
 
-func NewUserServiceImpl(userRepo repository.UserRepo) service.UserService {
-	return UserServiceImpl{userRepo}
+func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo) service.UserService {
+	return UserServiceImpl{userRepo, programRepo}
 }
 
 type UserServiceImpl struct {
-	UserRepo repository.UserRepo
+	UserRepo    repository.UserRepo
+	ProgramRepo repository.ProgramRepo
+}
+
+// FindSavedProgram implements service.UserService.
+func (service UserServiceImpl) FindSavedProgram(c *gin.Context) ([]entity.Program, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	programs, err := service.ProgramRepo.FindSavedProgramByUserId(uint64(claims.UserID))
+	if err != nil {
+		return nil, err
+	}
+	return programs, nil
 }
 
 // UpdateUser implements service.UserService.
