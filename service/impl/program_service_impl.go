@@ -39,6 +39,11 @@ func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
 	if upErr != nil {
 		return upErr
 	}
+	_, err := service.GorseClient.InsertFeedback(context.Background(), []client.Feedback{{UserId: strconv.Itoa(int(userId)), ItemId: strconv.Itoa(int(id)), FeedbackType: "save_program"}})
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
