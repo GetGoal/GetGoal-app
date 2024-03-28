@@ -233,6 +233,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	if err := common.Validate(program); err != nil {
 		return entity.Program{}, err
 	}
+	claims := c.MustGet("claims").(*common.Claims)
 	programToUpdate, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return entity.Program{}, err
@@ -276,6 +277,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 				StartTime:         task.StartTime,
 				IsSetNotification: task.IsSetNotification,
 				TimeBeforeNotify:  task.TimeBeforeNotify,
+				UserAccountID:     int(claims.UserID),
 			}
 			task, terr := service.TaskRepo.Save(&newTask)
 			tasks = append(tasks, task)
@@ -289,7 +291,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 			existedTask.StartTime = program.Tasks[index].StartTime
 			existedTask.IsSetNotification = program.Tasks[index].IsSetNotification
 			existedTask.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
-
 			task, terr := service.TaskRepo.Update(task.TaskID, existedTask)
 			tasks = append(tasks, task)
 			if terr != nil {
