@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"log"
 	"strconv"
 
@@ -30,6 +31,10 @@ type ProgramServiceImpl struct {
 // SaveProgram implements service.ProgramService.
 // Subtle: this method shadows the method (ProgramRepo).SaveProgram of ProgramServiceImpl.ProgramRepo.
 func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
+	program, _ := service.ProgramRepo.FindProgramByID(id)
+	if program.ProgramID == 0 {
+		return errors.New("program not found")
+	}
 	upErr := service.UserProgramRepo.Save(3, id, userId)
 	if upErr != nil {
 		return upErr

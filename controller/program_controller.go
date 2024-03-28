@@ -27,7 +27,6 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.POST("/programs/filter", controller.FindProgramByLabel)
 	api.POST("/programs", controller.CreateProgram)
 	api.POST("/programs/save-program/:id", controller.SaveProgram)
-	api.POST("/programs/unsave-program/:id", controller.UpdateProgram)
 	api.PUT("/programs/:id", controller.UpdateProgram)
 	api.DELETE("/programs/:id", controller.DeleteProgram)
 }
@@ -426,8 +425,18 @@ func (controller ProgramController) SaveProgram(c *gin.Context) {
 		return
 	}
 
-	err = controller.ProgramService.SaveProgram(claims.UserID, id)
+	err = controller.ProgramService.SaveProgram(id, claims.UserID)
 	if err != nil {
+		if err.Error() == "program not found" {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
