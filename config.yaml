@@ -27,5 +27,5 @@ mailer:
   url: "https://getgoal.com"
 
 gorse: 
-  host: "getgoal-db-dev"
+  host: "localhost"
   port: 8088
