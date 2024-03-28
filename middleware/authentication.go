@@ -103,7 +103,7 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 		}
 		c.Set("claims", claims)
 		c.Set("access_token", tokenString)
-
+		log.Default().Printf("Claims: %v", claims)
 		// Call the next handler
 		c.Next()
 	}
