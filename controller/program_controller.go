@@ -90,7 +90,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 		return
 	}
 
-	program, err := controller.ProgramService.FindProgramByID(id)
+	program, err := controller.ProgramService.FindProgramByID(c, id)
 	if err != nil {
 		if err.Error() == "record not found" {
 			log.Default().Printf("Error: %v", err)

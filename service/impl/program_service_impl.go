@@ -88,10 +88,24 @@ func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Pro
 }
 
 // FindProgramByID implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByID(id uint64) (*entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, error) {
 	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return nil, err
+	}
+
+	claims := c.MustGet("claims").(*common.Claims)
+	rowAffected, gErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
+		UserId:       strconv.Itoa(int(claims.UserID)),
+		ItemId:       strconv.Itoa(int(id)),
+		FeedbackType: "view_program",
+		Timestamp:    time.Now().Format("2006-01-02"),
+	}})
+	if rowAffected.RowAffected == 0 {
+		return nil, errors.New("error in gorse")
+	}
+	if gErr != nil {
+		return nil, gErr
 	}
 	return &program, nil
 }
@@ -206,7 +220,6 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	if gErr != nil {
 		return entity.Program{}, gErr
 	}
-
 	upErr := service.UserProgramRepo.Save(1, program.ProgramID, user.UserID)
 	if upErr != nil {
 		return entity.Program{}, upErr
