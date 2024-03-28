@@ -13,6 +13,7 @@ type ProgramService interface {
 	FindProgramByLabel(labels []string) ([]entity.Program, error)
 	FindProgramByUserId(id uint64) ([]entity.Program, error)
 	Save(program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error)
+	SaveProgram(id uint64, userId uint64) error
 	Update(id uint64, program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error)
 	Delete(id uint64) error
 }
