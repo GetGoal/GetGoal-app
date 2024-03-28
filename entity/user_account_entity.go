@@ -21,7 +21,7 @@ type UserAccount struct {
 	CreatedAt               time.Time  `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt               time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
 	DeletedAt               *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
-	Labels                  []string   `gorm:"column:labels" json:"labels"`
+	Labels                  []string   `gorm:"column:labels;type:jsonb" json:"labels"`
 	//Relationship
 	Tasks            *[]Task            `gorm:"foreignKey:UserAccountID" json:"tasks"`
 	ActionType       []ActionType       `gorm:"many2many:user_program;foreignKey:user_id;joinForeignKey:user_account_id;References:ActionID;JoinReferences:ActionID" json:"action_types"`
