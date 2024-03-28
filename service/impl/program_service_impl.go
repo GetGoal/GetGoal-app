@@ -177,6 +177,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	}
 	user, err := service.UserRepo.FindUserByID(uint64(cliams.UserID))
 	if err != nil {
+		log.Default().Printf("error in finding user %v", err)
 		return entity.Program{}, err
 	}
 	var tasks []entity.Task
