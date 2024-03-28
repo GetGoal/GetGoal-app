@@ -17,7 +17,7 @@ func (g *gorseDB) GetGorseClient() *client.GorseClient {
 
 func NewGorseClient(cfg *Config) gorseDB {
 
-	url := fmt.Sprintf("%s", cfg.GorseConfig.Host)
+	url := fmt.Sprintf("http://%s:%d", cfg.GorseConfig.Host, cfg.GorseConfig.Port)
 	gorse := client.NewGorseClient(url, "")
 	return gorseDB{Gorse: gorse}
 }
