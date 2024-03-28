@@ -1,6 +1,10 @@
 package config
 
-import "github.com/zhenghaoz/gorse/client"
+import (
+	"fmt"
+
+	"github.com/zhenghaoz/gorse/client"
+)
 
 type gorseDB struct {
 	Gorse *client.GorseClient
@@ -12,6 +16,8 @@ func (g *gorseDB) GetGorseClient() *client.GorseClient {
 }
 
 func NewGorseClient(cfg *Config) gorseDB {
-	gorse := client.NewGorseClient("http://cp23ssa1.sit.kmutt.ac.th:8088", "")
+
+	url := fmt.Sprintf("http://%s:%d", cfg.GorseConfig.Host, cfg.GorseConfig.Port)
+	gorse := client.NewGorseClient(url, "")
 	return gorseDB{Gorse: gorse}
 }

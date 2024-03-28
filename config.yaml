@@ -25,3 +25,7 @@ mailer:
   email: cp23ssa1.getgoal@gmail.com
   password: vxnm aowx wunn wtzz
   url: "https://getgoal.com"
+
+gorse: 
+  host: "localhost"
+  port: 8088
