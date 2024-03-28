@@ -20,6 +20,16 @@ type labelRepoImpl struct {
 	db *gorm.DB
 }
 
+// GetPreferenceLabel implements repository.LabelRepo.
+func (l *labelRepoImpl) GetPreferenceLabel() ([]entity.Label, error) {
+
+	pref_limit := config.GetConfig().Search.PreferenceLimit
+	var labels []entity.Label
+	err := l.db.Debug().Model(&entity.Label{}).Preload("Programs").Order("RANDOM()").Limit(pref_limit).Find(&labels).Error
+
+	return labels, err
+}
+
 // Delete implements repositoryentity.LabelRepo.
 func (l *labelRepoImpl) Delete(id uint64) error {
 	lErr := l.db.Where("label_id = ?", id).Delete(&entity.Label{}).Error

@@ -35,7 +35,8 @@ type (
 		TimeZone string
 	}
 	Search struct {
-		LabelLimit int
+		LabelLimit      int
+		PreferenceLimit int
 	}
 
 	DockerEnv struct {
@@ -105,7 +106,8 @@ func ReadConfig(path string) Config {
 		},
 		Env: viper.GetString("env"),
 		Search: Search{
-			LabelLimit: viper.GetInt("search.label_limit"),
+			LabelLimit:      viper.GetInt("search.label_limit"),
+			PreferenceLimit: viper.GetInt("search.preference_limit"),
 		},
 		Mailer: MailerConfig{
 			Host:     viper.GetString("mailer.host"),
