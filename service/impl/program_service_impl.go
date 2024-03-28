@@ -262,6 +262,11 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		labels = append(labels, existedLabel)
 	}
 
+	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
+	if err != nil {
+		log.Default().Printf("error in finding user %v", err)
+		return entity.Program{}, err
+	}
 	var tasks []entity.Task
 	for index, task := range program.Tasks {
 		err := common.Validate(task)
@@ -270,6 +275,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		}
 		existedTask, _ := service.TaskRepo.FindTaskByID(task.TaskID)
 		if existedTask.TaskID == 0 {
+			programId := int(programToUpdate.ProgramID)
 			newTask := entity.Task{
 				TaskName:          task.TaskName,
 				TaskDescription:   task.TaskDescription,
@@ -278,6 +284,8 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 				IsSetNotification: task.IsSetNotification,
 				TimeBeforeNotify:  task.TimeBeforeNotify,
 				UserAccountID:     int(claims.UserID),
+				UserAccount:       user,
+				ProgramID:         &programId,
 			}
 			task, terr := service.TaskRepo.Save(&newTask)
 			tasks = append(tasks, task)
