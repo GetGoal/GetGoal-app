@@ -27,6 +27,16 @@ type ProgramServiceImpl struct {
 	client.GorseClient
 }
 
+// SaveProgram implements service.ProgramService.
+// Subtle: this method shadows the method (ProgramRepo).SaveProgram of ProgramServiceImpl.ProgramRepo.
+func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
+	upErr := service.UserProgramRepo.Save(3, id, userId)
+	if upErr != nil {
+		return upErr
+	}
+	return nil
+}
+
 // FindProgramByUserId implements service.ProgramService.
 func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Program, error) {
 	programs, err := service.ProgramRepo.FetchProgramByUserId(id)
