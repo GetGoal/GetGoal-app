@@ -21,6 +21,16 @@ type UserServiceImpl struct {
 	ProgramRepo repository.ProgramRepo
 }
 
+// FindJoinedProgram implements service.UserService.
+func (service UserServiceImpl) FindJoinedProgram(c *gin.Context) ([]entity.Program, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	programs, err := service.ProgramRepo.FindSavedProgramByUserId(uint64(claims.UserID))
+	if err != nil {
+		return nil, err
+	}
+	return programs, nil
+}
+
 // FindSavedProgram implements service.UserService.
 func (service UserServiceImpl) FindSavedProgram(c *gin.Context) ([]entity.Program, error) {
 	claims := c.MustGet("claims").(*common.Claims)
