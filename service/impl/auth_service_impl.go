@@ -232,6 +232,14 @@ func (service *AuthServiceImpl) signInWithGoogle(request model.GoogleSignInReque
 		if err != nil {
 			return "", "", err
 		}
+
+		_, gErr := service.Gorse.InsertUser(context.TODO(), client.User{
+			UserId: strconv.Itoa(int(user.UserID)),
+			Labels: []string{},
+		})
+		if gErr != nil {
+			return "", "", gErr
+		}
 		// generate access token
 		access, refresh, err := common.GenerateToken(user)
 		if err != nil {
