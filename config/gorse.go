@@ -17,7 +17,19 @@ func (g *gorseDB) GetGorseClient() *client.GorseClient {
 
 func NewGorseClient(cfg *Config) gorseDB {
 
-	url := fmt.Sprintf("http://%s:%d", cfg.GorseConfig.Host, cfg.GorseConfig.Port)
+	var url string
+
+	switch cfg.Env {
+	case "dev":
+		url = fmt.Sprintf("http://%s:%d", cfg.DevGorseConfig.Host, cfg.DevGorseConfig.Port)
+	case "qa":
+		url = fmt.Sprintf("http://%s:%d", cfg.QaGorseConfig.Host, cfg.QaGorseConfig.Port)
+	case "prod":
+		url = fmt.Sprintf("http://%s:%d", cfg.ProdGorseConfig.Host, cfg.ProdGorseConfig.Port)
+	default:
+		url = fmt.Sprintf("http://%s:%d", cfg.DevGorseConfig.Host, cfg.DevGorseConfig.Port)
+	}
+
 	gorse := client.NewGorseClient(url, "")
 	return gorseDB{Gorse: gorse}
 }
