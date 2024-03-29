@@ -25,6 +25,7 @@ type ProgramDTO struct {
 	Labels             []LabelIDAndName `json:"labels"`
 	CreatedAt          time.Time        `json:"created_at"`
 	UpdatedAt          time.Time        `json:"updated_at"`
+	IsSaved            bool             `json:"is_saved"`
 }
 
 type Search struct {
