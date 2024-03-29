@@ -66,21 +66,21 @@ func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Prog
 
 // FindAllPrograms implements service.ProgramService.
 func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
-	claims := c.MustGet("claims").(*common.Claims)
-	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(claims.UserID)), "", 10)
-	if err != nil {
-		return nil, err
-	}
-	log.Default().Println(programIdList)
+	// claims := c.MustGet("claims").(*common.Claims)
+	// programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(claims.UserID)), "", 10)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Default().Println(programIdList)
 
 	//convert string to uint64
-	var programIds []uint64
-	for _, id := range programIdList {
-		convertedId, _ := strconv.ParseUint(id, 10, 64)
-		programIds = append(programIds, convertedId)
+	// var programIds []uint64
+	// for _, id := range programIdList {
+	// 	convertedId, _ := strconv.ParseUint(id, 10, 64)
+	// 	programIds = append(programIds, convertedId)
 
-	}
-	programs, err := service.ProgramRepo.FindProgramByIDs(programIds)
+	// }
+	programs, err := service.ProgramRepo.FindAllPrograms()
 	if err != nil {
 		return nil, err
 	}
@@ -328,4 +328,26 @@ func (service *ProgramServiceImpl) Delete(id uint64) error {
 	}
 	serviceErr := service.ProgramRepo.Delete(id)
 	return serviceErr
+}
+
+func (service *ProgramServiceImpl) CheckSavedProgram(userId uint64, programs *[]model.ProgramDTO) error {
+	activities, err := service.UserProgramRepo.FindActionByUserId(userId, 3)
+	if err != nil {
+		return err
+	}
+
+	// Collect saved program IDs
+	savedProgramIds := make(map[uint64]bool)
+	for _, activity := range activities {
+		savedProgramIds[activity.ProgramID] = true
+	}
+
+	// Update IsSaved field in ProgramDTOs
+	for i := range *programs {
+		if savedProgramIds[(*programs)[i].ProgramID] {
+			(*programs)[i].IsSaved = true
+		}
+	}
+
+	return nil
 }
