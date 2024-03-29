@@ -134,7 +134,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
-			Error:   err.Error(),
+			Error:   sErr.Error(),
 		})
 		return
 
@@ -203,7 +203,7 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
-			Error:   err.Error(),
+			Error:   sErr.Error(),
 		})
 		return
 
@@ -274,7 +274,7 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
-			Error:   err.Error(),
+			Error:   sErr.Error(),
 		})
 		return
 
@@ -461,7 +461,7 @@ func (controller ProgramController) FindProgramByUserId(c *gin.Context) {
 			Code:    http.StatusBadRequest,
 			Message: "Something Went Wrong",
 			Data:    nil,
-			Error:   err.Error(),
+			Error:   sErr.Error(),
 		})
 		return
 

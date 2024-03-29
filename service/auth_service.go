@@ -11,6 +11,7 @@ type AuthService interface {
 	ExternalSignIn(request model.ProviderSignInRequest) (accessToken string, refreshToken string, err error)
 	SignOut(token string) error
 	Verify(request model.VerifyRequest) error
+	VerifyPasswordReset(request model.VerifyResetRequest) error
 	IsTokenBlacklisted(tokenString string) bool
 	ResetPassword(request model.ResetPasswordRequest) error
 }

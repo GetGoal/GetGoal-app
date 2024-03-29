@@ -24,7 +24,7 @@ func (controller *AuthController) RouteAnonymous(api *gin.RouterGroup) {
 	api.POST("/auth/sign-in", controller.SignIn)
 	api.POST("/auth/external-sign-in", controller.ProviderSignIn)
 	api.POST("/auth/reset-password", controller.ResetPassword)
-	api.POST("/auth/verify-token", controller.VerifyToken)
+	api.POST("/auth/verify-password-reset", controller.VerifyReset)
 }
 
 func (controller *AuthController) Route(api *gin.RouterGroup) {
@@ -325,6 +325,46 @@ func (controller *AuthController) VerifyToken(c *gin.Context) {
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Token is valid",
+		Data:    nil,
+		Error:   nil,
+	})
+
+}
+
+func (controller *AuthController) VerifyReset(c *gin.Context) {
+	var request model.VerifyResetRequest
+	if err := common.Bind(c, &request); err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	err := controller.AuthService.VerifyPasswordReset(request)
+	if err != nil {
+		if err.Error() == "email not found" {
+			c.JSON(http.StatusUnauthorized, model.GeneralResponse{
+				Code:    http.StatusUnauthorized,
+				Message: "Email not found",
+				Data:    nil,
+				Error:   nil,
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Bad request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "code is valid",
 		Data:    nil,
 		Error:   nil,
 	})
