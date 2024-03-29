@@ -1,10 +1,11 @@
 package model
 
 type SignUpRequest struct {
-	FirstName string `json:"first_name" binding:"required" validate:"min=1,max=70"`
-	LastName  string `json:"last_name" binding:"required" validate:"min=1,max=70"`
-	Email     string `json:"email" binding:"required" validate:"email"`
-	Password  string `json:"password" binding:"required" validate:"min=8"`
+	FirstName string   `json:"first_name" binding:"required" validate:"min=1,max=70"`
+	LastName  string   `json:"last_name" binding:"required" validate:"min=1,max=70"`
+	Email     string   `json:"email" binding:"required" validate:"email"`
+	Password  string   `json:"password" binding:"required" validate:"min=8"`
+	Labels    []string `json:"labels" binding:"required" `
 }
 
 type VerifyRequest struct {

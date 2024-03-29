@@ -12,6 +12,16 @@ type labelServiceImpl struct {
 	LabelRepo repository.LabelRepo
 }
 
+// GetPreferenceLabel implements service.LabelService.
+func (service *labelServiceImpl) GetPreferenceLabel() ([]entity.Label, error) {
+	labels, err := service.LabelRepo.GetPreferenceLabel()
+
+	if err != nil {
+		return nil, err
+	}
+	return labels, nil
+}
+
 // Delete implements service.LabelService.
 func (service *labelServiceImpl) Delete(id uint64) error {
 

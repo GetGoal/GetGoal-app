@@ -18,6 +18,7 @@ type (
 		EnvFromDockerFile DockerEnv
 		Mailer            MailerConfig
 		JwtKeys           JwtKey
+		GorseConfig       GorseConfig
 	}
 
 	App struct {
@@ -34,7 +35,8 @@ type (
 		TimeZone string
 	}
 	Search struct {
-		LabelLimit int
+		LabelLimit      int
+		PreferenceLimit int
 	}
 
 	DockerEnv struct {
@@ -57,6 +59,11 @@ type (
 	JwtKey struct {
 		AccessSecret  string
 		RefreshSecret string
+	}
+
+	GorseConfig struct {
+		Host string
+		Port int
 	}
 )
 
@@ -99,7 +106,8 @@ func ReadConfig(path string) Config {
 		},
 		Env: viper.GetString("env"),
 		Search: Search{
-			LabelLimit: viper.GetInt("search.label_limit"),
+			LabelLimit:      viper.GetInt("search.label_limit"),
+			PreferenceLimit: viper.GetInt("search.preference_limit"),
 		},
 		Mailer: MailerConfig{
 			Host:     viper.GetString("mailer.host"),
@@ -111,6 +119,10 @@ func ReadConfig(path string) Config {
 		JwtKeys: JwtKey{
 			AccessSecret:  viper.GetString("secrets.jwt.accesskey"),
 			RefreshSecret: viper.GetString("secrets.jwt.refreshkey"),
+		},
+		GorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.host"),
+			Port: viper.GetInt("gorse.port"),
 		},
 	}
 	return config

@@ -14,6 +14,31 @@ type programRepoImpl struct {
 	db *gorm.DB
 }
 
+// FindSavedProgramByUserId implements repository.ProgramRepo.
+func (p *programRepoImpl) FindSavedProgramByUserId(id uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Joins("JOIN user_program ON program.program_id = user_program.program_id").
+		Where("user_program.user_account_id = ?", id).
+		Where("user_program.action_id = 3").
+		Find(&programs).Error
+	return programs, err
+}
+
+// FindProgramByIDs implements repository.ProgramRepo.
+func (p *programRepoImpl) FindProgramByIDs(ids []uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Where("program_id IN (?)", ids).
+		Order("RANDOM()").
+		Find(&programs).Error
+	return programs, err
+}
+
 // FetchProgramByUserId implements repository.ProgramRepo.
 func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, error) {
 	var programs []entity.Program

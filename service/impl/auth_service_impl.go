@@ -1,10 +1,13 @@
 package impl
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/xbklyn/getgoal-app/common"
@@ -13,10 +16,11 @@ import (
 	"github.com/xbklyn/getgoal-app/model"
 	repository "github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService) service.AuthService {
-	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}}
+func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService, gorse client.GorseClient) service.AuthService {
+	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}, gorse}
 }
 
 type AuthServiceImpl struct {
@@ -24,6 +28,7 @@ type AuthServiceImpl struct {
 	Mailer           service.MailerService
 	BlackListedToken map[string]bool
 	Claims           common.Claims
+	Gorse            client.GorseClient
 }
 
 // ResetPassword implements service.AuthService.
@@ -154,8 +159,8 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 		return entity.UserAccount{}, validateErr
 	}
 	//check existing user with email
-	user, _ := service.UserRepo.FindUserByEmail(request.Email)
-	if user.UserID != 0 {
+	existedUser, _ := service.UserRepo.FindUserByEmail(request.Email)
+	if existedUser.UserID != 0 {
 		return entity.UserAccount{}, errors.New("this email is already registered")
 	}
 	//gen passwod
@@ -163,22 +168,25 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 	if err != nil {
 		return entity.UserAccount{}, err
 	}
-
+	// log.Default().Printf("json data: %s", jsonData)
 	//gen verification code
 	verificationCode := generateVerificationCode(6)
 	//save user with email_validation = 2
-	user.FirstName = request.FirstName
-	user.LastName = request.LastName
-	user.Email = request.Email
 
-	user.PasswordHash = hashed
-	user.PasswordSalt = encodedHash
+	text, _ := json.Marshal(request.Labels)
+	newUser := entity.UserAccount{
+		FirstName:               request.FirstName,
+		LastName:                request.LastName,
+		Email:                   request.Email,
+		Labels:                  string(text),
+		PasswordHash:            hashed,
+		PasswordSalt:            encodedHash,
+		ConfirmationToken:       verificationCode,
+		TokenGenerationTime:     time.Now(),
+		EmailValidationStatusID: 2,
+	}
 
-	user.ConfirmationToken = verificationCode
-	user.TokenGenerationTime = time.Now()
-	user.EmailValidationStatusID = 2
-
-	err = service.UserRepo.Save(&user)
+	err = service.UserRepo.Save(&newUser)
 	if err != nil {
 		return entity.UserAccount{}, err
 	}
@@ -187,10 +195,17 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 	data := model.EmailTemplateData{
 		VerificationCode: verificationCode,
 	}
-	if err := service.Mailer.SendEmail([]string{user.Email}, config.VERIFICATION_SUBJECT+verificationCode, config.VERIFICATION_TEMPLATE, data); err != nil {
+	if err := service.Mailer.SendEmail([]string{newUser.Email}, config.VERIFICATION_SUBJECT+verificationCode, config.VERIFICATION_TEMPLATE, data); err != nil {
 		return entity.UserAccount{}, err
 	}
-	return user, nil
+	_, gErr := service.Gorse.InsertUser(context.TODO(), client.User{
+		UserId: strconv.Itoa(int(newUser.UserID)),
+		Labels: request.Labels,
+	})
+	if gErr != nil {
+		return entity.UserAccount{}, gErr
+	}
+	return newUser, nil
 }
 
 func (service *AuthServiceImpl) signInWithGoogle(request model.GoogleSignInRequest) (accessToken string, refreshToken string, err error) {

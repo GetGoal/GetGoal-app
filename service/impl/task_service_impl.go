@@ -1,8 +1,10 @@
 package impl
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +13,11 @@ import (
 	"github.com/xbklyn/getgoal-app/model"
 	repository "github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewTaskServiceImpl(taskRepo repository.TaskRepo, userRepo repository.UserRepo, userProgramRepo repository.UserProgramRepo) service.TaskService {
-	return &TaskServiceImpl{TaskRepo: taskRepo, UserRepo: userRepo, UserProgramRepo: userProgramRepo}
+func NewTaskServiceImpl(taskRepo repository.TaskRepo, userRepo repository.UserRepo, userProgramRepo repository.UserProgramRepo, gorse client.GorseClient) service.TaskService {
+	return &TaskServiceImpl{TaskRepo: taskRepo, UserRepo: userRepo, UserProgramRepo: userProgramRepo, GorseClient: gorse}
 }
 
 type TaskServiceImpl struct {
@@ -22,6 +25,7 @@ type TaskServiceImpl struct {
 	UserRepo        repository.UserRepo
 	UserProgramRepo repository.UserProgramRepo
 	AuthService     service.AuthService
+	GorseClient     client.GorseClient
 }
 
 // FindTaskByUserId implements service.TaskService.
@@ -77,6 +81,15 @@ func (service TaskServiceImpl) JoinProgram(programId uint64, model model.JoinPro
 		if saveErr != nil {
 			return nil, saveErr
 		}
+	}
+	_, fErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
+		UserId:       strconv.Itoa(int(user.UserID)),
+		ItemId:       strconv.Itoa(int(programId)),
+		FeedbackType: "join_program",
+		Timestamp:    time.Now().Format("2006-01-02"),
+	}})
+	if fErr != nil {
+		return nil, fErr
 	}
 	upErr := service.UserProgramRepo.Save(2, programId, user.UserID)
 	if upErr != nil {

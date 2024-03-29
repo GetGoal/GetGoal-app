@@ -7,6 +7,7 @@ import (
 )
 
 type TaskCreateOrUpdate struct {
+	TaskID            uint64    `json:"task_id"`
 	TaskName          string    `json:"task_name" validate:"required,min=1,max=150"`
 	IsSetNotification int       `json:"is_set_noti" default:"0"`
 	StartTime         time.Time `json:"start_time" binding:"required"`
