@@ -21,6 +21,7 @@ func NewProgramController(programService service.ProgramService) *ProgramControl
 
 func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.GET("/programs", controller.FindAllPrograms)
+	api.GET("/programs/for-you", controller.FindRecommendedPrograms)
 	api.GET("/programs/:id", controller.FindProgramByID)
 	api.GET("/programs/user", controller.FindProgramByUserId)
 	api.POST("/programs/search", controller.FindProgramByText)
@@ -514,6 +515,46 @@ func (controller ProgramController) SaveProgram(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Success",
 		Data:    nil,
+		Error:   nil,
+	})
+}
+
+func (controller ProgramController) FindRecommendedPrograms(c *gin.Context) {
+	claims := c.MustGet("claims").(*common.Claims)
+
+	programs, err := controller.ProgramService.FindRecommendedPrograms(claims.UserID)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	programsDTO := make([]model.ProgramDTO, 0)
+	if len(programs) > 0 {
+		programsDTO = model.ConvertToProgramDTOs(programs)
+	}
+	sErr := controller.ProgramService.CheckSavedProgram(claims.UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   len(programsDTO),
+		Data:    programsDTO,
 		Error:   nil,
 	})
 }
