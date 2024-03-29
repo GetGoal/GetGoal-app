@@ -83,6 +83,7 @@ func (s *Gin) Start() {
 	//No header required
 	authController.RouteAnonymous(v1)
 	labelController.RouteAnonymous(v1)
+	userController.RouteAnonymous(v1)
 
 	//Enable middleware
 	v1.Use(middleware.JWTAuthMiddleware(authService.(*service.AuthServiceImpl), []byte(s.cfg.JwtKeys.AccessSecret)))
