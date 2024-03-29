@@ -15,12 +15,14 @@ type UserController struct {
 func NewUserController(userService service.UserService) UserController {
 	return UserController{userService}
 }
+func (controller UserController) RouteAnonymous(api *gin.RouterGroup) {
+	api.POST("/users/reset-password", controller.ResetPassword)
+}
 
 func (controller UserController) Route(api *gin.RouterGroup) {
 	api.GET("/users/profile", controller.FindUserByEmail)
 	api.GET("/users/programs/saved", controller.FindSavedProgramByUser)
 	api.GET("/users/programs/joined", controller.FindSavedProgramByUser)
-	api.POST("/users/reset-password", controller.ResetPassword)
 }
 func (controller UserController) FindUserByEmail(c *gin.Context) {
 	user, err := controller.UserService.FindUserByEmail(c)
