@@ -29,6 +29,27 @@ type ProgramServiceImpl struct {
 	client.GorseClient
 }
 
+// FindRecommendedPrograms implements service.ProgramService.
+func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]entity.Program, error) {
+	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(userId)), "", 10)
+	if err != nil {
+		return nil, err
+	}
+
+	//convert string to uint64
+	var programIds []uint64
+	for _, id := range programIdList {
+		convertedId, _ := strconv.ParseUint(id, 10, 64)
+		programIds = append(programIds, convertedId)
+
+	}
+	programs, err := service.ProgramRepo.FindProgramByIDs(programIds)
+	if err != nil {
+		return nil, err
+	}
+	return programs, nil
+}
+
 // SaveProgram implements service.ProgramService.
 // Subtle: this method shadows the method (ProgramRepo).SaveProgram of ProgramServiceImpl.ProgramRepo.
 func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
