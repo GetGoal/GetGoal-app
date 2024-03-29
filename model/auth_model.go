@@ -13,6 +13,10 @@ type VerifyRequest struct {
 	Email string `json:"email" binding:"required" validate:"email"`
 }
 
+type VerifyResetRequest struct {
+	Code  string `json:"code" binding:"required" validate:"min=6"`
+	Email string `json:"email" binding:"required" validate:"email"`
+}
 type Credentials struct {
 	Email    string `json:"email" binding:"required" validate:"email"`
 	Password string `json:"password" binding:"required" validate:"min=8"`

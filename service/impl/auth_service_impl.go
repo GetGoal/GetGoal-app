@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -31,6 +30,28 @@ type AuthServiceImpl struct {
 	Gorse            client.GorseClient
 }
 
+// VerifyPasswordReset implements service.AuthService.
+func (service *AuthServiceImpl) VerifyPasswordReset(request model.VerifyResetRequest) error {
+	//find user by email
+	user, _ := service.UserRepo.FindUserByEmail(request.Email)
+	if user.UserID == 0 {
+		return errors.New("email not found")
+	}
+	//check if len of provider is 0
+	if len(user.ExternalProvider) != 0 {
+		return errors.New("user is registered with external provider, please login using external provider instead")
+	}
+	//check if verification code is valid
+	if user.PasswordRecoveryToken != request.Code {
+		return errors.New("invalid verification code")
+	}
+	//check if verification code is expired
+	if time.Since(user.TokenGenerationTime).Hours() > 24 {
+		return errors.New("verification code is expired")
+	}
+	return nil
+}
+
 // ResetPassword implements service.AuthService.
 func (service *AuthServiceImpl) ResetPassword(request model.ResetPasswordRequest) error {
 	//find user by email
@@ -42,16 +63,18 @@ func (service *AuthServiceImpl) ResetPassword(request model.ResetPasswordRequest
 	if len(user.ExternalProvider) != 0 {
 		return errors.New("user is registered with external provider, please login using external provider instead")
 	}
-	//gen new access token
-	access, _, err := common.GenerateToken(user)
+
+	verificationCode := generateVerificationCode(6)
+	//update user with new verification code
+	user.PasswordRecoveryToken = verificationCode
+	user.TokenGenerationTime = time.Now()
+	err := service.UserRepo.Update(user.UserID, user)
 	if err != nil {
 		return err
 	}
-
-	resetLink := fmt.Sprintf("%s?token=%s", config.GetConfig().Mailer.BaseURL, access)
 	//send email
 	data := model.ResetPasswordTemplateData{
-		ResetLink: resetLink,
+		ResetCode: verificationCode,
 	}
 
 	if err := service.Mailer.SendEmail([]string{user.Email}, config.RESET_PASSWORD_SUBJECT, config.RESET_PASSWORD_TEMPLATE, data); err != nil {

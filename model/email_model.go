@@ -5,5 +5,5 @@ type EmailTemplateData struct {
 }
 
 type ResetPasswordTemplateData struct {
-	ResetLink string
+	ResetCode string
 }
