@@ -18,7 +18,9 @@ type (
 		EnvFromDockerFile DockerEnv
 		Mailer            MailerConfig
 		JwtKeys           JwtKey
-		GorseConfig       GorseConfig
+		DevGorseConfig    GorseConfig
+		QaGorseConfig     GorseConfig
+		ProdGorseConfig   GorseConfig
 	}
 
 	App struct {
@@ -120,9 +122,17 @@ func ReadConfig(path string) Config {
 			AccessSecret:  viper.GetString("secrets.jwt.accesskey"),
 			RefreshSecret: viper.GetString("secrets.jwt.refreshkey"),
 		},
-		GorseConfig: GorseConfig{
-			Host: viper.GetString("gorse.host"),
-			Port: viper.GetInt("gorse.port"),
+		DevGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.dev.host"),
+			Port: viper.GetInt("gorse.dev.port"),
+		},
+		QaGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.qa.host"),
+			Port: viper.GetInt("gorse.qa.port"),
+		},
+		ProdGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.prod.host"),
+			Port: viper.GetInt("gorse.prod.port"),
 		},
 	}
 	return config
