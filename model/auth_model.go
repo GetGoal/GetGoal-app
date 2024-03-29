@@ -27,6 +27,7 @@ type ResetPasswordRequest struct {
 }
 
 type ChangePasswordRequest struct {
+	Email       string `json:"email" binding:"required" validate:"email"`
 	NewPassword string `json:"password" binding:"required" validate:"min=8"`
 }
 

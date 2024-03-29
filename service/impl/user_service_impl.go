@@ -46,12 +46,11 @@ func (service UserServiceImpl) ResetPassword(c *gin.Context, credential model.Ch
 	if err := common.Validate(credential); err != nil {
 		return nil, err
 	}
-	claims := c.MustGet("claims").(*common.Claims)
-	user, _ := service.UserRepo.FindUserByEmail(claims.Email)
+	user, _ := service.UserRepo.FindUserByEmail(credential.Email)
 	if user.UserID == 0 {
 		return nil, errors.New("user not found")
 	}
-	if claims.Email != user.Email {
+	if credential.Email != user.Email {
 		return nil, errors.New("unauthorized")
 	}
 
