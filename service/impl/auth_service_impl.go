@@ -244,6 +244,7 @@ func (service *AuthServiceImpl) signInWithGoogle(request model.GoogleSignInReque
 		user.FirstName = request.DisplayName
 		user.Email = request.Email
 		user.EmailValidationStatusID = 1
+		user.Labels = "[]"
 
 		//display picture
 		// user. = request.PhotoURL
