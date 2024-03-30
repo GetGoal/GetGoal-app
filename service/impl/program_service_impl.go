@@ -3,7 +3,6 @@ package impl
 import (
 	"context"
 	"errors"
-	"log"
 	"strconv"
 	"time"
 
@@ -69,7 +68,6 @@ func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
 	}})
 
 	if err != nil {
-		log.Default().Println("error in gorse")
 		return err
 	}
 
@@ -87,20 +85,6 @@ func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Prog
 
 // FindAllPrograms implements service.ProgramService.
 func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
-	// claims := c.MustGet("claims").(*common.Claims)
-	// programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(claims.UserID)), "", 10)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// log.Default().Println(programIdList)
-
-	//convert string to uint64
-	// var programIds []uint64
-	// for _, id := range programIdList {
-	// 	convertedId, _ := strconv.ParseUint(id, 10, 64)
-	// 	programIds = append(programIds, convertedId)
-
-	// }
 	programs, err := service.ProgramRepo.FindAllPrograms()
 	if err != nil {
 		return nil, err
@@ -198,7 +182,6 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	}
 	user, err := service.UserRepo.FindUserByID(uint64(cliams.UserID))
 	if err != nil {
-		log.Default().Printf("error in finding user %v", err)
 		return entity.Program{}, err
 	}
 	var tasks []entity.Task
@@ -229,7 +212,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		}
 	}
 	program.Tasks = tasks
-	updated, sErr := service.ProgramRepo.Update(program.ProgramID, program)
+	sErr := service.ProgramRepo.Update(program.ProgramID, &program)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
@@ -246,7 +229,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 	if upErr != nil {
 		return entity.Program{}, upErr
 	}
-	return updated, nil
+	return program, nil
 }
 
 // Update implements service.ProgramService.
@@ -285,7 +268,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 
 	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
 	if err != nil {
-		log.Default().Printf("error in finding user %v", err)
 		return entity.Program{}, err
 	}
 	var tasks []entity.Task
@@ -333,12 +315,11 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	programToUpdate.ExpectedTime = program.ExpectedTime
 	programToUpdate.Labels = labels
 	programToUpdate.Tasks = tasks
-
-	updated, sErr := service.ProgramRepo.Update(id, programToUpdate)
+	sErr := service.ProgramRepo.Update(id, &programToUpdate)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
-	return updated, nil
+	return programToUpdate, nil
 }
 
 // Delete implements service.ProgramService.

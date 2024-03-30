@@ -12,6 +12,6 @@ type ProgramRepo interface {
 	FindProgramByLabel(labels []string) ([]entity.Program, error)
 	FetchProgramByUserId(id uint64) ([]entity.Program, error)
 	Save(program *entity.Program) (entity.Program, error)
-	Update(id uint64, program entity.Program) (entity.Program, error)
+	Update(id uint64, program *entity.Program) error
 	Delete(id uint64) error
 }
