@@ -25,6 +25,8 @@ func (controller *AuthController) RouteAnonymous(api *gin.RouterGroup) {
 	api.POST("/auth/external-sign-in", controller.ProviderSignIn)
 	api.POST("/auth/reset-password", controller.ResetPassword)
 	api.POST("/auth/verify-password-reset", controller.VerifyReset)
+	api.GET("/auth/verify-token", controller.VerifyToken)
+
 }
 
 func (controller *AuthController) Route(api *gin.RouterGroup) {
