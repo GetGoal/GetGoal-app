@@ -1,9 +1,11 @@
 package impl
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
@@ -11,15 +13,17 @@ import (
 	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo) service.UserService {
-	return UserServiceImpl{userRepo, programRepo}
+func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo, gorse client.GorseClient) service.UserService {
+	return UserServiceImpl{userRepo, programRepo, gorse}
 }
 
 type UserServiceImpl struct {
 	UserRepo    repository.UserRepo
 	ProgramRepo repository.ProgramRepo
+	GorseClient client.GorseClient
 }
 
 // UpdateLabel implements service.UserService.
@@ -35,6 +39,13 @@ func (service UserServiceImpl) UpdateLabel(c *gin.Context, userModel model.UserM
 	err := service.UserRepo.Update(user.UserID, user)
 	if err != nil {
 		return nil, err
+	}
+	userId := strconv.Itoa(int(user.UserID))
+	_, gEer := service.GorseClient.UpdateUser(context.TODO(), userId, client.UserPatch{
+		Labels: userModel.Labels,
+	})
+	if gEer != nil {
+		return nil, gEer
 	}
 	return &user, nil
 }
