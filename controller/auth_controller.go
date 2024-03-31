@@ -99,7 +99,7 @@ func (controller *AuthController) Verify(c *gin.Context) {
 		})
 		return
 	}
-	err := controller.AuthService.Verify(request)
+	accessToken, refreshToken, err := controller.AuthService.Verify(request)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -110,10 +110,15 @@ func (controller *AuthController) Verify(c *gin.Context) {
 		})
 		return
 	}
+
+	token := model.TokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Verify Success",
-		Data:    nil,
+		Data:    token,
 		Error:   nil,
 	})
 }

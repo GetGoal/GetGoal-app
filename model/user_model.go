@@ -3,10 +3,11 @@ package model
 import "github.com/xbklyn/getgoal-app/entity"
 
 type UserModel struct {
-	UserID    uint64 `json:"user_id"`
-	Email     string `json:"email"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	UserID    uint64   `json:"user_id"`
+	Email     string   `json:"email"`
+	FirstName string   `json:"first_name"`
+	LastName  string   `json:"last_name"`
+	Labels    []string `json:"labels"`
 }
 
 func ConvertToUserDTO(entityUser entity.UserAccount) UserModel {
