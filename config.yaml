@@ -1,14 +1,14 @@
 app:
   server:
     port: 8080
-  
+
 search:
   label_limit: 13
   preference_limit: 20
-  
+
 recommendation:
-  limit: 100
-  
+  limit: 15
+
 database:
   host: localhost
   port: 5432
@@ -31,7 +31,7 @@ mailer:
   url: "https://getgoal.com"
 
 gorse:
-  dev: 
+  dev:
     host: "gorse-dev-master"
     port: 8088
   qa:

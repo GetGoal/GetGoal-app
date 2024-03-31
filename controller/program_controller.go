@@ -56,9 +56,9 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
+		log.Default().Printf("here")
 		programsDTO = model.ConvertToProgramDTOs(programs)
 	}
-	log.Default().Printf("Old Programs: %v", programsDTO[len(programsDTO)-1].IsSaved)
 
 	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
 	if sErr != nil {
@@ -71,7 +71,6 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 		})
 		return
 	}
-	log.Default().Printf("New Programs: %v", programsDTO[len(programsDTO)-1].IsSaved)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
