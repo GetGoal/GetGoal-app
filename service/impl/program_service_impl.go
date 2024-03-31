@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
@@ -30,7 +31,7 @@ type ProgramServiceImpl struct {
 
 // FindRecommendedPrograms implements service.ProgramService.
 func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]entity.Program, error) {
-	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(userId)), "", 10)
+	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(userId)), "", config.GetConfig().Recommendation.Limit)
 	if err != nil {
 		return nil, err
 	}

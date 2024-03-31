@@ -6,6 +6,9 @@ search:
   label_limit: 13
   preference_limit: 20
   
+recommendation:
+  limit: 100
+  
 database:
   host: localhost
   port: 5432

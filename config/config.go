@@ -21,6 +21,7 @@ type (
 		DevGorseConfig    GorseConfig
 		QaGorseConfig     GorseConfig
 		ProdGorseConfig   GorseConfig
+		Recommendation    Recommendation
 	}
 
 	App struct {
@@ -66,6 +67,10 @@ type (
 	GorseConfig struct {
 		Host string
 		Port int
+	}
+
+	Recommendation struct {
+		Limit int
 	}
 )
 
@@ -133,6 +138,9 @@ func ReadConfig(path string) Config {
 		ProdGorseConfig: GorseConfig{
 			Host: viper.GetString("gorse.prod.host"),
 			Port: viper.GetInt("gorse.prod.port"),
+		},
+		Recommendation: Recommendation{
+			Limit: viper.GetInt("recommendation.limit"),
 		},
 	}
 	return config
