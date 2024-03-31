@@ -253,7 +253,7 @@ func (service *AuthServiceImpl) signInWithGoogle(request model.GoogleSignInReque
 		user.Labels = "[]"
 
 		//display picture
-		// user. = request.PhotoURL
+		user.ImageURL = request.PhotoURL
 		user.ExternalProvider = append(user.ExternalProvider, entity.ExternalProvider{
 			ExternalProviderID: 1,
 			ProviderName:       "google",
