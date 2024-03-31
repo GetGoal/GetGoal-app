@@ -39,7 +39,7 @@ type GoogleSignInRequest struct {
 	DisplayName    string `json:"display_name" binding:"required" validate:"min=1,max=70"`
 	Email          string `json:"email" binding:"required" validate:"email"`
 	ID             string `json:"id" binding:"required"`
-	PhotoURL       string `json:"photo_url" binding:"required"`
+	PhotoURL       string `json:"photo_url"`
 	ServerAuthCode string `json:"server_auth_code" `
 }
 

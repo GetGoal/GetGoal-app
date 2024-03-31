@@ -20,6 +20,7 @@ type UserAccount struct {
 	RecoveryTokenTime       time.Time  `gorm:"column:recovery_token_time;not null;default:current_timestamp" json:"recovery_token_time"`
 	CreatedAt               time.Time  `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt               time.Time  `gorm:"column:updated_at;not null;default:current_timestamp" json:"updated_at"`
+	ImageURL                string     `gorm:"column:image_url;type:varchar(250)" json:"image_url"`
 	DeletedAt               *time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 	Labels                  string     `gorm:"column:labels;type:json" json:"labels"`
 	//Relationship d
