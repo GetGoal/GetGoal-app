@@ -178,7 +178,7 @@ func (service *AuthServiceImpl) Verify(request model.VerifyRequest) (accessToken
 		return "", "", err
 
 	}
-	return
+	return accessToken, refreshToken, nil
 }
 
 // SignUp implements service.AuthService.
