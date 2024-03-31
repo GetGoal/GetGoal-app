@@ -324,11 +324,12 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 
 // Delete implements service.ProgramService.
 func (service *ProgramServiceImpl) Delete(id uint64) error {
-	_, err := service.ProgramRepo.FindProgramByID(id)
+	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return err
 	}
-	serviceErr := service.ProgramRepo.Delete(id)
+
+	serviceErr := service.ProgramRepo.Delete(&program)
 	return serviceErr
 }
 

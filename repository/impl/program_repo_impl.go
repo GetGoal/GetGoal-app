@@ -66,9 +66,14 @@ func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, err
 }
 
 // Delete implements repository.ProgramRepo.
-func (p *programRepoImpl) Delete(id uint64) error {
+func (p *programRepoImpl) Delete(program *entity.Program) error {
 
-	err := p.db.Where("program_id = ?", id).Delete(&entity.Program{}).Error
+	//clear associattion before delte program
+	cErr := p.db.Model(program).Association("UserAccount").Clear()
+	if cErr != nil {
+		return cErr
+	}
+	err := p.db.Delete(program).Error
 	return err
 }
 

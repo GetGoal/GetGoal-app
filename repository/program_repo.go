@@ -13,5 +13,5 @@ type ProgramRepo interface {
 	FetchProgramByUserId(id uint64) ([]entity.Program, error)
 	Save(program *entity.Program) (entity.Program, error)
 	Update(id uint64, program *entity.Program) error
-	Delete(id uint64) error
+	Delete(program *entity.Program) error
 }
