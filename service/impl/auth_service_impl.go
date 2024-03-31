@@ -148,31 +148,37 @@ func (service *AuthServiceImpl) SignIn(request model.Credentials) (string, strin
 }
 
 // Verify implements service.AuthService.
-func (service *AuthServiceImpl) Verify(request model.VerifyRequest) error {
+func (service *AuthServiceImpl) Verify(request model.VerifyRequest) (accessToken string, refreshToken string, err error) {
 	//find user by email
 	user, err := service.UserRepo.FindUserByEmail(request.Email)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	//check if user is already verified
 	if user.EmailValidationStatusID == 1 {
-		return errors.New("user is already verified")
+		return "", "", errors.New("user is already verified")
 	}
 	//check if verification code is valid
 	if user.ConfirmationToken != request.Code {
-		return errors.New("invalid verification code")
+		return "", "", errors.New("invalid verification code")
 	}
 	//check if verification code is expired
 	if time.Since(user.TokenGenerationTime).Hours() > 24 {
-		return errors.New("verification code is expired")
+		return "", "", errors.New("verification code is expired")
 	}
 	//update user email_validation = 1
 	user.EmailValidationStatusID = 1
 	err = service.UserRepo.Update(user.UserID, user)
 	if err != nil {
-		return err
+		return "", "", err
 	}
-	return nil
+
+	accessToken, refreshToken, err = common.GenerateToken(user)
+	if err != nil {
+		return "", "", err
+
+	}
+	return
 }
 
 // SignUp implements service.AuthService.
