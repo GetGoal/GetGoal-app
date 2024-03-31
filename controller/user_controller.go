@@ -23,6 +23,7 @@ func (controller UserController) Route(api *gin.RouterGroup) {
 	api.GET("/users/profile", controller.FindUserByEmail)
 	api.GET("/users/programs/saved", controller.FindSavedProgramByUser)
 	api.GET("/users/programs/joined", controller.FindSavedProgramByUser)
+	api.PUT("/users/labels", controller.UpdateUserLabel)
 }
 func (controller UserController) FindUserByEmail(c *gin.Context) {
 	user, err := controller.UserService.FindUserByEmail(c)
@@ -113,6 +114,38 @@ func (controller UserController) FindJoinedProgramByUser(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Success",
 		Data:    programDto,
+		Error:   nil,
+	})
+}
+
+func (controller UserController) UpdateUserLabel(c *gin.Context) {
+	var user model.UserModel
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	updated, err := controller.UserService.UpdateLabel(c, user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	dto := model.ConvertToUserDTO(*updated)
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    dto,
 		Error:   nil,
 	})
 }

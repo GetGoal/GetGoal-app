@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 
@@ -19,6 +20,23 @@ func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.Pro
 type UserServiceImpl struct {
 	UserRepo    repository.UserRepo
 	ProgramRepo repository.ProgramRepo
+}
+
+// UpdateLabel implements service.UserService.
+func (service UserServiceImpl) UpdateLabel(c *gin.Context, userModel model.UserModel) (*entity.UserAccount, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	user, _ := service.UserRepo.FindUserByID(claims.UserID)
+	if user.UserID == 0 {
+		return nil, errors.New("user not found")
+	}
+	labelText, _ := json.Marshal(userModel.Labels)
+	user.Labels = string(labelText)
+
+	err := service.UserRepo.Update(user.UserID, user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 // FindJoinedProgram implements service.UserService.
