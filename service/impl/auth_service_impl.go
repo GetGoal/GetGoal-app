@@ -18,12 +18,13 @@ import (
 	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewAuthServiceImpl(userRepo repository.UserRepo, mailer service.MailerService, gorse client.GorseClient) service.AuthService {
-	return &AuthServiceImpl{userRepo, mailer, make(map[string]bool), common.Claims{}, gorse}
+func NewAuthServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo, mailer service.MailerService, gorse client.GorseClient) service.AuthService {
+	return &AuthServiceImpl{userRepo, programRepo, mailer, make(map[string]bool), common.Claims{}, gorse}
 }
 
 type AuthServiceImpl struct {
 	UserRepo         repository.UserRepo
+	ProgramRepo      repository.ProgramRepo
 	Mailer           service.MailerService
 	BlackListedToken map[string]bool
 	Claims           common.Claims
@@ -231,6 +232,26 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 		UserId: strconv.Itoa(int(newUser.UserID)),
 		Labels: request.Labels,
 	})
+	if gErr != nil {
+		return entity.UserAccount{}, gErr
+	}
+
+	programs, err := service.ProgramRepo.FindProgramByLabeWithLimits(request.Labels, 10)
+	if err != nil {
+		return entity.UserAccount{}, err
+	}
+
+	var feedbacks []client.Feedback
+	for _, program := range programs {
+		feedbacks = append(feedbacks, client.Feedback{
+			FeedbackType: "view_program",
+			UserId:       strconv.Itoa(int(newUser.UserID)),
+			ItemId:       strconv.Itoa(int(program.ProgramID)),
+			Timestamp:    time.Now().Format("2006-01-02"),
+		})
+	}
+	log.Default().Printf("feedbacks numbers: %d", len(feedbacks))
+	_, gErr = service.Gorse.InsertFeedback(context.TODO(), feedbacks)
 	if gErr != nil {
 		return entity.UserAccount{}, gErr
 	}
