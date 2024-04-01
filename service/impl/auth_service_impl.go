@@ -236,7 +236,7 @@ func (service *AuthServiceImpl) SignUp(request model.SignUpRequest) (useEntityr 
 		return entity.UserAccount{}, gErr
 	}
 
-	programs, err := service.ProgramRepo.FindProgramByLabeWithLimits(request.Labels, 10)
+	programs, err := service.ProgramRepo.FindProgramByLabelWithLimits(request.Labels, 10)
 	if err != nil {
 		return entity.UserAccount{}, err
 	}
