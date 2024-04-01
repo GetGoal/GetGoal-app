@@ -112,6 +112,19 @@ func (p *programRepoImpl) FindProgramByLabel(labels []string) ([]entity.Program,
 	return programs, err
 }
 
+func (p *programRepoImpl) FindProgramByLabelWithLimits(labels []string, limit int) ([]entity.Program, error) {
+
+	var programs []entity.Program
+	err := p.db.Debug().Model(&entity.Program{}).Joins("JOIN label_program ON program.program_id = label_program.program_id").
+		Joins("JOIN label ON label_program.label_id = label.label_id AND label.label_name IN (?)", labels).
+		Preload("Labels", "label_name IN (?)", labels).
+		Preload("Tasks").
+		Limit(limit).
+		Find(&programs).Error
+
+	return programs, err
+}
+
 // FindProgramByText implements repository.ProgramRepo.
 func (p *programRepoImpl) FindProgramByText(str string) ([]entity.Program, error) {
 
