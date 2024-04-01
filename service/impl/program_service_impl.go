@@ -222,6 +222,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		ItemId:     strconv.Itoa(int(program.ProgramID)),
 		IsHidden:   false,
 		Categories: strLabel,
+		Labels:     strLabel,
 	})
 	if gErr != nil {
 		return entity.Program{}, gErr
@@ -265,6 +266,11 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		}
 
 		labels = append(labels, existedLabel)
+	}
+
+	var strLabel []string
+	for _, label := range labels {
+		strLabel = append(strLabel, label.LabelName)
 	}
 
 	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
@@ -319,6 +325,13 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	sErr := service.ProgramRepo.Update(id, &programToUpdate)
 	if sErr != nil {
 		return entity.Program{}, sErr
+	}
+	_, gErr := service.GorseClient.UpdateItem(context.TODO(), strconv.Itoa(int(programToUpdate.ProgramID)), client.ItemPatch{
+		Categories: strLabel,
+		Labels:     strLabel,
+	})
+	if gErr != nil {
+		return entity.Program{}, gErr
 	}
 	return programToUpdate, nil
 }
