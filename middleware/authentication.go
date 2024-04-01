@@ -49,7 +49,7 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 			if strings.Contains(err.Error(), "token is expired by") {
 				// Token is expired, try refreshing
 				log.Default().Println("Token is expired, try refreshing")
-				refreshToken := c.Request.Header.Get("Refreshtoken")
+				refreshToken := c.Request.Header.Get("RefreshToken")
 				if refreshToken == "" {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, model.GeneralResponse{
 						Code:    http.StatusUnauthorized,
@@ -85,8 +85,10 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 				// Set new access token in response headers
 				c.Writer.Header().Set("Authorization", "Bearer "+newAccessToken)
 				// Optionally, set new refresh token in response headers
-				c.Writer.Header().Set("Refreshtoken", newRefreshToken)
-
+				c.Writer.Header().Set("RefreshToken", newRefreshToken)
+				log.Default().Printf("New access token: %s", newAccessToken)
+				log.Default().Printf("New refresh token: %s", newRefreshToken)
+				log.Default().Printf("New claims: %v", newClaims)
 				// Proceed with the request using the new access token
 				c.Next()
 				return
@@ -101,7 +103,7 @@ func JWTAuthMiddleware(service *impl.AuthServiceImpl, jwtKey []byte) gin.Handler
 		}
 		c.Set("claims", claims)
 		c.Set("access_token", tokenString)
-
+		log.Default().Printf("Claims: %v", claims)
 		// Call the next handler
 		c.Next()
 	}

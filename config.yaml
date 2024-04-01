@@ -4,7 +4,11 @@ app:
   
 search:
   label_limit: 13
-
+  preference_limit: 20
+  
+recommendation:
+  limit: 100
+  
 database:
   host: localhost
   port: 5432
@@ -24,3 +28,15 @@ mailer:
   host: smtp.gmail.com
   email: cp23ssa1.getgoal@gmail.com
   password: vxnm aowx wunn wtzz
+  url: "https://getgoal.com"
+
+gorse:
+  dev: 
+    host: "gorse-dev-master"
+    port: 8088
+  qa:
+    host: "gorse-qa-master"
+    port: 8088
+  prod:
+    host: "gorse-prod-master"
+    port: 8088

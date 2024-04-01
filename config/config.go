@@ -18,6 +18,10 @@ type (
 		EnvFromDockerFile DockerEnv
 		Mailer            MailerConfig
 		JwtKeys           JwtKey
+		DevGorseConfig    GorseConfig
+		QaGorseConfig     GorseConfig
+		ProdGorseConfig   GorseConfig
+		Recommendation    Recommendation
 	}
 
 	App struct {
@@ -34,7 +38,8 @@ type (
 		TimeZone string
 	}
 	Search struct {
-		LabelLimit int
+		LabelLimit      int
+		PreferenceLimit int
 	}
 
 	DockerEnv struct {
@@ -52,10 +57,20 @@ type (
 		Port     int
 		Email    string
 		Password string
+		BaseURL  string
 	}
 	JwtKey struct {
 		AccessSecret  string
 		RefreshSecret string
+	}
+
+	GorseConfig struct {
+		Host string
+		Port int
+	}
+
+	Recommendation struct {
+		Limit int
 	}
 )
 
@@ -98,17 +113,34 @@ func ReadConfig(path string) Config {
 		},
 		Env: viper.GetString("env"),
 		Search: Search{
-			LabelLimit: viper.GetInt("search.label_limit"),
+			LabelLimit:      viper.GetInt("search.label_limit"),
+			PreferenceLimit: viper.GetInt("search.preference_limit"),
 		},
 		Mailer: MailerConfig{
 			Host:     viper.GetString("mailer.host"),
 			Port:     viper.GetInt("mailer.port"),
 			Email:    viper.GetString("mailer.email"),
 			Password: viper.GetString("mailer.password"),
+			BaseURL:  viper.GetString("mailer.url"),
 		},
 		JwtKeys: JwtKey{
 			AccessSecret:  viper.GetString("secrets.jwt.accesskey"),
 			RefreshSecret: viper.GetString("secrets.jwt.refreshkey"),
+		},
+		DevGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.dev.host"),
+			Port: viper.GetInt("gorse.dev.port"),
+		},
+		QaGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.qa.host"),
+			Port: viper.GetInt("gorse.qa.port"),
+		},
+		ProdGorseConfig: GorseConfig{
+			Host: viper.GetString("gorse.prod.host"),
+			Port: viper.GetInt("gorse.prod.port"),
+		},
+		Recommendation: Recommendation{
+			Limit: viper.GetInt("recommendation.limit"),
 		},
 	}
 	return config

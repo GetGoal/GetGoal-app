@@ -29,7 +29,7 @@ func ConvertToLabelModels(entityLabels []entity.Label) []LabelModel {
 }
 
 type LabelRequest struct {
-	LabelName string `json:"label_name" validate:"required,min=4,max=30"`
+	LabelName string `json:"label_name" validate:"required,min=1,max=30"`
 }
 
 type LabelIDAndName struct {

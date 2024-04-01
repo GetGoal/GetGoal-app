@@ -1,16 +1,23 @@
 package impl
 
 import (
+	"context"
+	"errors"
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
+	"github.com/xbklyn/getgoal-app/config"
 	"github.com/xbklyn/getgoal-app/entity"
 	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"github.com/xbklyn/getgoal-app/service"
+	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewProgramServiceImpl(programRepo repository.ProgramRepo, taskRepo repository.TaskRepo, labelRepo repository.LabelRepo, userRepo repository.UserRepo, userProRepo repository.UserProgramRepo) service.ProgramService {
-	return &ProgramServiceImpl{programRepo, taskRepo, labelRepo, userRepo, userProRepo}
+func NewProgramServiceImpl(programRepo repository.ProgramRepo, taskRepo repository.TaskRepo, labelRepo repository.LabelRepo, userRepo repository.UserRepo, userProRepo repository.UserProgramRepo, gorse client.GorseClient) service.ProgramService {
+	return &ProgramServiceImpl{programRepo, taskRepo, labelRepo, userRepo, userProRepo, gorse}
 }
 
 type ProgramServiceImpl struct {
@@ -19,6 +26,53 @@ type ProgramServiceImpl struct {
 	repository.LabelRepo
 	repository.UserRepo
 	repository.UserProgramRepo
+	client.GorseClient
+}
+
+// FindRecommendedPrograms implements service.ProgramService.
+func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]entity.Program, error) {
+	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(userId)), "", config.GetConfig().Recommendation.Limit)
+	if err != nil {
+		return nil, err
+	}
+
+	//convert string to uint64
+	var programIds []uint64
+	for _, id := range programIdList {
+		convertedId, _ := strconv.ParseUint(id, 10, 64)
+		programIds = append(programIds, convertedId)
+
+	}
+	programs, err := service.ProgramRepo.FindProgramByIDs(programIds)
+	if err != nil {
+		return nil, err
+	}
+	return programs, nil
+}
+
+// SaveProgram implements service.ProgramService.
+// Subtle: this method shadows the method (ProgramRepo).SaveProgram of ProgramServiceImpl.ProgramRepo.
+func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
+	program, _ := service.ProgramRepo.FindProgramByID(id)
+	if program.ProgramID == 0 {
+		return errors.New("program not found")
+	}
+	upErr := service.UserProgramRepo.Save(3, id, userId)
+	if upErr != nil {
+		return upErr
+	}
+	_, err := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
+		UserId:       strconv.Itoa(int(userId)),
+		ItemId:       strconv.Itoa(int(id)),
+		FeedbackType: "save_program",
+		Timestamp:    time.Now().Format("2006-01-02"),
+	}})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // FindProgramByUserId implements service.ProgramService.
@@ -27,12 +81,11 @@ func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Prog
 	if err != nil {
 		return nil, err
 	}
-
 	return programs, nil
 }
 
 // FindAllPrograms implements service.ProgramService.
-func (service *ProgramServiceImpl) FindAllPrograms() ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
 	programs, err := service.ProgramRepo.FindAllPrograms()
 	if err != nil {
 		return nil, err
@@ -41,10 +94,24 @@ func (service *ProgramServiceImpl) FindAllPrograms() ([]entity.Program, error) {
 }
 
 // FindProgramByID implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByID(id uint64) (*entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, error) {
 	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return nil, err
+	}
+
+	claims := c.MustGet("claims").(*common.Claims)
+	rowAffected, gErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
+		UserId:       strconv.Itoa(int(claims.UserID)),
+		ItemId:       strconv.Itoa(int(id)),
+		FeedbackType: "view_program",
+		Timestamp:    time.Now().Format("2006-01-02"),
+	}})
+	if rowAffected.RowAffected == 0 {
+		return nil, errors.New("error in gorse")
+	}
+	if gErr != nil {
+		return nil, gErr
 	}
 	return &program, nil
 }
@@ -105,7 +172,12 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		Labels:             labels,
 	}
 
+	var strLabel []string
+	for _, label := range labels {
+		strLabel = append(strLabel, label.LabelName)
+	}
 	program, err := service.ProgramRepo.Save(&programToCreate)
+
 	if err != nil {
 		return entity.Program{}, err
 	}
@@ -141,16 +213,25 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		}
 	}
 	program.Tasks = tasks
-	updated, sErr := service.ProgramRepo.Update(program.ProgramID, program)
+	sErr := service.ProgramRepo.Update(program.ProgramID, &program)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
 
+	_, gErr := service.GorseClient.InsertItem(context.TODO(), client.Item{
+		ItemId:     strconv.Itoa(int(program.ProgramID)),
+		IsHidden:   false,
+		Categories: strLabel,
+		Labels:     strLabel,
+	})
+	if gErr != nil {
+		return entity.Program{}, gErr
+	}
 	upErr := service.UserProgramRepo.Save(1, program.ProgramID, user.UserID)
 	if upErr != nil {
 		return entity.Program{}, upErr
 	}
-	return updated, nil
+	return program, nil
 }
 
 // Update implements service.ProgramService.
@@ -158,6 +239,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	if err := common.Validate(program); err != nil {
 		return entity.Program{}, err
 	}
+	claims := c.MustGet("claims").(*common.Claims)
 	programToUpdate, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return entity.Program{}, err
@@ -186,51 +268,103 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		labels = append(labels, existedLabel)
 	}
 
+	var strLabel []string
+	for _, label := range labels {
+		strLabel = append(strLabel, label.LabelName)
+	}
+
+	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
+	if err != nil {
+		return entity.Program{}, err
+	}
 	var tasks []entity.Task
-	for index, task := range programToUpdate.Tasks {
+	for index, task := range program.Tasks {
 		err := common.Validate(task)
 		if err != nil {
 			return entity.Program{}, err
 		}
-		taskToUpdate, err := service.TaskRepo.FindTaskByID(task.TaskID)
-		if err != nil {
-			return entity.Program{}, err
-		}
-		taskToUpdate.TaskName = program.Tasks[index].TaskName
-		taskToUpdate.TaskDescription = program.Tasks[index].TaskDescription
-		taskToUpdate.Category = program.Tasks[index].Category
-		taskToUpdate.StartTime = program.Tasks[index].StartTime
-		taskToUpdate.IsSetNotification = program.Tasks[index].IsSetNotification
-		taskToUpdate.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
-
-		task, terr := service.TaskRepo.Update(task.TaskID, taskToUpdate)
-
-		tasks = append(tasks, task)
-		if terr != nil {
-			return entity.Program{}, terr
+		existedTask, _ := service.TaskRepo.FindTaskByID(task.TaskID)
+		if existedTask.TaskID == 0 {
+			programId := int(programToUpdate.ProgramID)
+			newTask := entity.Task{
+				TaskName:          task.TaskName,
+				TaskDescription:   task.TaskDescription,
+				Category:          task.Category,
+				StartTime:         task.StartTime,
+				IsSetNotification: task.IsSetNotification,
+				TimeBeforeNotify:  task.TimeBeforeNotify,
+				UserAccountID:     int(claims.UserID),
+				UserAccount:       user,
+				ProgramID:         &programId,
+			}
+			task, terr := service.TaskRepo.Save(&newTask)
+			tasks = append(tasks, task)
+			if terr != nil {
+				return entity.Program{}, terr
+			}
+		} else {
+			existedTask.TaskName = program.Tasks[index].TaskName
+			existedTask.TaskDescription = program.Tasks[index].TaskDescription
+			existedTask.Category = program.Tasks[index].Category
+			existedTask.StartTime = program.Tasks[index].StartTime
+			existedTask.IsSetNotification = program.Tasks[index].IsSetNotification
+			existedTask.TimeBeforeNotify = program.Tasks[index].TimeBeforeNotify
+			task, terr := service.TaskRepo.Update(task.TaskID, existedTask)
+			tasks = append(tasks, task)
+			if terr != nil {
+				return entity.Program{}, terr
+			}
 		}
 	}
-
 	programToUpdate.ProgramName = program.ProgramName
 	programToUpdate.ProgramDescription = program.ProgramDescription
 	programToUpdate.MediaURL = program.MediaURL
 	programToUpdate.ExpectedTime = program.ExpectedTime
 	programToUpdate.Labels = labels
 	programToUpdate.Tasks = tasks
-
-	updated, sErr := service.ProgramRepo.Update(id, programToUpdate)
+	sErr := service.ProgramRepo.Update(id, &programToUpdate)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
-	return updated, nil
+	_, gErr := service.GorseClient.UpdateItem(context.TODO(), strconv.Itoa(int(programToUpdate.ProgramID)), client.ItemPatch{
+		Categories: strLabel,
+		Labels:     strLabel,
+	})
+	if gErr != nil {
+		return entity.Program{}, gErr
+	}
+	return programToUpdate, nil
 }
 
 // Delete implements service.ProgramService.
 func (service *ProgramServiceImpl) Delete(id uint64) error {
-	_, err := service.ProgramRepo.FindProgramByID(id)
+	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
 		return err
 	}
-	serviceErr := service.ProgramRepo.Delete(id)
+
+	serviceErr := service.ProgramRepo.Delete(&program)
 	return serviceErr
+}
+
+func (service *ProgramServiceImpl) CheckSavedProgram(userId uint64, programs *[]model.ProgramDTO) error {
+	activities, err := service.UserProgramRepo.FindActionByUserId(userId, 3)
+	if err != nil {
+		return err
+	}
+
+	// Collect saved program IDs
+	savedProgramIds := make(map[uint64]bool)
+	for _, activity := range activities {
+		savedProgramIds[activity.ProgramID] = true
+	}
+
+	// Update IsSaved field in ProgramDTOs
+	for i := range *programs {
+		if savedProgramIds[(*programs)[i].ProgramID] {
+			(*programs)[i].IsSaved = true
+		}
+	}
+
+	return nil
 }

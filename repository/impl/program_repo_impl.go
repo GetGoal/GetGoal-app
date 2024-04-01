@@ -14,6 +14,44 @@ type programRepoImpl struct {
 	db *gorm.DB
 }
 
+// FindJoinedProgramByUserId implements repository.ProgramRepo.
+func (p *programRepoImpl) FindJoinedProgramByUserId(id uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Joins("JOIN user_program ON program.program_id = user_program.program_id").
+		Where("user_program.user_account_id = ?", id).
+		Where("user_program.action_id = 2").
+		Find(&programs).Error
+	return programs, err
+}
+
+// FindSavedProgramByUserId implements repository.ProgramRepo.
+func (p *programRepoImpl) FindSavedProgramByUserId(id uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Joins("JOIN user_program ON program.program_id = user_program.program_id").
+		Where("user_program.user_account_id = ?", id).
+		Where("user_program.action_id = 3").
+		Find(&programs).Error
+	return programs, err
+}
+
+// FindProgramByIDs implements repository.ProgramRepo.
+func (p *programRepoImpl) FindProgramByIDs(ids []uint64) ([]entity.Program, error) {
+	var programs []entity.Program
+	err := p.db.
+		Preload("Labels").
+		Preload("Tasks").
+		Where("program_id IN (?)", ids).
+		Order("RANDOM()").
+		Find(&programs).Error
+	return programs, err
+}
+
 // FetchProgramByUserId implements repository.ProgramRepo.
 func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, error) {
 	var programs []entity.Program
@@ -28,9 +66,14 @@ func (p *programRepoImpl) FetchProgramByUserId(id uint64) ([]entity.Program, err
 }
 
 // Delete implements repository.ProgramRepo.
-func (p *programRepoImpl) Delete(id uint64) error {
+func (p *programRepoImpl) Delete(program *entity.Program) error {
 
-	err := p.db.Where("program_id = ?", id).Delete(&entity.Program{}).Error
+	//clear associattion before delte program
+	cErr := p.db.Model(program).Association("UserAccount").Clear()
+	if cErr != nil {
+		return cErr
+	}
+	err := p.db.Delete(program).Error
 	return err
 }
 
@@ -69,6 +112,19 @@ func (p *programRepoImpl) FindProgramByLabel(labels []string) ([]entity.Program,
 	return programs, err
 }
 
+func (p *programRepoImpl) FindProgramByLabelWithLimits(labels []string, limit int) ([]entity.Program, error) {
+
+	var programs []entity.Program
+	err := p.db.Debug().Model(&entity.Program{}).Joins("JOIN label_program ON program.program_id = label_program.program_id").
+		Joins("JOIN label ON label_program.label_id = label.label_id AND label.label_name IN (?)", labels).
+		Preload("Labels", "label_name IN (?)", labels).
+		Preload("Tasks").
+		Limit(limit).
+		Find(&programs).Error
+
+	return programs, err
+}
+
 // FindProgramByText implements repository.ProgramRepo.
 func (p *programRepoImpl) FindProgramByText(str string) ([]entity.Program, error) {
 
@@ -90,7 +146,23 @@ func (p *programRepoImpl) Save(program *entity.Program) (entity.Program, error) 
 }
 
 // Update implements repository.ProgramRepo.
-func (p *programRepoImpl) Update(id uint64, program entity.Program) (entity.Program, error) {
-	err := p.db.Model(&entity.Program{}).Where("program_id = ?", id).Updates(program).Error
-	return program, err
+func (p *programRepoImpl) Update(id uint64, program *entity.Program) error {
+	tempLabel := program.Labels
+	err := p.db.Debug().Model(&program).Updates(&program).Error
+	if err != nil {
+		return err
+	}
+
+	//clear association in label_program
+	clErr := p.db.Debug().Model(&program).Association("Labels").Clear()
+	if clErr != nil {
+		return clErr
+	}
+
+	//add new association in label_program
+	aErr := p.db.Debug().Model(&program).Association("Labels").Append(&tempLabel)
+	if aErr != nil {
+		return aErr
+	}
+	return nil
 }

@@ -21,11 +21,13 @@ func NewProgramController(programService service.ProgramService) *ProgramControl
 
 func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.GET("/programs", controller.FindAllPrograms)
+	api.GET("/programs/for-you", controller.FindRecommendedPrograms)
 	api.GET("/programs/:id", controller.FindProgramByID)
 	api.GET("/programs/user", controller.FindProgramByUserId)
 	api.POST("/programs/search", controller.FindProgramByText)
 	api.POST("/programs/filter", controller.FindProgramByLabel)
-	api.POST("/programs", controller.SaveProgram)
+	api.POST("/programs", controller.CreateProgram)
+	api.POST("/programs/save-program/:id", controller.SaveProgram)
 	api.PUT("/programs/:id", controller.UpdateProgram)
 	api.DELETE("/programs/:id", controller.DeleteProgram)
 }
@@ -40,7 +42,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/programs [get]
 func (controller ProgramController) FindAllPrograms(c *gin.Context) {
-	programs, err := controller.ProgramService.FindAllPrograms()
+	programs, err := controller.ProgramService.FindAllPrograms(c)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -56,10 +58,24 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 	if len(programs) > 0 {
 		programsDTO = model.ConvertToProgramDTOs(programs)
 	}
+	log.Default().Printf("Old Programs: %v", programsDTO[len(programsDTO)-1].IsSaved)
+
+	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+	}
+	log.Default().Printf("New Programs: %v", programsDTO[len(programsDTO)-1].IsSaved)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(programs),
+		Count:   len(programsDTO),
 		Data:    programsDTO,
 		Error:   nil,
 	})
@@ -89,7 +105,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 		return
 	}
 
-	program, err := controller.ProgramService.FindProgramByID(id)
+	program, err := controller.ProgramService.FindProgramByID(c, id)
 	if err != nil {
 		if err.Error() == "record not found" {
 			log.Default().Printf("Error: %v", err)
@@ -111,6 +127,18 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 		return
 	}
 	programDTO := model.ConvertToProgramDTO(*program)
+	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &[]model.ProgramDTO{programDTO})
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -168,10 +196,23 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 	if len(programs) > 0 {
 		programsDTO = model.ConvertToProgramDTOs(programs)
 	}
+	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
+
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(programs),
+		Count:   len(programsDTO),
 		Data:    programsDTO,
 		Error:   nil,
 	})
@@ -226,10 +267,22 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 	if len(programs) > 0 {
 		programsDTO = model.ConvertToProgramDTOs(programs)
 	}
+	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(programs),
+		Count:   len(programsDTO),
 		Data:    programsDTO,
 		Error:   nil,
 	})
@@ -245,7 +298,7 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 // @response 201 {object} model.GeneralResponse "Created"
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/programs [post]
-func (controller ProgramController) SaveProgram(c *gin.Context) {
+func (controller ProgramController) CreateProgram(c *gin.Context) {
 	program := new(model.ProgramCreateOrUpdate)
 	if err := common.Bind(c, program); err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -401,10 +454,106 @@ func (controller ProgramController) FindProgramByUserId(c *gin.Context) {
 	if len(programs) > 0 {
 		programsDTO = model.ConvertToProgramDTOs(programs)
 	}
+	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
-		Count:   len(programs),
+		Count:   len(programsDTO),
+		Data:    programsDTO,
+		Error:   nil,
+	})
+}
+
+func (controller ProgramController) SaveProgram(c *gin.Context) {
+	claims := c.MustGet("claims").(*common.Claims)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	err = controller.ProgramService.SaveProgram(id, claims.UserID)
+	if err != nil {
+		if err.Error() == "program not found" {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    nil,
+		Error:   nil,
+	})
+}
+
+func (controller ProgramController) FindRecommendedPrograms(c *gin.Context) {
+	claims := c.MustGet("claims").(*common.Claims)
+
+	programs, err := controller.ProgramService.FindRecommendedPrograms(claims.UserID)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	programsDTO := make([]model.ProgramDTO, 0)
+	if len(programs) > 0 {
+		programsDTO = model.ConvertToProgramDTOs(programs)
+	}
+	sErr := controller.ProgramService.CheckSavedProgram(claims.UserID, &programsDTO)
+	if sErr != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   sErr.Error(),
+		})
+		return
+
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   len(programsDTO),
 		Data:    programsDTO,
 		Error:   nil,
 	})

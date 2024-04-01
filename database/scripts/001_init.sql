@@ -66,7 +66,6 @@ CREATE TABLE "public"."label" (
   "deleted_at" TIMESTAMP
 );
 
-
 CREATE TABLE "public"."label_program" (
   "label_id" INT NOT NULL,
   "program_id" INT NOT NULL,
@@ -75,7 +74,6 @@ CREATE TABLE "public"."label_program" (
   "deleted_at" TIMESTAMP,
   PRIMARY KEY ("label_id", "program_id")
 );
-
 
 CREATE TABLE "public"."action_type" (
   "action_id" SERIAL PRIMARY KEY,
@@ -95,6 +93,23 @@ CREATE TABLE "public"."user_program" (
   "deleted_at" TIMESTAMP
 );
 
+CREATE TABLE "public"."user_login_data_external" (
+  "user_login_data_external_id" SERIAL PRIMARY KEY,
+  "user_id" INT NOT NULL,
+  "external_provider_id" INT NOT NULL,
+  "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "deleted_at" TIMESTAMP
+);
+
+CREATE TABLE "public"."external_provider" (
+  "external_provider_id" SERIAL PRIMARY KEY,
+  "provider_name" VARCHAR(50) NOT NULL,
+  "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "deleted_at" TIMESTAMP
+);
+
 CREATE INDEX "fk_task_program_idx" ON "public"."task" ("program_id");
 CREATE INDEX "fk_task_user_account1_idx" ON "public"."task" ("user_account_id");
 CREATE INDEX "fk_category_has_program_program1_idx" ON "public"."label_program" ("program_id");
@@ -104,11 +119,11 @@ CREATE INDEX "fk_user_account_has_program_user_account1_idx" ON "public"."user_p
 CREATE INDEX "fk_user_program_action_type1_idx" ON "public"."user_program" ("action_id");
 CREATE INDEX "fk_user_account_email_validation_status1_idx" ON "public"."user_account" ("email_validation_status_id");
 
-ALTER TABLE "public"."task" ADD CONSTRAINT "fk_task_program" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."task" ADD CONSTRAINT "fk_task_user_account1" FOREIGN KEY ("user_account_id") REFERENCES "public"."user_account" ("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."label_program" ADD CONSTRAINT "fk_category_has_program_category1" FOREIGN KEY ("label_id") REFERENCES "public"."label" ("label_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."label_program" ADD CONSTRAINT "fk_category_has_program_program1" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_account_has_program_user_account1" FOREIGN KEY ("user_account_id") REFERENCES "public"."user_account" ("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_account_has_program_program1" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_program_action_type1" FOREIGN KEY ("action_id") REFERENCES "public"."action_type" ("action_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE "public"."user_account" ADD CONSTRAINT "fk_user_account" FOREIGN KEY ("email_validation_status_id") REFERENCES "public"."email_validation_status" ("email_validation_status_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "public"."task" ADD CONSTRAINT "fk_task_program" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."task" ADD CONSTRAINT "fk_task_user_account1" FOREIGN KEY ("user_account_id") REFERENCES "public"."user_account" ("user_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."label_program" ADD CONSTRAINT "fk_category_has_program_category1" FOREIGN KEY ("label_id") REFERENCES "public"."label" ("label_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."label_program" ADD CONSTRAINT "fk_category_has_program_program1" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_account_has_program_user_account1" FOREIGN KEY ("user_account_id") REFERENCES "public"."user_account" ("user_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_account_has_program_program1" FOREIGN KEY ("program_id") REFERENCES "public"."program" ("program_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."user_program" ADD CONSTRAINT "fk_user_program_action_type1" FOREIGN KEY ("action_id") REFERENCES "public"."action_type" ("action_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."user_account" ADD CONSTRAINT "fk_user_account" FOREIGN KEY ("email_validation_status_id") REFERENCES "public"."email_validation_status" ("email_validation_status_id") ON DELETE CASCADE ON UPDATE NO ACTION;

@@ -20,6 +20,10 @@ func NewLabelController(labelService service.LabelService) *LabelController {
 	return &LabelController{LabelService: labelService}
 }
 
+func (controller LabelController) RouteAnonymous(api *gin.RouterGroup) {
+	api.GET("/labels/preferences", controller.GetPreferenceLabel)
+}
+
 func (controller LabelController) Route(api *gin.RouterGroup) {
 	api.GET("/labels", controller.FindAllLabels)
 	api.GET("/labels/search", controller.GetSearchLabel)
@@ -288,6 +292,30 @@ func (controller LabelController) Delete(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Deleted id " + strconv.FormatUint(uint64(id), 10) + " successfully",
 		Data:    nil,
+		Error:   nil,
+	})
+}
+
+func (controller LabelController) GetPreferenceLabel(c *gin.Context) {
+	labels, err := controller.LabelService.GetPreferenceLabel()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+	labelsDTO := make([]model.LabelModel, 0)
+	if len(labels) > 0 {
+		labelsDTO = model.ConvertToLabelModels(labels)
+	}
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   len(labels),
+		Data:    labelsDTO,
 		Error:   nil,
 	})
 }
