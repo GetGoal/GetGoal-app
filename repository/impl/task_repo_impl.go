@@ -35,6 +35,7 @@ func (t *taskRepoImpl) FindAllTasks() ([]entity.Task, error) {
 	err := t.db.Model(&entity.Task{}).
 		Preload("Program").
 		Preload("UserAccount").
+		Order("start_time ASC").
 		Find(&tasks).Error
 
 	return tasks, err
