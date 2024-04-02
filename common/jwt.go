@@ -18,7 +18,10 @@ type Claims struct {
 }
 
 type RefreshClaims struct {
-	User entity.UserAccount `json:"user"`
+	Email     string `json:"email"`
+	UserID    uint64 `json:"user_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 	jwt.StandardClaims
 }
 
@@ -77,7 +80,10 @@ func generateAccessTokenForResetPassword(user entity.UserAccount) (string, error
 func generateRefreshToken(user entity.UserAccount) (string, error) {
 	refreshExpirationTime := time.Now().Add(7 * 24 * time.Hour)
 	refreshClaims := &RefreshClaims{
-		User: user,
+		UserID:    user.UserID,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: refreshExpirationTime.Unix(),
 		},
