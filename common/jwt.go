@@ -108,7 +108,13 @@ func RefreshTokens(refreshTokenString string) (string, string, error) {
 	}
 
 	// Generate new Access Token
-	accessToken, err := generateAccessToken(claims.User)
+	user := entity.UserAccount{
+		UserID:    claims.UserID,
+		Email:     claims.Email,
+		FirstName: claims.FirstName,
+		LastName:  claims.LastName,
+	}
+	accessToken, err := generateAccessToken(user)
 	if err != nil {
 		return "", "", err
 	}
