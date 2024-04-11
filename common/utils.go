@@ -179,3 +179,8 @@ func VerifyPassword(password, encodedHash string) (match bool, err error) {
 	}
 	return false, nil
 }
+
+// json unmarshal
+func UnmarshalJSON(data []byte, v interface{}) error {
+	return json.Unmarshal(data, v)
+}
