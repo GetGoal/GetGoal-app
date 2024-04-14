@@ -22,7 +22,7 @@ func (up *userRepoImpl) FindDateWithTasks(date time.Time, id uint64) ([]model.Da
 	var dates []model.DateHasTask
 
 	err := up.db.Debug().Table("task").
-		Select("distinct(start_time), count(*) as no_of_task").
+		Select("distinct(to_char(start_time, 'YYYY-MM-DD')) as start_time, count(*) as no_of_task").
 		Where("user_account_id = ?", id).
 		Where("extract(month from start_time) = ? ", int(date.Month())).
 		Where("extract(year from start_time) = ? ", date.Year()).

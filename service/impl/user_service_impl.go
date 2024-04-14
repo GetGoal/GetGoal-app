@@ -42,8 +42,9 @@ func (service UserServiceImpl) FindDateWithTasks(c *gin.Context, date time.Time)
 	log.Default().Printf("dates: %v", dates)
 	datesWithTask := make([]int, 0)
 	for _, date := range dates {
+		parsedDate, _ := time.Parse("2006-01-02", date.Date)
 		if date.Count > 0 {
-			datesWithTask = append(datesWithTask, date.Date.Day())
+			datesWithTask = append(datesWithTask, parsedDate.Day())
 		}
 	}
 	return datesWithTask, nil
