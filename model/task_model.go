@@ -32,6 +32,11 @@ type JoinProgramModifications struct {
 	Modifications []Modification `json:"modifications"`
 }
 
+type DateHasTask struct {
+	Date  time.Time `gorm:"column:start_time" json:"start_time"`
+	Count int       `gorm:"column:no_of_task" json:"no_of_task"`
+}
+
 type TaskModel struct {
 	TaskID            uint64    `json:"task_id"`
 	TaskName          string    `json:"task_name"`
