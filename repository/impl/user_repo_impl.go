@@ -1,7 +1,10 @@
 package impl
 
 import (
+	"time"
+
 	"github.com/xbklyn/getgoal-app/entity"
+	"github.com/xbklyn/getgoal-app/model"
 	"github.com/xbklyn/getgoal-app/repository"
 	"gorm.io/gorm"
 )
@@ -12,6 +15,22 @@ func NewUserRepoImpl(db *gorm.DB) repository.UserRepo {
 
 type userRepoImpl struct {
 	db *gorm.DB
+}
+
+// FindDateWithTasks implements repository.UserRepo.
+func (up *userRepoImpl) FindDateWithTasks(date time.Time, id uint64) ([]model.DateHasTask, error) {
+	var dates []model.DateHasTask
+
+	err := up.db.Debug().Table("task").
+		Select("start_time, count(*) as no_of_task").
+		Where("user_account_id = ?", id).
+		Where("extract(month from start_time) = ? ", int(date.Month())).
+		Where("extract(year from start_time) = ? ", date.Year()).
+		Group("start_time").
+		Scan(&dates).
+		Error
+
+	return dates, err
 }
 
 // FetchProgramByUserId implements repository.UserRepo.
