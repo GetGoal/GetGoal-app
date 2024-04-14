@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/common"
@@ -24,6 +25,29 @@ type UserServiceImpl struct {
 	UserRepo    repository.UserRepo
 	ProgramRepo repository.ProgramRepo
 	GorseClient client.GorseClient
+}
+
+// FindDateWithTasks implements service.UserService.
+func (service UserServiceImpl) FindDateWithTasks(c *gin.Context, date time.Time) ([]int, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	user, _ := service.UserRepo.FindUserByID(claims.UserID)
+	if user.UserID == 0 {
+		return nil, errors.New("user not found")
+	}
+
+	dates, err := service.UserRepo.FindDateWithTasks(date, user.UserID)
+	if err != nil {
+		return nil, err
+	}
+	log.Default().Printf("dates: %v", dates)
+	datesWithTask := make([]int, 0)
+	for _, date := range dates {
+		if date.Count > 0 {
+			datesWithTask = append(datesWithTask, date.Date.Day())
+		}
+	}
+	return datesWithTask, nil
+
 }
 
 // UpdateLabel implements service.UserService.
