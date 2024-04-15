@@ -2,6 +2,7 @@ package impl
 
 import (
 	"github.com/xbklyn/getgoal-app/entity"
+	"github.com/xbklyn/getgoal-app/model"
 	repository "github.com/xbklyn/getgoal-app/repository"
 	"gorm.io/gorm"
 )
@@ -12,6 +13,20 @@ func NewUserProgramRepoImpl(db *gorm.DB) repository.UserProgramRepo {
 
 type UserProgramRepoImpl struct {
 	db *gorm.DB
+}
+
+// GetStatistic implements repository.UserProgramRepo.
+func (u *UserProgramRepoImpl) GetStatistic(programId uint64) (model.ProgramStat, error) {
+	var stats model.ProgramStat
+
+	err := u.db.Debug().Model(&entity.UserProgram{}).
+		Select("program_id,COUNT(CASE WHEN action_id = 2 THEN 1 END) AS joined,COUNT(CASE WHEN action_id = 3 THEN 1 END) AS saved,COUNT(CASE WHEN action_id = 4 THEN 1 END) AS viewed,MAX(CASE WHEN action_id = 2 THEN created_at END) AS last_joined").
+		Where("program_id = ?", programId).
+		Group("program_id").
+		Find(&stats).
+		Error
+
+	return stats, err
 }
 
 // FindActionByUserId implements repository.UserProgramRepo.

@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
+	"log"
 	"strconv"
 	"time"
 
@@ -27,6 +28,34 @@ type ProgramServiceImpl struct {
 	repository.UserRepo
 	repository.UserProgramRepo
 	client.GorseClient
+}
+
+// FindProgramStatByID implements service.ProgramService.
+func (service *ProgramServiceImpl) FindProgramStatByID(c *gin.Context, id uint64) (model.ProgramStat, error) {
+	claims := c.MustGet("claims").(*common.Claims)
+	program, _ := service.ProgramRepo.FindProgramByID(id)
+	if program.ProgramID == 0 {
+		return model.ProgramStat{}, errors.New("program not found")
+	}
+	log.Default().Printf("program: %v", program.ProgramID)
+	hasAccessed := false
+	userPro, _ := service.UserProgramRepo.FindActionByUserId(uint64(claims.UserID), 1)
+	for _, up := range userPro {
+		log.Default().Printf("up: %v", up.ProgramID)
+		if up.ProgramID == program.ProgramID {
+			hasAccessed = true
+			break
+		}
+	}
+	if !hasAccessed {
+		return model.ProgramStat{}, errors.New("unauthorized access")
+	}
+
+	stat, err := service.UserProgramRepo.GetStatistic(program.ProgramID)
+	if err != nil {
+		return model.ProgramStat{}, err
+	}
+	return stat, nil
 }
 
 // FindRecommendedPrograms implements service.ProgramService.
@@ -101,6 +130,11 @@ func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*
 	}
 
 	claims := c.MustGet("claims").(*common.Claims)
+	upErr := service.UserProgramRepo.Save(4, id, claims.UserID)
+	if upErr != nil {
+		return nil, upErr
+
+	}
 	rowAffected, gErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
 		UserId:       strconv.Itoa(int(claims.UserID)),
 		ItemId:       strconv.Itoa(int(id)),
