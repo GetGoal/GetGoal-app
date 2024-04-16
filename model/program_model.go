@@ -26,6 +26,14 @@ type ProgramDTO struct {
 	CreatedAt          time.Time        `json:"created_at"`
 	UpdatedAt          time.Time        `json:"updated_at"`
 	IsSaved            bool             `json:"is_saved"`
+	Owner              Owner            `json:"owner"`
+}
+
+type Owner struct {
+	OwnerID   uint64 `json:"owner_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
 }
 
 type ProgramStat struct {
@@ -75,4 +83,13 @@ func ConvertToProgramDTOs(entityPrograms []entity.Program) []ProgramDTO {
 		programs = append(programs, ConvertToProgramDTO(program))
 	}
 	return programs
+}
+
+func AttachOwnerToProgramDTO(programDTO *ProgramDTO, userAccount entity.UserAccount) {
+	programDTO.Owner = Owner{
+		OwnerID:   userAccount.UserID,
+		FirstName: userAccount.FirstName,
+		LastName:  userAccount.LastName,
+		Email:     userAccount.Email,
+	}
 }
