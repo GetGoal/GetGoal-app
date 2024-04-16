@@ -15,6 +15,18 @@ type UserProgramRepoImpl struct {
 	db *gorm.DB
 }
 
+// FindUserProgramByProgramId implements repository.UserProgramRepo.
+func (u *UserProgramRepoImpl) FindUserProgramByProgramId(programId uint64) (entity.UserProgram, error) {
+	var userProgram entity.UserProgram
+	err := u.db.Debug().Model(&entity.UserProgram{}).
+		Where("program_id = ?", programId).
+		Where("action_id = 1").
+		Find(&userProgram).
+		Error
+
+	return userProgram, err
+}
+
 // GetStatistic implements repository.UserProgramRepo.
 func (u *UserProgramRepoImpl) GetStatistic(programId uint64) (model.ProgramStat, error) {
 	var stats model.ProgramStat
