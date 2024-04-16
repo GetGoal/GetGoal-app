@@ -28,6 +28,13 @@ type ProgramDTO struct {
 	IsSaved            bool             `json:"is_saved"`
 }
 
+type ProgramStat struct {
+	ProgramID  uint64    `gorm:"column:program_id" json:"program_id"`
+	Joined     int       `gorm:"column:joined" json:"joined"`
+	Saved      int       `gorm:"column:saved" json:"saved"`
+	Viewed     int       `gorm:"column:viewed" json:"viewed"`
+	LastJoined time.Time `gorm:"column:last_joined" json:"last_joined"`
+}
 type Search struct {
 	SearchText string `json:"search_text"  validate:"required"`
 }

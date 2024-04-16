@@ -23,6 +23,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 	api.GET("/programs", controller.FindAllPrograms)
 	api.GET("/programs/for-you", controller.FindRecommendedPrograms)
 	api.GET("/programs/:id", controller.FindProgramByID)
+	api.GET("/programs/:id/stat", controller.FindProgramStatByID)
 	api.GET("/programs/user", controller.FindProgramByUserId)
 	api.POST("/programs/search", controller.FindProgramByText)
 	api.POST("/programs/filter", controller.FindProgramByLabel)
@@ -555,6 +556,60 @@ func (controller ProgramController) FindRecommendedPrograms(c *gin.Context) {
 		Message: "Success",
 		Count:   len(programsDTO),
 		Data:    programsDTO,
+		Error:   nil,
+	})
+}
+
+func (controller ProgramController) FindProgramStatByID(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid ID",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	stat, err := controller.ProgramService.FindProgramStatByID(c, id)
+	if err != nil {
+		if err.Error() == "record not found" {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusNotFound, model.GeneralResponse{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+		if err.Error() == "unauthorized access" {
+			log.Default().Printf("Error: %v", err)
+			c.JSON(http.StatusUnauthorized, model.GeneralResponse{
+				Code:    http.StatusUnauthorized,
+				Message: "Unauthorized Access",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+		log.Default().Printf("Error: %v", err)
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Count:   1,
+		Data:    stat,
 		Error:   nil,
 	})
 }
