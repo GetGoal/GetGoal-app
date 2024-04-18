@@ -34,6 +34,7 @@ type Owner struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
+	ImageUrl  string `json:"image_url"`
 }
 
 type ProgramStat struct {
@@ -91,5 +92,6 @@ func AttachOwnerToProgramDTO(programDTO *ProgramDTO, userAccount entity.UserAcco
 		FirstName: userAccount.FirstName,
 		LastName:  userAccount.LastName,
 		Email:     userAccount.Email,
+		ImageUrl:  userAccount.ImageURL,
 	}
 }
