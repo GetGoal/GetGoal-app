@@ -91,7 +91,7 @@ func (p *programRepoImpl) FindAllPrograms() ([]entity.Program, error) {
 func (p *programRepoImpl) FindProgramByID(id uint64) (entity.Program, error) {
 
 	var program entity.Program
-	err := p.db.
+	err := p.db.Model(&entity.Program{}).
 		Preload("Labels").
 		Preload("Tasks").
 		First(&program, id).Error

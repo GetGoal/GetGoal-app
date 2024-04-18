@@ -106,7 +106,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 		return
 	}
 
-	program, err := controller.ProgramService.FindProgramByID(c, id)
+	program, owner, err := controller.ProgramService.FindProgramByID(c, id)
 	if err != nil {
 		if err.Error() == "record not found" {
 			log.Default().Printf("Error: %v", err)
@@ -128,6 +128,7 @@ func (controller ProgramController) FindProgramByID(c *gin.Context) {
 		return
 	}
 	programDTO := model.ConvertToProgramDTO(*program)
+	model.AttachOwnerToProgramDTO(&programDTO, *owner)
 	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &[]model.ProgramDTO{programDTO})
 	if sErr != nil {
 		log.Default().Printf("Error: %v", err)

@@ -123,16 +123,28 @@ func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Pro
 }
 
 // FindProgramByID implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, *entity.UserAccount, error) {
 	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+
+	up, oErr := service.FindUserProgramByProgramId(uint64(id))
+	if oErr != nil {
+		return nil, nil, oErr
+	}
+
+	owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+	if onErr != nil {
+		return nil, nil, onErr
+
+	}
+	log.Default().Printf("owner: %v", owner)
 
 	claims := c.MustGet("claims").(*common.Claims)
 	upErr := service.UserProgramRepo.Save(4, id, claims.UserID)
 	if upErr != nil {
-		return nil, upErr
+		return nil, nil, upErr
 
 	}
 	rowAffected, gErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
@@ -142,12 +154,12 @@ func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*
 		Timestamp:    time.Now().Format("2006-01-02"),
 	}})
 	if rowAffected.RowAffected == 0 {
-		return nil, errors.New("error in gorse")
+		return nil, nil, errors.New("error in gorse")
 	}
 	if gErr != nil {
-		return nil, gErr
+		return nil, nil, gErr
 	}
-	return &program, nil
+	return &program, &owner, nil
 }
 
 // FindProgramByLabel implements service.ProgramService.
