@@ -78,10 +78,12 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 	}
 }
 
-func ConvertToProgramDTOs(entityPrograms []entity.Program) []ProgramDTO {
+func ConvertToProgramDTOs(entityPrograms []entity.Program, entityUser []entity.UserAccount) []ProgramDTO {
 	var programs []ProgramDTO
-	for _, program := range entityPrograms {
-		programs = append(programs, ConvertToProgramDTO(program))
+	for i, program := range entityPrograms {
+		programDTO := ConvertToProgramDTO(program)
+		AttachOwnerToProgramDTO(&programDTO, entityUser[i])
+		programs = append(programs, programDTO)
 	}
 	return programs
 }

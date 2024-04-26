@@ -80,9 +80,12 @@ func (p *programRepoImpl) Delete(program *entity.Program) error {
 // FindAllPrograms implements repository.ProgramRepo.
 func (p *programRepoImpl) FindAllPrograms() ([]entity.Program, error) {
 	var programs []entity.Program
-	err := p.db.
+	err := p.db.Debug().
 		Preload("Labels").
 		Preload("Tasks").
+		Preload("UserAccount").
+		Joins("JOIN user_program ON program.program_id = user_program.program_id").
+		// Where("user_program.action_id = 1").
 		Find(&programs).Error
 	return programs, err
 }

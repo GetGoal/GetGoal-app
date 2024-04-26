@@ -43,7 +43,7 @@ func (controller ProgramController) Route(api *gin.RouterGroup) {
 // @response 400 {object} model.GeneralResponse "Bad Request"
 // @Router /api/v1/programs [get]
 func (controller ProgramController) FindAllPrograms(c *gin.Context) {
-	programs, err := controller.ProgramService.FindAllPrograms(c)
+	programs, owners, err := controller.ProgramService.FindAllPrograms(c)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -54,10 +54,10 @@ func (controller ProgramController) FindAllPrograms(c *gin.Context) {
 		})
 		return
 	}
-
+	log.Default().Printf("User: %v", programs[0].UserAccount[0])
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
-		programsDTO = model.ConvertToProgramDTOs(programs)
+		programsDTO = model.ConvertToProgramDTOs(programs, owners)
 	}
 	log.Default().Printf("Old Programs: %v", programsDTO[len(programsDTO)-1].IsSaved)
 
@@ -183,7 +183,7 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 
 	}
 
-	programs, err := controller.ProgramService.FindProgramByLabel(labels.Labels)
+	programs, owners, err := controller.ProgramService.FindProgramByLabel(labels.Labels)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -196,7 +196,7 @@ func (controller ProgramController) FindProgramByLabel(c *gin.Context) {
 
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
-		programsDTO = model.ConvertToProgramDTOs(programs)
+		programsDTO = model.ConvertToProgramDTOs(programs, owners)
 	}
 	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
 	if sErr != nil {
@@ -254,7 +254,7 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 		return
 
 	}
-	programs, err := controller.ProgramService.FindProgramByText(text.SearchText)
+	programs, owners, err := controller.ProgramService.FindProgramByText(text.SearchText)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -267,7 +267,7 @@ func (controller ProgramController) FindProgramByText(c *gin.Context) {
 
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
-		programsDTO = model.ConvertToProgramDTOs(programs)
+		programsDTO = model.ConvertToProgramDTOs(programs, owners)
 	}
 	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
 	if sErr != nil {
@@ -440,7 +440,7 @@ func (controller ProgramController) UpdateProgram(c *gin.Context) {
 func (controller ProgramController) FindProgramByUserId(c *gin.Context) {
 	claims := c.MustGet("claims").(*common.Claims)
 
-	programs, err := controller.ProgramService.FindProgramByUserId(claims.UserID)
+	programs, owners, err := controller.ProgramService.FindProgramByUserId(claims.UserID)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -454,7 +454,7 @@ func (controller ProgramController) FindProgramByUserId(c *gin.Context) {
 
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
-		programsDTO = model.ConvertToProgramDTOs(programs)
+		programsDTO = model.ConvertToProgramDTOs(programs, owners)
 	}
 	sErr := controller.ProgramService.CheckSavedProgram(c.MustGet("claims").(*common.Claims).UserID, &programsDTO)
 	if sErr != nil {
@@ -524,7 +524,7 @@ func (controller ProgramController) SaveProgram(c *gin.Context) {
 func (controller ProgramController) FindRecommendedPrograms(c *gin.Context) {
 	claims := c.MustGet("claims").(*common.Claims)
 
-	programs, err := controller.ProgramService.FindRecommendedPrograms(claims.UserID)
+	programs, owners, err := controller.ProgramService.FindRecommendedPrograms(claims.UserID)
 	if err != nil {
 		log.Default().Printf("Error: %v", err)
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
@@ -538,7 +538,7 @@ func (controller ProgramController) FindRecommendedPrograms(c *gin.Context) {
 
 	programsDTO := make([]model.ProgramDTO, 0)
 	if len(programs) > 0 {
-		programsDTO = model.ConvertToProgramDTOs(programs)
+		programsDTO = model.ConvertToProgramDTOs(programs, owners)
 	}
 	sErr := controller.ProgramService.CheckSavedProgram(claims.UserID, &programsDTO)
 	if sErr != nil {
