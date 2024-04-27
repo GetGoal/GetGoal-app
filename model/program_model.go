@@ -26,8 +26,24 @@ type ProgramDTO struct {
 	CreatedAt          time.Time        `json:"created_at"`
 	UpdatedAt          time.Time        `json:"updated_at"`
 	IsSaved            bool             `json:"is_saved"`
+	Owner              Owner            `json:"owner"`
 }
 
+type Owner struct {
+	OwnerID   uint64 `json:"owner_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	ImageUrl  string `json:"image_url"`
+}
+
+type ProgramStat struct {
+	ProgramID  uint64    `gorm:"column:program_id" json:"program_id"`
+	Joined     int       `gorm:"column:joined" json:"joined"`
+	Saved      int       `gorm:"column:saved" json:"saved"`
+	Viewed     int       `gorm:"column:viewed" json:"viewed"`
+	LastJoined time.Time `gorm:"column:last_joined" json:"last_joined"`
+}
 type Search struct {
 	SearchText string `json:"search_text"  validate:"required"`
 }
@@ -62,10 +78,22 @@ func ConvertToProgramDTO(entityProgram entity.Program) ProgramDTO {
 	}
 }
 
-func ConvertToProgramDTOs(entityPrograms []entity.Program) []ProgramDTO {
+func ConvertToProgramDTOs(entityPrograms []entity.Program, entityUser []entity.UserAccount) []ProgramDTO {
 	var programs []ProgramDTO
-	for _, program := range entityPrograms {
-		programs = append(programs, ConvertToProgramDTO(program))
+	for i, program := range entityPrograms {
+		programDTO := ConvertToProgramDTO(program)
+		AttachOwnerToProgramDTO(&programDTO, entityUser[i])
+		programs = append(programs, programDTO)
 	}
 	return programs
+}
+
+func AttachOwnerToProgramDTO(programDTO *ProgramDTO, userAccount entity.UserAccount) {
+	programDTO.Owner = Owner{
+		OwnerID:   userAccount.UserID,
+		FirstName: userAccount.FirstName,
+		LastName:  userAccount.LastName,
+		Email:     userAccount.Email,
+		ImageUrl:  userAccount.ImageURL,
+	}
 }

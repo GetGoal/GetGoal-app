@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xbklyn/getgoal-app/model"
@@ -24,6 +25,7 @@ func (controller UserController) Route(api *gin.RouterGroup) {
 	api.GET("/users/programs/saved", controller.FindSavedProgramByUser)
 	api.GET("/users/programs/joined", controller.FindSavedProgramByUser)
 	api.PUT("/users/labels", controller.UpdateUserLabel)
+	api.GET("/users/calendar", controller.FindDateWithTask)
 }
 func (controller UserController) FindUserByEmail(c *gin.Context) {
 	user, err := controller.UserService.FindUserByEmail(c)
@@ -77,7 +79,7 @@ func (controller UserController) ResetPassword(c *gin.Context) {
 }
 
 func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
-	savedPrograms, err := controller.UserService.FindSavedProgram(c)
+	savedPrograms, owners, err := controller.UserService.FindSavedProgram(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -88,7 +90,7 @@ func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
 		return
 	}
 
-	programDto := model.ConvertToProgramDTOs(savedPrograms)
+	programDto := model.ConvertToProgramDTOs(savedPrograms, owners)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -98,7 +100,7 @@ func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
 }
 
 func (controller UserController) FindJoinedProgramByUser(c *gin.Context) {
-	joinedPrograms, err := controller.UserService.FindJoinedProgram(c)
+	joinedPrograms, owners, err := controller.UserService.FindJoinedProgram(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -109,7 +111,7 @@ func (controller UserController) FindJoinedProgramByUser(c *gin.Context) {
 		return
 	}
 
-	programDto := model.ConvertToProgramDTOs(joinedPrograms)
+	programDto := model.ConvertToProgramDTOs(joinedPrograms, owners)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -146,6 +148,40 @@ func (controller UserController) UpdateUserLabel(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Success",
 		Data:    dto,
+		Error:   nil,
+	})
+}
+
+func (controller UserController) FindDateWithTask(c *gin.Context) {
+
+	//check if date is valid
+	dateStr := c.Query("date")
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Request",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	datesWithTask, err := controller.UserService.FindDateWithTasks(c, date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Something Went Wrong",
+			Data:    nil,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, model.GeneralResponse{
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    datesWithTask,
 		Error:   nil,
 	})
 }
