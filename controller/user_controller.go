@@ -79,7 +79,7 @@ func (controller UserController) ResetPassword(c *gin.Context) {
 }
 
 func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
-	savedPrograms, err := controller.UserService.FindSavedProgram(c)
+	savedPrograms, owners, err := controller.UserService.FindSavedProgram(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -90,7 +90,7 @@ func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
 		return
 	}
 
-	programDto := model.ConvertToProgramDTOs(savedPrograms)
+	programDto := model.ConvertToProgramDTOs(savedPrograms, owners)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
@@ -100,7 +100,7 @@ func (controller UserController) FindSavedProgramByUser(c *gin.Context) {
 }
 
 func (controller UserController) FindJoinedProgramByUser(c *gin.Context) {
-	joinedPrograms, err := controller.UserService.FindJoinedProgram(c)
+	joinedPrograms, owners, err := controller.UserService.FindJoinedProgram(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.GeneralResponse{
 			Code:    http.StatusBadRequest,
@@ -111,7 +111,7 @@ func (controller UserController) FindJoinedProgramByUser(c *gin.Context) {
 		return
 	}
 
-	programDto := model.ConvertToProgramDTOs(joinedPrograms)
+	programDto := model.ConvertToProgramDTOs(joinedPrograms, owners)
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Success",
