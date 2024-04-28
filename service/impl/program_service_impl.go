@@ -386,10 +386,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		strLabel = append(strLabel, label.LabelName)
 	}
 
-	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
-	if err != nil {
-		return entity.Program{}, err
-	}
 	var tasks []entity.Task
 	for index, task := range program.Tasks {
 		err := common.Validate(task)
@@ -407,7 +403,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 				IsSetNotification: task.IsSetNotification,
 				TimeBeforeNotify:  task.TimeBeforeNotify,
 				UserAccountID:     int(claims.UserID),
-				UserAccount:       user,
 				ProgramID:         &programId,
 			}
 			task, terr := service.TaskRepo.Save(&newTask)
