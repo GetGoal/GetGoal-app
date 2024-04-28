@@ -153,7 +153,7 @@ func (p *programRepoImpl) Update(id uint64, program *entity.Program) error {
 	tempLabel := program.Labels
 	tempTasks := program.Tasks
 
-	err := p.db.Debug().Model(&program).Updates(&program).Error
+	err := p.db.Debug().Model(&program).Save(&program).Error
 	if err != nil {
 		return err
 	}

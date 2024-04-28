@@ -396,6 +396,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		if existedTask.TaskID == 0 {
 			programId := int(programToUpdate.ProgramID)
 			newTask := entity.Task{
+				TaskID:            0,
 				TaskName:          task.TaskName,
 				TaskDescription:   task.TaskDescription,
 				Category:          task.Category,
