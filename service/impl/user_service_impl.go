@@ -17,14 +17,15 @@ import (
 	"github.com/zhenghaoz/gorse/client"
 )
 
-func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo, gorse client.GorseClient) service.UserService {
-	return UserServiceImpl{userRepo, programRepo, gorse}
+func NewUserServiceImpl(userRepo repository.UserRepo, programRepo repository.ProgramRepo, upRepo repository.UserProgramRepo, gorse client.GorseClient) service.UserService {
+	return UserServiceImpl{userRepo, programRepo, upRepo, gorse}
 }
 
 type UserServiceImpl struct {
-	UserRepo    repository.UserRepo
-	ProgramRepo repository.ProgramRepo
-	GorseClient client.GorseClient
+	UserRepo        repository.UserRepo
+	ProgramRepo     repository.ProgramRepo
+	UserProgramRepo repository.UserProgramRepo
+	GorseClient     client.GorseClient
 }
 
 // FindDateWithTasks implements service.UserService.
@@ -97,23 +98,49 @@ func (service UserServiceImpl) UpdateLabel(c *gin.Context, userModel model.UserM
 }
 
 // FindJoinedProgram implements service.UserService.
-func (service UserServiceImpl) FindJoinedProgram(c *gin.Context) ([]entity.Program, error) {
+func (service UserServiceImpl) FindJoinedProgram(c *gin.Context) ([]entity.Program, []entity.UserAccount, error) {
 	claims := c.MustGet("claims").(*common.Claims)
 	programs, err := service.ProgramRepo.FindSavedProgramByUserId(uint64(claims.UserID))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.UserProgramRepo.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // FindSavedProgram implements service.UserService.
-func (service UserServiceImpl) FindSavedProgram(c *gin.Context) ([]entity.Program, error) {
+func (service UserServiceImpl) FindSavedProgram(c *gin.Context) ([]entity.Program, []entity.UserAccount, error) {
 	claims := c.MustGet("claims").(*common.Claims)
 	programs, err := service.ProgramRepo.FindSavedProgramByUserId(uint64(claims.UserID))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.UserProgramRepo.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // UpdateUser implements service.UserService.

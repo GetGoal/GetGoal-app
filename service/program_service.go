@@ -8,13 +8,13 @@ import (
 
 type ProgramService interface {
 	CheckSavedProgram(userId uint64, programs *[]model.ProgramDTO) error
-	FindAllPrograms(c *gin.Context) ([]entity.Program, error)
-	FindProgramByID(c *gin.Context, id uint64) (*entity.Program, error)
+	FindAllPrograms(c *gin.Context) ([]entity.Program, []entity.UserAccount, error)
+	FindProgramByID(c *gin.Context, id uint64) (*entity.Program, *entity.UserAccount, error)
 	FindProgramStatByID(c *gin.Context, id uint64) (model.ProgramStat, error)
-	FindProgramByText(str string) ([]entity.Program, error)
-	FindProgramByLabel(labels []string) ([]entity.Program, error)
-	FindProgramByUserId(id uint64) ([]entity.Program, error)
-	FindRecommendedPrograms(userId uint64) ([]entity.Program, error)
+	FindProgramByText(str string) ([]entity.Program, []entity.UserAccount, error)
+	FindProgramByLabel(labels []string) ([]entity.Program, []entity.UserAccount, error)
+	FindProgramByUserId(id uint64) ([]entity.Program, []entity.UserAccount, error)
+	FindRecommendedPrograms(userId uint64) ([]entity.Program, []entity.UserAccount, error)
 	Save(program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error)
 	SaveProgram(id uint64, userId uint64) error
 	Update(id uint64, program model.ProgramCreateOrUpdate, c *gin.Context) (entity.Program, error)

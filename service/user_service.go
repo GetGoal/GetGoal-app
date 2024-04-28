@@ -10,8 +10,8 @@ import (
 
 type UserService interface {
 	FindUserByEmail(c *gin.Context) (*entity.UserAccount, error)
-	FindSavedProgram(c *gin.Context) ([]entity.Program, error)
-	FindJoinedProgram(c *gin.Context) ([]entity.Program, error)
+	FindSavedProgram(c *gin.Context) ([]entity.Program, []entity.UserAccount, error)
+	FindJoinedProgram(c *gin.Context) ([]entity.Program, []entity.UserAccount, error)
 	FindDateWithTasks(c *gin.Context, date time.Time) ([]int, error)
 	UpdateLabel(c *gin.Context, userModel model.UserModel) (*entity.UserAccount, error)
 	ResetPassword(c *gin.Context, credential model.ChangePasswordRequest) (*entity.UserAccount, error)

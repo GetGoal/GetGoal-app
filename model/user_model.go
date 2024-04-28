@@ -11,6 +11,7 @@ type UserModel struct {
 	FirstName string   `json:"first_name"`
 	LastName  string   `json:"last_name"`
 	Labels    []string `json:"labels"`
+	ImageURL  string   `json:"image_url"`
 }
 
 func ConvertToUserDTO(entityUser entity.UserAccount) UserModel {
@@ -22,5 +23,6 @@ func ConvertToUserDTO(entityUser entity.UserAccount) UserModel {
 		FirstName: entityUser.FirstName,
 		LastName:  entityUser.LastName,
 		Labels:    labels,
+		ImageURL:  entityUser.ImageURL,
 	}
 }

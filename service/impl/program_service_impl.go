@@ -59,10 +59,10 @@ func (service *ProgramServiceImpl) FindProgramStatByID(c *gin.Context, id uint64
 }
 
 // FindRecommendedPrograms implements service.ProgramService.
-func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]entity.Program, []entity.UserAccount, error) {
 	programIdList, err := service.GorseClient.GetRecommend(context.TODO(), strconv.Itoa(int(userId)), "", config.GetConfig().Recommendation.Limit)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	//convert string to uint64
@@ -74,9 +74,23 @@ func (service *ProgramServiceImpl) FindRecommendedPrograms(userId uint64) ([]ent
 	}
 	programs, err := service.ProgramRepo.FindProgramByIDs(programIds)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // SaveProgram implements service.ProgramService.
@@ -105,34 +119,72 @@ func (service *ProgramServiceImpl) SaveProgram(id uint64, userId uint64) error {
 }
 
 // FindProgramByUserId implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByUserId(id uint64) ([]entity.Program, []entity.UserAccount, error) {
 	programs, err := service.ProgramRepo.FetchProgramByUserId(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // FindAllPrograms implements service.ProgramService.
-func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindAllPrograms(c *gin.Context) ([]entity.Program, []entity.UserAccount, error) {
 	programs, err := service.ProgramRepo.FindAllPrograms()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // FindProgramByID implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*entity.Program, *entity.UserAccount, error) {
 	program, err := service.ProgramRepo.FindProgramByID(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+
+	up, oErr := service.FindUserProgramByProgramId(uint64(id))
+	if oErr != nil {
+		return nil, nil, oErr
+	}
+
+	owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+	if onErr != nil {
+		return nil, nil, onErr
+
+	}
+	log.Default().Printf("owner: %v", owner)
 
 	claims := c.MustGet("claims").(*common.Claims)
 	upErr := service.UserProgramRepo.Save(4, id, claims.UserID)
 	if upErr != nil {
-		return nil, upErr
+		return nil, nil, upErr
 
 	}
 	rowAffected, gErr := service.GorseClient.InsertFeedback(context.TODO(), []client.Feedback{{
@@ -142,30 +194,57 @@ func (service *ProgramServiceImpl) FindProgramByID(c *gin.Context, id uint64) (*
 		Timestamp:    time.Now().Format("2006-01-02"),
 	}})
 	if rowAffected.RowAffected == 0 {
-		return nil, errors.New("error in gorse")
+		return nil, nil, errors.New("error in gorse")
 	}
 	if gErr != nil {
-		return nil, gErr
+		return nil, nil, gErr
 	}
-	return &program, nil
+	return &program, &owner, nil
 }
 
 // FindProgramByLabel implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByLabel(labels []string) ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByLabel(labels []string) ([]entity.Program, []entity.UserAccount, error) {
 	programs, err := service.ProgramRepo.FindProgramByLabel(labels)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // FindProgramByText implements service.ProgramService.
-func (service *ProgramServiceImpl) FindProgramByText(str string) ([]entity.Program, error) {
+func (service *ProgramServiceImpl) FindProgramByText(str string) ([]entity.Program, []entity.UserAccount, error) {
 	programs, err := service.ProgramRepo.FindProgramByText(str)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return programs, nil
+	var owners []entity.UserAccount
+	for _, program := range programs {
+		up, oErr := service.FindUserProgramByProgramId(program.ProgramID)
+		if oErr != nil {
+			return nil, nil, oErr
+		}
+
+		owner, onErr := service.UserRepo.FindUserByID(uint64(up.UserAccountID))
+		if onErr != nil {
+			return nil, nil, onErr
+		}
+		owners = append(owners, owner)
+	}
+	return programs, owners, nil
 }
 
 // Save implements service.ProgramService.
