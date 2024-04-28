@@ -326,7 +326,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		}
 	}
 	program.Tasks = tasks
-	sErr := service.ProgramRepo.Update(program.ProgramID, &program)
+	sErr := service.ProgramRepo.Update(program.ProgramID, &program, labels, tasks)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
@@ -354,6 +354,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	}
 	claims := c.MustGet("claims").(*common.Claims)
 	programToUpdate, err := service.ProgramRepo.FindProgramByID(id)
+	log.Default().Printf("programToUpdate: %v", programToUpdate)
 	if err != nil {
 		return entity.Program{}, err
 	}
@@ -386,10 +387,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		strLabel = append(strLabel, label.LabelName)
 	}
 
-	user, err := service.UserRepo.FindUserByID(uint64(claims.UserID))
-	if err != nil {
-		return entity.Program{}, err
-	}
 	var tasks []entity.Task
 	for index, task := range program.Tasks {
 		err := common.Validate(task)
@@ -400,6 +397,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 		if existedTask.TaskID == 0 {
 			programId := int(programToUpdate.ProgramID)
 			newTask := entity.Task{
+				TaskID:            0,
 				TaskName:          task.TaskName,
 				TaskDescription:   task.TaskDescription,
 				Category:          task.Category,
@@ -407,7 +405,6 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 				IsSetNotification: task.IsSetNotification,
 				TimeBeforeNotify:  task.TimeBeforeNotify,
 				UserAccountID:     int(claims.UserID),
-				UserAccount:       user,
 				ProgramID:         &programId,
 			}
 			task, terr := service.TaskRepo.Save(&newTask)
@@ -429,13 +426,23 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 			}
 		}
 	}
-	programToUpdate.ProgramName = program.ProgramName
-	programToUpdate.ProgramDescription = program.ProgramDescription
-	programToUpdate.MediaURL = program.MediaURL
-	programToUpdate.ExpectedTime = program.ExpectedTime
-	programToUpdate.Labels = labels
-	programToUpdate.Tasks = tasks
-	sErr := service.ProgramRepo.Update(id, &programToUpdate)
+
+	toUpdateProgram := entity.Program{
+		ProgramID:          programToUpdate.ProgramID,
+		ProgramName:        program.ProgramName,
+		ProgramDescription: program.ProgramDescription,
+		MediaURL:           program.MediaURL,
+		ExpectedTime:       program.ExpectedTime,
+		// Labels:             labels,
+		// Tasks:              tasks,
+	}
+	// programToUpdate.ProgramName = program.ProgramName
+	// programToUpdate.ProgramDescription = program.ProgramDescription
+	// programToUpdate.MediaURL = program.MediaURL
+	// programToUpdate.ExpectedTime = program.ExpectedTime
+	// programToUpdate.Labels = labels
+	// programToUpdate.Tasks = tasks
+	sErr := service.ProgramRepo.Update(id, &toUpdateProgram, labels, tasks)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}

@@ -73,6 +73,27 @@ func (service UserServiceImpl) UpdateLabel(c *gin.Context, userModel model.UserM
 	if gEer != nil {
 		return nil, gEer
 	}
+
+	programs, err := service.ProgramRepo.FindProgramByLabelWithLimits(userModel.Labels, 10)
+	if err != nil {
+		return nil, err
+	}
+
+	var feedbacks []client.Feedback
+	for _, program := range programs {
+		feedbacks = append(feedbacks, client.Feedback{
+			FeedbackType: "view_program",
+			UserId:       userId,
+			ItemId:       strconv.Itoa(int(program.ProgramID)),
+			Timestamp:    time.Now().Format("2006-01-02"),
+		})
+	}
+
+	log.Default().Printf("feedbacks numbers: %d", len(feedbacks))
+	_, gErr := service.GorseClient.InsertFeedback(context.TODO(), feedbacks)
+	if gErr != nil {
+		return nil, gErr
+	}
 	return &user, nil
 }
 

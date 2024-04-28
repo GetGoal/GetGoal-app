@@ -13,6 +13,6 @@ type ProgramRepo interface {
 	FindProgramByLabelWithLimits(labels []string, limit int) ([]entity.Program, error)
 	FetchProgramByUserId(id uint64) ([]entity.Program, error)
 	Save(program *entity.Program) (entity.Program, error)
-	Update(id uint64, program *entity.Program) error
+	Update(id uint64, program *entity.Program, labels []entity.Label, tasks []entity.Task) error
 	Delete(program *entity.Program) error
 }
