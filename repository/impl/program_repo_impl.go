@@ -149,9 +149,9 @@ func (p *programRepoImpl) Save(program *entity.Program) (entity.Program, error) 
 }
 
 // Update implements repository.ProgramRepo.
-func (p *programRepoImpl) Update(id uint64, program *entity.Program) error {
-	tempLabel := program.Labels
-	err := p.db.Debug().Model(&program).Updates(&program).Error
+func (p *programRepoImpl) Update(id uint64, program *entity.Program, labels []entity.Label, tasks []entity.Task) error {
+
+	err := p.db.Debug().Save(&program).Error
 	if err != nil {
 		return err
 	}
@@ -163,9 +163,21 @@ func (p *programRepoImpl) Update(id uint64, program *entity.Program) error {
 	}
 
 	//add new association in label_program
-	aErr := p.db.Debug().Model(&program).Association("Labels").Append(&tempLabel)
+	aErr := p.db.Debug().Model(&program).Association("Labels").Append(&labels)
 	if aErr != nil {
 		return aErr
+	}
+
+	//clear association in task_program
+	ctErr := p.db.Debug().Model(&program).Association("Tasks").Clear()
+	if ctErr != nil {
+		return ctErr
+	}
+
+	//add new association in task_program
+	atErr := p.db.Debug().Model(&program).Association("Tasks").Append(&tasks)
+	if atErr != nil {
+		return atErr
 	}
 	return nil
 }

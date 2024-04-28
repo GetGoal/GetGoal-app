@@ -7,7 +7,7 @@ search:
   preference_limit: 20
   
 recommendation:
-  limit: 100
+  limit: 20
   
 database:
   host: localhost
