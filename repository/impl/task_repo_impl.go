@@ -87,7 +87,7 @@ func (t *taskRepoImpl) Save(task *entity.Task) (entity.Task, error) {
 // Update implements repository.TaskRepo.
 func (t *taskRepoImpl) Update(id uint64, task entity.Task) (entity.Task, error) {
 
-	err := t.db.Model(&entity.Task{}).Where("task_id = ?", id).Updates(&task).Error
+	err := t.db.Model(&entity.Task{}).Where("task_id = ?", id).Save(&task).Error
 	return task, err
 }
 
