@@ -326,7 +326,7 @@ func (service *ProgramServiceImpl) Save(programModel model.ProgramCreateOrUpdate
 		}
 	}
 	program.Tasks = tasks
-	sErr := service.ProgramRepo.Update(program.ProgramID, &program)
+	sErr := service.ProgramRepo.Update(program.ProgramID, &program, labels, tasks)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
@@ -354,6 +354,7 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 	}
 	claims := c.MustGet("claims").(*common.Claims)
 	programToUpdate, err := service.ProgramRepo.FindProgramByID(id)
+	log.Default().Printf("programToUpdate: %v", programToUpdate)
 	if err != nil {
 		return entity.Program{}, err
 	}
@@ -425,13 +426,23 @@ func (service *ProgramServiceImpl) Update(id uint64, program model.ProgramCreate
 			}
 		}
 	}
-	programToUpdate.ProgramName = program.ProgramName
-	programToUpdate.ProgramDescription = program.ProgramDescription
-	programToUpdate.MediaURL = program.MediaURL
-	programToUpdate.ExpectedTime = program.ExpectedTime
-	programToUpdate.Labels = labels
-	programToUpdate.Tasks = tasks
-	sErr := service.ProgramRepo.Update(id, &programToUpdate)
+
+	toUpdateProgram := entity.Program{
+		ProgramID:          programToUpdate.ProgramID,
+		ProgramName:        program.ProgramName,
+		ProgramDescription: program.ProgramDescription,
+		MediaURL:           program.MediaURL,
+		ExpectedTime:       program.ExpectedTime,
+		// Labels:             labels,
+		// Tasks:              tasks,
+	}
+	// programToUpdate.ProgramName = program.ProgramName
+	// programToUpdate.ProgramDescription = program.ProgramDescription
+	// programToUpdate.MediaURL = program.MediaURL
+	// programToUpdate.ExpectedTime = program.ExpectedTime
+	// programToUpdate.Labels = labels
+	// programToUpdate.Tasks = tasks
+	sErr := service.ProgramRepo.Update(id, &toUpdateProgram, labels, tasks)
 	if sErr != nil {
 		return entity.Program{}, sErr
 	}
